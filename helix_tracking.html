@@ -1,0 +1,65 @@
+<style>
+	.title {
+		background-color: red;
+		color: white;
+		text-align: center;
+		font-size: 18px;
+		font-weight: bold;
+	}
+	.main_header {
+		font-size: 18px;
+		background-color: #e2e2e2;
+		font-weight: bold;
+	}
+	.main_header_text {
+		font-size: 18px;
+		column-span: 10;
+		text-align: left;
+	}
+	.cell {
+		background-color: #999999;
+		text-align: center;
+		font-weight: bold;
+	}
+</style>
+<table border="1" bordercolordark="#000000" bordercolorlight="#000000" cellpadding="3" cellspacing="0">
+	<tr>
+		<td colspan="13" class="title">Roterra - HELIX MATERIAL TRACKING FORM</td>
+	</tr>
+	<tr>
+		<td class="main_header">JOB NUMBER:</td>
+		<td class="main_header_text" colspan="6"><%=rswomtf("workorder_id")%></td>
+		<td class="main_header">DATE:</td>
+		<td class="main_header_text" colspan="6"><%=rswomtf("created_on")%></td>
+	</tr>
+	<tr>
+		<td class="main_header">CUSTOMER:</td>
+		<td class="main_header_text" colspan="6"><%=customer%></td>
+		<td class="main_header">PROJECT:</td>
+		<td class="main_header_text" colspan="6"><%=rsproject("project")%></td>
+	</tr>
+	<tr>
+		<td class="cell">PILE #</td>
+		<td class="cell" colspan="2">DESCRIPTION</td>
+		<td class="cell">Quantity</td>
+		<td class="cell">HELIX HEAT # 1</td>
+		<td class="cell">Quantity</td>
+		<td class="cell">HELIX HEAT # 2</td>
+		<td class="cell">Quantity</td>
+		<td class="cell">HELIX HEAT # 3</td>
+		<td class="cell">Quantity</td>
+		<td class="cell">HELIX HEAT # 4</td>
+		<td class="cell">Quantity</td>
+		<td class="cell">SHOP INITIALS</td>
+	</tr>
+	<tr>
+		<td class="cell"><strong>Quantity</strong></td>
+		<td class="cell" colspan="11"><strong>Description</strong></td>
+		<td class="cell"><strong>SHOP INITIALS</strong></td>
+	</tr>
+	<tr>
+		<td><%=rspile("quantity")%></td>
+		<td colspan="11"><%=rspile("line_item_desc")%></td>
+		<td></td>
+	</tr>
+</table>

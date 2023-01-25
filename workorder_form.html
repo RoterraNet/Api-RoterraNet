@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+   </head>
+   <body>
+      <style> 
+         table {font-family:Arial, Helvetica, sans-serif; font-size:14px} 
+         .table_heaers{}
+         .border {border-style: solid; border-width:1px;}
+         .border-bottom {border-bottom-style:solid; border-bottom-width:1px;
+         }
+         .border-center {border-style: solid; border-width:1px; text-align: center}
+         .bold {font-weight:bold}
+         .bg-grey{background-color: #cccccc}
+         .right{text-align: right}
+         .center {text-align: center}
+         .bg-grey-border-bold-center {background-color: #cccccc; font-weight: bold; border-style: solid; border-width:1px; text-align: center;}
+         .font-size7 {font-size: 7}
+      </style>
+      <table cellpadding="3" cellspacing="0" border="0" width="800" height="" align="center">
+         <tr>
+            <td colspan="6" align="center" style="padding-left: 120px" class="bold">Shop Workorde</td>
+            <td></td>
+         </tr>
+         <tr>
+            <td colspan="7" align="center" style="font-size: 18px" class="bold">Workorder Number: =rswo("workorder_id")%</td>
+         </tr>
+         <tr>
+            <td colspan="7">&nbsp;</td>
+         </tr>
+         <tr>
+            <td class="header">Customer:</td>
+            <td></td>
+            <td class="border-bottom">=customer</td>
+            <td></td>
+            <td class="header">Date:</td>
+            <td></td>
+            <td class="border-bottom">=rswo("created_on")</td>
+         </tr>
+         <tr>
+            <td class="header">Contact:</td>
+            <td></td>
+            <td class="border-bottom">=contact</td>
+            <td></td>
+            <td class="header">Date Required:</td>
+            <td></td>
+            <td class="border-bottom">=rswo("required_date")</td>
+         </tr>
+         <tr>
+            <td class="header">Phone:</td>
+            <td></td>
+            <td class="border-bottom">=phone</td>
+            <td></td>
+            <td class="header">Purchasing Agent:</td>
+            <td></td>
+            <td class="border-bottom"> 
+            </td>
+         </tr>
+         <tr>
+            <td class="header">Billing Address:</td>
+            <td></td>
+            <td class="border-bottom">=address</td>
+            <td></td>
+            <td> RUSH:</td>
+            <td></td>
+            <td class="border-bottom"  if rswo("rush") = 0 then else bgcolor="red" end if > if rswo("rush") = 0 thenNO else YES end if </td>
+            <!--</td>-->
+         </tr>
+         <tr>
+            <td class="header">Project:</td>
+            <td></td>
+            <td class="border-bottom">=rsproject("project")</td>
+            <td></td>
+            <td  class="header">Roterra Install:</td>
+            <td></td>
+            <td class="border-bottom">if rsproject("type") =2 thenYeselseNoend if</td>
+         <tr>
+            <td class="header">Quote:</td>
+            <td></td>
+            <td class="border-bottom">=rsproject("quote_id")</td>
+            <td></td>
+            <td colspan="3"></td>
+         </tr>
+         <tr>
+            <td class="header">Purchase Order:</td>
+            <td></td>
+            <td class="border-bottom">=rswo("purchase_order")</td>
+            <td></td>
+            <td class="header">Special Requirements:</td>
+            <td></td>
+            <td class="border-bottom"> 
+               if rswo("special_requirements")= "on" then <strong>Yes</strong>else Noend if 
+            </td>
+         </tr>
+         <tr>
+            <td colspan="5">&nbsp;</td>
+         </tr>
+         <tr>
+            <td class="bg-grey-border-bold-center" >Line</td>
+            <td class="bg-grey-border-bold-center" >Quantity</td>
+            <td colspan=4 class="bg-grey-border-bold-center" >Description</td>
+            <td class="bg-grey-border-bold-center" >Inspected By/On</td>
+         </tr>
+         <tr class="border"></tr>
+         <td class="border-center" >=count</td>
+         <td class="border-center" ></td>
+         <td class="border" colspan="4" >=rspile("line_item_desc")if len(rspile("comment"))>0 then - =rspile("comment")end if</td>
+         <td class="border-center" ></td>
+         </tr> 
+         <tr class="border">
+            <td class="border-center" >=count</td>
+            <td class="border-center" >=rspile("quantity")</td>
+            <td class="border" colspan="4" >=rspile("line_item_desc")if len(rspile("comment"))>0 then - =rspile("comment")end if</td>
+            <td class="border-center" ></td>
+         </tr>
+         end if 
+         count = count + 1 
+         rspile.movenext 
+         wend 
+         <tr>
+            <td colspan="7">&nbsp;</td>
+         </tr>
+         <tr>
+            <td colspan="7"  class="bg-grey-border-bold-center">Notes:</td>
+         </tr>
+         <tr>
+            <td colspan="7" class="border">=rswo("notes")</td>
+         </tr>
+         <tr>
+            <td colspan="7">&nbsp;</td>
+         </tr>
+         <tr>
+            <td colspan="3" align="right" class="bold">Production Review</td>
+            <td></td>
+            <td class="border-bottom"></td>
+            <td class="bold">Date:</td>
+            <td class="border-bottom"></td>
+         </tr>
+         <tr>
+            <td colspan="3" align="right" class="bold">Shop Foreman Review</td>
+            <td></td>
+            <td class="border-bottom"></td>
+            <td class="bold">Date:</td>
+            <td class="border-bottom"></td>
+         </tr>
+         <tr>
+            <td colspan="3" align="right" class="bold">Shop Foreman Workorder Completion</td>
+            <td></td>
+            <td class="border-bottom"></td>
+            <td class="bold">Date:</td>
+            <td class="border-bottom"></td>
+         </tr>
+         <tr>
+            <td colspan="7">&nbsp;</td>
+         </tr>
+         <tr>
+            <td colspan="7">&nbsp;</td>
+         </tr>
+         <tr>
+            <td colspan="3" align="right" class="bold">Production Sign off</td>
+            <td></td>
+            <td class="border-bottom"></td>
+            <td class="bold">Date:</td>
+            <td class="border-bottom"></td>
+         </tr>
+         <tr>
+            <td colspan="7">&nbsp;</td>
+         </tr>
+         <tr>
+            <td colspan="7" style="font-size: 7pt"><b>Production Review:</b></td>
+         </tr>
+         <tr>
+            <td colspan="7" style="font-size: 7pt">Drawings attached for each item, Drawings match the work order descriptions, Welding fillet size, Drive Hole Configuration, Quantity Anomalies IE: 4 Piles, 5 caps, Special Instructions and Highlight 
+            </td>
+         </tr>
+         <tr>
+            <td>&nbsp;</td>
+         </tr>
+         <tr>
+            <td colspan="7" style="font-size: 7pt"><b>Shop Foreman Review:</b></td>
+         </tr>
+         <tr>
+            <td colspan="7" style="font-size: 7pt">Materials available to complete the job, Special Instructions 
+            </td> 
+         </tr>
+          if rswo("rush") = 1 then
+         <tr>
+            <td colspan="7" style="font-size: 50pt">
+               <center>RUSH</center>
+            </td>
+         </tr>
+          end if  
+      </table>
+   </body>
+</html>
