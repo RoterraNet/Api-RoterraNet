@@ -18,7 +18,7 @@ router.post('/', async (req, res) => {
 			.whereRaw(`UPPER(user_name) = ?`, [username.toLocaleUpperCase()])
 			.andWhere({ deleted: 0 })
 			.returning('password');
-		console.log('findUser', findUser);
+
 		if (findUser.length > 0 && Boolean(userpwd === findUser[0].password.replace(/\s+/g, ''))) {
 			const userPerm = await knex(getUsersPermissionsDB)
 				.whereRaw(`UPPER(user_name) = ?`, [username.toLocaleUpperCase()])

@@ -25,7 +25,12 @@ router.get('/', async (req, res) => {
 		url,
 	};
 
-	await axios(options).then((graphRes) => res.status(200).send(graphRes.data.access_token));
+	await axios(options)
+		.then((graphRes) => res.status(200).send(graphRes.data.access_token))
+		.catch((error) => {
+			console.log(error);
+			res.status(500).json(error);
+		});
 });
 
 module.exports = router;

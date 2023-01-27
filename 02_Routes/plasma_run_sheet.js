@@ -8,6 +8,7 @@ const SearchBuilder = require('./RouteCreaters/RouteHelpers/SearchBuilder');
 const { postUserNotification } = require('../02_Routes/userNotifications/userNotifications');
 const subMonths = require('date-fns/subMonths');
 const format = require('date-fns/format');
+const { includes } = require('lodash');
 
 const sixMonthAgo = format(subMonths(new Date(), 6), 'yyyy-MM-dd');
 
@@ -50,11 +51,33 @@ router.get(`/table`, async (req, res) => {
 		.orderBy('id', 'desc')
 		.where({ deleted: false })
 		// .distinctOn('id')
+
 		.paginate({
 			perPage: perPage,
 			currentPage: page,
 			isLengthAware: true,
 		});
+	const ids = [];
+	paginatedTable.data.map((each) => {
+		ids.push(each.id);
+	});
+
+	const itemList = await knex(getPlasmaRunSheetItemsDB)
+		.select('plasma_run_sheet_id', 'workorder_name')
+		.whereIn('plasma_run_sheet_id', ids)
+		.whereNotNull('workorder_name');
+
+	paginatedTable.data.map((each) => {
+		each.workorders = [];
+		itemList.map((eachItem) => {
+			if (
+				eachItem.plasma_run_sheet_id === each.id &&
+				!each.workorders.includes(eachItem.workorder_name)
+			) {
+				each.workorders.push(eachItem.workorder_name);
+			}
+		});
+	});
 
 	res.json(paginatedTable);
 });
@@ -71,7 +94,7 @@ router.get('/:id/items', async (req, res) => {
 		.select('*')
 		.where({ plasma_run_sheet_id: id })
 		.orderBy('id', 'asc');
-	console.log(itemList);
+
 	res.json(itemList);
 });
 
@@ -128,7 +151,6 @@ router.put('/sheet/complete', async (req, res) => {
 router.put('/items', async (req, res) => {
 	try {
 		const { values } = req.body;
-		console.log(values);
 
 		const updatedData = await knex(postPlasmaRunSheetItemsDB)
 			.update(values.update)
@@ -171,7 +193,6 @@ router.post('/items', async (req, res) => {
 			width: item.width,
 		}));
 
-		console.log('fieldsToInsert');
 		const itemList = await knex(postPlasmaRunSheetItemsDB).insert(fieldsToInsert);
 		res.json({ msg: 'Plasma Sheet Items were added', color: 'success' });
 	} catch (error) {
@@ -195,11 +216,6 @@ router.get('/optionsList', async (req, res) => {
 		.select('thickness as size', 'id')
 		.orderBy('sortorder', 'asc');
 
-	// const sheetSizeList = await knex(getPlasma_run_sheet_sizesDB)
-	// 	.select('id', 'size')
-	// 	.orderBy('size', 'acs');
-
-	console.log(sheetSizeList);
 	res.json({
 		workorderList: workordersList,
 		idSizeList: idSizeList,
