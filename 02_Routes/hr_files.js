@@ -1,3 +1,4 @@
+const { yearsToMonths } = require('date-fns');
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const knex = require('../01_Database/connection');
@@ -9,12 +10,46 @@ const postHrFilesDB = database.postHrFilesDB;
 // / -> GET ALL FILES
 router.get('/', async (req, res) => {
 	const { type } = req.query;
-	const getAllFiles = await knex(getHrFilesDB)
-		.select('hr_file_id', 'file_name', 'url', 'section')
-		.where({ deleted_by: null })
-		.andWhere(type, '=', true)
-		.orderBy('file_name', 'asc');
-	res.json(getAllFiles);
+	try {
+		if (type !== 'news_letters') {
+			const getAllFiles = await knex(getHrFilesDB)
+				.select('hr_file_id', 'file_name', 'url', 'section')
+				.where({ deleted_by: null })
+				.andWhere(type, '=', true)
+				.orderBy('file_name', 'asc');
+			res.json(getAllFiles);
+		} else {
+			const rawSql = knex.raw(`DATE_PART('year', date) AS year`);
+			const getAllYears = await knex(getHrFilesDB)
+				.select(rawSql)
+				.whereNotNull('date')
+				.groupByRaw(`DATE_PART('year', date)`);
+
+			const getAllFiles = await knex(getHrFilesDB)
+				.select('hr_file_id', 'file_name', 'url', 'section', 'date')
+				.where({ deleted_by: null })
+				.andWhere(type, '=', true)
+				.orderBy('date', 'asc')
+				.whereNotNull('date');
+
+			getAllYears.map((date) => {
+				date.newsLetters = [];
+				getAllFiles.map((newsLetter) => {
+					if (date.year == new Date(newsLetter.date).getFullYear()) {
+						date.newsLetters.push(newsLetter);
+					}
+				});
+			});
+
+			res.json(getAllYears);
+		}
+	} catch (error) {
+		console.log(error);
+		return res.status(503).send({
+			message: 'This is an error!',
+			error: error,
+		});
+	}
 });
 
 router.post('/', async (req, res) => {
