@@ -54,6 +54,8 @@ app.use('/hrfiles', require('./02_Routes/hr_files'));
 app.use('/calendarevents', require('./02_Routes/calendar_events'));
 app.use('/industries', require('./02_Routes/industries'));
 app.use('/itprojects', require('./02_Routes/it_projects'));
+
+app.use('/logistics', require('./02_Routes/Projects/Logistics/logistics.js'));
 app.use('/mtrs', require('./02_Routes/mtrs.js'));
 app.use('/mtrfiles', require('./02_Routes/mtr_files.js'));
 // mtr_details => Joined Route 		=> Accessible in mtr_details.js file
