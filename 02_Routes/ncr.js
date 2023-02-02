@@ -30,7 +30,10 @@ router.get(`/table`, async (req, res) => {
 			'defect_code',
 			'detail',
 			'quantity',
-			'status'
+			'status',
+			'labor_cost',
+			'other_cost',
+			'material_cost'
 		)
 		.where({ deleted: false })
 		.paginate({
@@ -55,6 +58,7 @@ router.get('/:id', async (req, res) => {
 			'created_by',
 			'created_by_name',
 			'classification_name',
+			'classification',
 			'supplier_id',
 			'supplier_id',
 			'supplier_name',
