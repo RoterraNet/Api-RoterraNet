@@ -42,6 +42,7 @@ router.get(`/table`, async (req, res) => {
 			'sheet_width',
 			'created_on',
 			'completed',
+			'completed_date',
 			'rush'
 		)
 		.modify((builder) => {
