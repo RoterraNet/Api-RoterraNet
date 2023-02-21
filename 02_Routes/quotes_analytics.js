@@ -155,4 +155,116 @@ router.get('/getQuoteUsers', async (req, res) => {
 	});
 	res.json({ deletedUsersList: deletedUsersList, activeUsersList: activeUsersList });
 });
+
+router.get('/quote_analytics_table', async (req, res) => {
+	const searchQuery = JSON.parse(req.query.search);
+
+	const usersList = req.query.usersList;
+
+	const getAllUsers = await knex(getQuotesAnalyticsDB)
+		.select('assigned_to_id', 'assigned_to_name')
+		.whereBetween('created_on', [searchQuery.start, searchQuery.finish])
+		.modify((builder) => {
+			if (usersList) {
+				builder.whereIn('assigned_to_id', usersList);
+			}
+		})
+		.distinctOn('assigned_to_id');
+
+	const getAllQuotes = await knex(getQuotesAnalyticsDB)
+		.select('category', 'assigned_to_id')
+		.sum({ total_value: 'est_total_value' })
+		.whereBetween('created_on', [searchQuery.start, searchQuery.finish])
+		.modify((builder) => {
+			if (usersList) {
+				builder.whereIn('assigned_to_id', usersList);
+			}
+		})
+		.groupBy('view_quotes_analysis.category', 'view_quotes_analysis.assigned_to_id');
+
+	const counts = await knex(getQuotesAnalyticsDB)
+		.select('category', 'assigned_to_id')
+		.count('category')
+		.whereBetween('created_on', [searchQuery.start, searchQuery.finish])
+		.modify((builder) => {
+			if (usersList) {
+				builder.whereIn('assigned_to_id', usersList);
+			}
+		})
+		.groupBy('view_quotes_analysis.category', 'view_quotes_analysis.assigned_to_id')
+		.orderBy('count', 'asc');
+
+	getAllUsers.map((user) => {
+		user.deleted = 0;
+		user.notBid = 0;
+		user.unknown = 0;
+		user.won = 0;
+		user.lost = 0;
+		user.deletedCount = 0;
+		user.notBidCount = 0;
+		user.unknownCount = 0;
+		user.wonCount = 0;
+		user.lostCount = 0;
+
+		// getAllUsers.totalWon = 0;
+
+		getAllQuotes.map((eachQuote) => {
+			if (user?.assigned_to_id == eachQuote?.assigned_to_id) {
+				if (eachQuote.category === 0) {
+					user.deleted = eachQuote.total_value;
+				}
+				if (eachQuote.category === 1) {
+					user.notBid = eachQuote.total_value;
+				}
+				if (eachQuote.category === 9) {
+					user.unknown = eachQuote.total_value;
+				}
+				if (eachQuote.category === 2) {
+					user.won = eachQuote.total_value;
+				}
+				if (eachQuote.category === 3) {
+					user.lost = eachQuote.total_value;
+				}
+			}
+		});
+
+		counts.map((eachQuote) => {
+			if (user?.assigned_to_id == eachQuote?.assigned_to_id) {
+				if (eachQuote.category === 0) {
+					user.deletedCount = eachQuote.count;
+				}
+				if (eachQuote.category === 1) {
+					user.notBidCount = eachQuote.count;
+				}
+				if (eachQuote.category === 9) {
+					user.unknownCount = eachQuote.count;
+				}
+				if (eachQuote.category === 2) {
+					user.wonCount = eachQuote.count;
+				}
+				if (eachQuote.category === 3) {
+					user.lostCount = eachQuote.count;
+				}
+			}
+		});
+	});
+
+	// const sql = knex.raw(
+	// 	`TO_CHAR(DATE_TRUNC('month',created_on), 'Mon-YY') as month, COUNT(quote_id) as count`
+	// );
+
+	// const monthStats = await knex(getQuotesAnalyticsDB)
+	// 	.select(sql)
+	// 	.groupByRaw(`DATE_TRUNC('month', created_on)`)
+	// 	.whereBetween('created_on', [searchQuery.start, searchQuery.finish])
+	// 	.modify((builder) => {
+	// 		if (userSearch.length) {
+	// 			builder.whereIn('assigned_to_id', userSearch);
+	// 		}
+	// 	})
+	// 	.orderByRaw(`DATE_TRUNC('month',created_on)`);
+
+	res.json(getAllUsers);
+});
+
 module.exports = router;

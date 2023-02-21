@@ -23,6 +23,8 @@ router.get('/', async (req, res) => {
 			const getAllYears = await knex(getHrFilesDB)
 				.select(rawSql)
 				.whereNotNull('date')
+				.orderByRaw("DATE_PART('year', date) asc")
+				// .orderBy('date', 'asc');
 				.groupByRaw(`DATE_PART('year', date)`);
 
 			const getAllFiles = await knex(getHrFilesDB)

@@ -3,9 +3,7 @@ const router = express.Router();
 const knex = require('../01_Database/connection');
 
 const deleteRoute = require('./RouteCreaters/delete');
-const postRoute = require('./RouteCreaters/post');
-const getRoute = require('./RouteCreaters/get');
-const getTableRoute = require('./RouteCreaters/getTable');
+
 const putRoute = require('./RouteCreaters/put');
 
 const database = require('../01_Database/database');
@@ -19,10 +17,6 @@ const datefns = require('date-fns');
 
 const today_now = datefns.format(new Date(), "yyyy-MM-dd'T'HH:MM:ssxxx");
 const today_date = datefns.format(new Date(), 'yyyy-MM-dd');
-const oneWeekFromToday_now = datefns.add(new Date(today_date), { weeks: 1 });
-
-const oneYearFromNow = datefns.add(new Date(), { months: 3 });
-const oneYearAgoFromNow = datefns.sub(new Date(), { months: 3 });
 
 // /calendarevent/current' -> GET
 /* GETS ALL IN and OUT Data ---
