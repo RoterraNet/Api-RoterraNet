@@ -9,6 +9,7 @@ const { postUserNotification } = require('../02_Routes/userNotifications/userNot
 const subMonths = require('date-fns/subMonths');
 const format = require('date-fns/format');
 const { includes } = require('lodash');
+const authorize = require('./Authorization/authorization');
 
 const sixMonthAgo = format(subMonths(new Date(), 6), 'yyyy-MM-dd');
 

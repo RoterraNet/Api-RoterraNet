@@ -6,6 +6,7 @@ const knex = require('../01_Database/connection');
 const postRoute = require('./RouteCreaters/post');
 const putRoute = require('./RouteCreaters/put');
 const { postUserNotification } = require('./userNotifications/userNotifications');
+const authorize = require('./Authorization/authorization');
 
 const getNcrDB = database.getNcrDB;
 const postNcrDB = database.postNcrDB;
@@ -47,10 +48,10 @@ router.get(`/table`, async (req, res) => {
 
 putRoute.editById(router, getNcrDB, postNcrDB, '', 'id');
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', authorize(), async (req, res) => {
 	const { id } = req.params;
 
-	const paginatedTable = await knex(getNcrDB)
+	const ncrDetail = await knex(getNcrDB)
 		.select(
 			'id',
 			'project_id',
@@ -88,7 +89,7 @@ router.get('/:id', async (req, res) => {
 		.where({ deleted: false })
 		.andWhere({ id: id });
 
-	res.json(paginatedTable);
+	res.json(ncrDetail);
 });
 
 router.post('/', async (req, res) => {
