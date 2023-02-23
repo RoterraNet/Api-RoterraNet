@@ -464,7 +464,6 @@ router.get('/tableDownload/download', async (req, res) => {
 		queryParams[each] === 'true' && newSearch.push(each);
 	});
 
-	console.log(newSearch);
 	const data = await knex(users)
 		.select(newSearch)
 		.from(users)
