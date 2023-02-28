@@ -6,51 +6,6 @@ const { format } = require('date-fns');
 const SearchBuilder = require('../../RouteCreaters/RouteHelpers/SearchBuilder');
 const getWorkordersItemsDetailsDB = database.getWorkordersItemsDetailsDB;
 
-// router.get(`/table`, async (req, res) => {
-// 	const page = req.query.page;
-// 	const perPage = req.query.perPage;
-
-// 	const search = Object.keys(JSON.parse(req.query.search));
-// 	const newArrayCleaned = [];
-
-// 	search.map((each) => {
-// 		const parsedObj = JSON.parse(req.query.search)[each];
-// 		parsedObj.filterBy !== '' && newArrayCleaned.push(parsedObj);
-// 	});
-
-// 	console.log(newArrayCleaned);
-// 	const paginatedTable = await knex(getWorkordersItemsDetailsDB)
-// 		.select(
-// 			'workorder_item_detail_name',
-// 			'pipe_approved_on',
-// 			'pipe_approved_name',
-// 			'pipe_od',
-// 			'pipe_wall',
-// 			'pipe_length',
-// 			'helix_1_thickness',
-// 			'helix_2_thickness',
-// 			'helix_4_thickness',
-// 			'helix_4_thickness',
-// 			'helix_1_diameter',
-// 			'helix_2_diameter',
-// 			'helix_4_diameter',
-// 			'helix_4_diameter'
-// 		)
-// 		.modify((builder) => {
-// 			SearchBuilder(newArrayCleaned, builder);
-// 		})
-// 		.whereNotNull('pipe_approved_on')
-// 		.orderBy('pipe_approved_on', 'desc')
-
-// 		.paginate({
-// 			perPage: perPage,
-// 			currentPage: page,
-// 			isLengthAware: true,
-// 		});
-
-// 	res.json(paginatedTable);
-// });
-
 router.get(`/table`, async (req, res) => {
 	const { start, size, filters, sorting, globalFilter } = req.query;
 

@@ -124,6 +124,7 @@ app.use(
 
 app.use('/workorderinspections', require('./02_Routes/workorders_items_details_inspections'));
 app.use('/workorderStats', require('./02_Routes/Workorders/WorkorderStats/WorkorderStats'));
+app.use('/workorderAnalytics', require('./02_Routes/Workorders/WorkorderStats/workorderAnalytics'));
 
 app.use('/MailerSendRoutes', require('./04_Emails/MailerSend/MailerSendRoutes'));
 

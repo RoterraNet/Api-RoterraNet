@@ -383,7 +383,8 @@ router.put('/workorder/approval', async (req, res) => {
 			'workorder_id',
 			'workorder_item_id'
 		)
-		.where('workorder_id', '=', workorder_id);
+		.where('workorder_id', '=', workorder_id)
+		.andWhere({ deleted: 0 });
 
 	const response2 = await knex(getUsersPermissionsDB)
 		.select('workorder_limit_self')
@@ -427,7 +428,7 @@ router.put('/workorder/approval', async (req, res) => {
 		}
 
 		// Email to requester Manager
-		workorder_self_approval_email(created_workorder, workorderItemsDetail, managerWorkEmail);
+		// workorder_self_approval_email(created_workorder, workorderItemsDetail, managerWorkEmail);
 
 		// // goes to manuf Group
 		workorder_self_approval_email(
