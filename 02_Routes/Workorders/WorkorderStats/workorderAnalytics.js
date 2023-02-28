@@ -9,7 +9,7 @@ const authorize = require('../../Authorization/authorization');
 const getWorkordersItemsDetailsDB = database.getWorkordersItemsDetailsDB;
 const getPlasmaRunSheetsDB = database.getPlasmaRunSheetsDB;
 
-router.get('/pipe_processed/', authorize({ workorder_manager: false }), async (req, res) => {
+router.get('/pipe_processed/', authorize({ workorder_manager: true }), async (req, res) => {
 	const { start, end } = req.query;
 
 	try {
@@ -35,6 +35,7 @@ router.get('/pipe_processed/', authorize({ workorder_manager: false }), async (r
 
 		res.json(allPipeSorted);
 	} catch (error) {
+		console.log(error);
 		res.status(500).json({ errorMsg: 'something went wrong', error: error });
 	}
 });
