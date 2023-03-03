@@ -22,15 +22,20 @@ const authorize = (credentials = {}) => {
 			if (err) {
 				return res.status(403).json({ message: 'Invalid token' });
 			}
-			const getPermissions = await knex(getUsersPermissionsDB)
-				.where({
-					user_id: decodedToken?.user_id,
-				})
-				.andWhere(credentials);
-			if (!getPermissions[0]) {
-				return res.status(401).json({ message: 'Unauthorized User' });
-			} else {
-				next();
+			try {
+				const getPermissions = await knex(getUsersPermissionsDB)
+					.where({
+						user_id: decodedToken?.user_id,
+					})
+					.andWhere(credentials);
+
+				if (!getPermissions[0]) {
+					return res.status(401).json({ message: 'Unauthorized User' });
+				} else {
+					next();
+				}
+			} catch (error) {
+				res.status(401).json({ message: 'Unauthorized User' });
 			}
 		});
 	};

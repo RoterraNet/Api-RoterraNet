@@ -41,6 +41,9 @@ exports.postEquipmentDB = 'roterranet.equipment';
 exports.getEquipmentTypesDB = 'roterranet.equipment_types';
 exports.postEquipmentTypesDB = 'roterranet.equipment_types';
 
+exports.getEquipmentScheduleDB = 'roterranet.view_equipment_schedule';
+exports.postEquipmentSchedulesDB = 'roterranet.equipment_schedule';
+
 exports.getGeneralLedgerDB = 'roterranet.general_ledger2';
 
 exports.getGeneralLedgerDetailsDB = 'roterranet.general_ledger_details2';

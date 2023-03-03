@@ -70,6 +70,7 @@ router.get(`/table`, async (req, res) => {
 		.modify((builder) => {
 			SearchBuilder(newArrayCleaned, builder);
 		})
+		.orderBy('project_id', 'desc')
 
 		.paginate({
 			perPage: perPage,

@@ -104,6 +104,19 @@ exports.AddUpdateAllUserPermissions = async (values, user_id) => {
 		user_id
 	);
 	await AddUpdatePermissions('roterranet.users', ['company'], values, user_id);
+
+	await AddUpdatePermissions(
+		'roterranet.logistics_permissions',
+		[
+			'logistics_create',
+			'logistics_read',
+			'logistics_update',
+			'logistics_delete',
+			'logistics_manager',
+		],
+		values,
+		user_id
+	);
 };
 
 const AddUpdatePermissions = async (postPermissionDB, permissions_names, values, user_id) => {
