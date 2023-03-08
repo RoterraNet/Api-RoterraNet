@@ -11,10 +11,11 @@ const postEquipmentSchedulesDB = database.postEquipmentSchedulesDB;
 const getProjectsDB = database.getProjectsDB;
 
 router.get('/allEquipment', authorize(), async (req, res) => {
+	const rawSql = knex.raw(`CONCAT(year, ' ', make_model ) as tip`);
 	const allEquipment = await knex(getEquipmentDB)
-		.select('equipment_id as id', 'unit_number as title')
+		.select('equipment_id as id', 'unit_number as title', 'type', rawSql)
 		.where({ deleted: 0 })
-		.whereIn('asset_type', ['Excavator', 'Skidsteer'])
+		.whereIn('type', [4, 21, 7, 23, 16])
 		.orderBy('unit_number', 'asc');
 
 	res.json(allEquipment);
@@ -49,11 +50,12 @@ router.get('/equipmentSchedule', authorize({ logistics_read: true }), async (req
 				'start_time as start_date',
 				'end_time as end_date',
 				'color',
-				'bgcolor',
-				'selectedbgcolor',
+				'bg_color',
+				'selected_bgcolor',
 				raw
 			)
-			.where({ deleted: false });
+			.where({ deleted: false })
+			.orderBy('id', 'asc');
 		res.status(200).json(allEquipmentSchedule);
 	} catch (e) {
 		console.log(e);
@@ -123,6 +125,23 @@ router.post('/equipmentSchedule', authorize({ logistics_create: true }), async (
 	try {
 		const allEquipmentSchedule = await knex(postEquipmentSchedulesDB).insert({ ...values });
 		res.status(200).json({ message: 'The Schedule was updated', color: 'success' });
+	} catch (e) {
+		console.log(e);
+		res.status(500).json({
+			message: 'Something Went Wrong',
+			error: e,
+		});
+	}
+});
+
+router.put('/deleteEquipmentSchedule', authorize({ logistics_delete: true }), async (req, res) => {
+	const values = req.body;
+
+	try {
+		const deleteOne = await knex(postEquipmentSchedulesDB)
+			.update({ ...values.delete })
+			.where({ id: values.id });
+		res.status(202).json({ message: 'The item was deleted', color: 'success' });
 	} catch (e) {
 		console.log(e);
 		res.status(500).json({
