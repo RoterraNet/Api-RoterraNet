@@ -40,18 +40,52 @@ router.use('/:id/projects_notes', require('./projects_notes'));
 // /project -> PATCH -> TABLE -> get all projects paginated
 getTableRoute.getTableData(router, getProjectsDB);
 
+// router.get(`/table`, async (req, res) => {
+// 	const page = req.query.page;
+// 	const perPage = req.query.perPage;
+
+// 	const search = Object.keys(JSON.parse(req.query.search));
+// 	const newArrayCleaned = [];
+
+// 	search.map((each) => {
+// 		const parsedObj = JSON.parse(req.query.search)[each];
+// 		parsedObj.filterBy !== '' && newArrayCleaned.push(parsedObj);
+// 	});
+
+// 	const paginatedTable = await knex(getProjectsDB)
+// 		.select(
+// 			'workorder_id',
+// 			'id',
+// 			'project',
+// 			'customer_name',
+// 			'customer_id',
+// 			'contact_id',
+// 			'contact_name',
+// 			'projectmanager_name',
+// 			'project_status',
+// 			'project_technology',
+// 			'contract_total',
+// 			'invoiced_total'
+// 		)
+// 		.modify((builder) => {
+// 			SearchBuilder(newArrayCleaned, builder);
+// 		})
+// 		.orderBy('project_id', 'desc')
+
+// 		.paginate({
+// 			perPage: perPage,
+// 			currentPage: page,
+// 			isLengthAware: true,
+// 		});
+
+// 	res.json(paginatedTable);
+// });
+
 router.get(`/table`, async (req, res) => {
-	const page = req.query.page;
-	const perPage = req.query.perPage;
+	const { start, size, filters, sorting, globalFilter } = req.query;
 
-	const search = Object.keys(JSON.parse(req.query.search));
-	const newArrayCleaned = [];
-
-	search.map((each) => {
-		const parsedObj = JSON.parse(req.query.search)[each];
-		parsedObj.filterBy !== '' && newArrayCleaned.push(parsedObj);
-	});
-
+	const parsedColumnSorting = JSON.parse(sorting);
+	const parsedColumnFilters = JSON.parse(filters);
 	const paginatedTable = await knex(getProjectsDB)
 		.select(
 			'workorder_id',
@@ -67,18 +101,34 @@ router.get(`/table`, async (req, res) => {
 			'contract_total',
 			'invoiced_total'
 		)
+
 		.modify((builder) => {
-			SearchBuilder(newArrayCleaned, builder);
+			if (!!parsedColumnFilters?.length) {
+				parsedColumnFilters.map((filter) => {
+					const { id: columnId, value: filterValue } = filter;
+					builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+				});
+			}
 		})
 		.orderBy('project_id', 'desc')
-
 		.paginate({
-			perPage: perPage,
-			currentPage: page,
+			perPage: size,
+			currentPage: start,
 			isLengthAware: true,
 		});
 
-	res.json(paginatedTable);
+	if (!!parsedColumnSorting?.length) {
+		const sort = parsedColumnSorting[0];
+		const { id, desc } = sort;
+		paginatedTable.data.sort((a, b) => {
+			if (desc) {
+				return a[id] < b[id] ? 1 : -1;
+			}
+			return a[id] > b[id] ? 1 : -1;
+		});
+	}
+
+	res.status(200).json(paginatedTable);
 });
 
 /**
