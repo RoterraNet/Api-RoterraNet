@@ -31,7 +31,6 @@ router.use('/:id/po_details', require('./po_details'));
 router.get('/', async (req, res) => {
 	const { type, job_number } = req.query;
 
-	console.log('made it PO Get All');
 	let query = knex(getPoDB);
 
 	if (type == 'total_cost') {
@@ -120,7 +119,9 @@ router.delete('/:id', async (req, res) => {
 	const { id } = req.params;
 	const { user_id } = req.body;
 
-	const deletedEntry = await knex(postDB).update({ deleted_by: user_id, deleted_on: current_day, deleted: 1, status: 1 }).where(delete_one_id_name, '=', id);
+	const deletedEntry = await knex(postDB)
+		.update({ deleted_by: user_id, deleted_on: current_day, deleted: 1, status: 1 })
+		.where(delete_one_id_name, '=', id);
 
 	res.json({ deletedEntry });
 });

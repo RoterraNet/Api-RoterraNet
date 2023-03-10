@@ -20,6 +20,7 @@ const { sendMail } = require('../04_Emails/00_mailer');
 const today_now = datefns.format(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS');
 
 const { createProjectEmailBody } = require('../04_Emails/Project Emails/newProjectEmail');
+const authorize = require('./Authorization/authorization');
 
 const makeEmailObject = (emailBody, contact_email, email_subject) => {
 	const emailObject = {
@@ -81,11 +82,12 @@ getTableRoute.getTableData(router, getProjectsDB);
 // 	res.json(paginatedTable);
 // });
 
-router.get(`/table`, async (req, res) => {
+router.get(`/table`, authorize({ project_read: true }), async (req, res) => {
 	const { start, size, filters, sorting, globalFilter } = req.query;
 
-	const parsedColumnSorting = JSON.parse(sorting);
 	const parsedColumnFilters = JSON.parse(filters);
+	const parsedColumnSorting = JSON.parse(sorting);
+
 	const paginatedTable = await knex(getProjectsDB)
 		.select(
 			'workorder_id',
@@ -101,32 +103,39 @@ router.get(`/table`, async (req, res) => {
 			'contract_total',
 			'invoiced_total'
 		)
-
 		.modify((builder) => {
-			if (!!parsedColumnFilters?.length) {
+			if (!!parsedColumnFilters.length) {
 				parsedColumnFilters.map((filter) => {
 					const { id: columnId, value: filterValue } = filter;
-					builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+					console.log(columnId);
+					if (columnId === 'contract_total') {
+						builder.whereBetween(
+							columnId,
+							filterValue.map((each) => (each === '' ? 0 : parseFloat(each)))
+						);
+					} else {
+						builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+					}
 				});
 			}
+			if (!!parsedColumnSorting.length) {
+				parsedColumnSorting.map((sort) => {
+					const { id: columnId, desc: sortValue } = sort;
+
+					const sorter = sortValue ? 'desc' : 'acs';
+					console.log(columnId, sortValue, sorter);
+					builder.orderBy(columnId, sorter);
+				});
+			} else {
+				builder.orderBy('project_id', 'desc');
+			}
 		})
-		.orderBy('project_id', 'desc')
+
 		.paginate({
 			perPage: size,
 			currentPage: start,
 			isLengthAware: true,
 		});
-
-	if (!!parsedColumnSorting?.length) {
-		const sort = parsedColumnSorting[0];
-		const { id, desc } = sort;
-		paginatedTable.data.sort((a, b) => {
-			if (desc) {
-				return a[id] < b[id] ? 1 : -1;
-			}
-			return a[id] > b[id] ? 1 : -1;
-		});
-	}
 
 	res.status(200).json(paginatedTable);
 });

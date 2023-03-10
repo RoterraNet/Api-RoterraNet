@@ -15,7 +15,6 @@ const authorize = (credentials = {}) => {
 
 		// Extract the token from the authorization header
 		const token = authHeader.split(' ')[1];
-		console.log(token);
 
 		// Verify the token
 		jwt.verify(token, process.env.SIGNATURE, async (err, decodedToken) => {

@@ -85,9 +85,9 @@ exports.po_add = (router) => {
 				// console.log({ ...po_detail, po_id: po_id, gl_id: gl_id, gl_detail_id: gl_detail_id });
 				return { ...po_detail, po_id: po_id, gl_id: gl_id, gl_detail_id: gl_detail_id };
 			});
-			console.log({ New_po_details_AND_po_id });
+
 			await knex(postPoDetailDB).insert(New_po_details_AND_po_id);
-			console.log('user_id', user_id, 'po_id', po_id);
+
 			// PO Approved?
 			const po_message = await po_approval_process(user_id, po_id);
 
@@ -434,6 +434,7 @@ const po_approval_process = async (user_id, po_id) => {
 		const manager_info = await recursiveFindManagerWithPOLimit(user_id, po_total_cost);
 		//		=> Send Manager Email to Approve PO
 		po_request_approval_email(Created_po, Created_po_details, manager_info.work_email);
+
 		// 		=> Sent Email To Admin (Morgan) notifying about PO
 		po_request_approval_email(Created_po, Created_po_details, 'mresler@roterra.com');
 
