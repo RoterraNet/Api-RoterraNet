@@ -127,7 +127,7 @@ router.get(`/table`, authorize({ project_read: true }), async (req, res) => {
 					builder.orderBy(columnId, sorter);
 				});
 			} else {
-				builder.orderBy('project_id', 'desc');
+				builder.orderBy('id', 'desc');
 			}
 		})
 
