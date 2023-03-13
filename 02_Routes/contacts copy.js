@@ -20,16 +20,22 @@ const today_now = datefns.format(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS');
 
 // /contacts -> GET
 router.get('/', async (req, res) => {
-	const { customer } = req.query;
-	const sql = knex(getContactDB).select('contact_id', 'full_name').where('deleted', '=', 0);
-	let getEntries;
+	try {
+		const { customer } = req.query;
+		const sql = knex(getContactDB).select('contact_id', 'full_name').where('deleted', '=', 0);
+		let getEntries;
 
-	// ?customer=customer_id -> Get Contacts who work for Customer X
-	if (customer) {
-		getEntries = await sql.andWhere('customer', '=', customer);
+		// ?customer=customer_id -> Get Contacts who work for Customer X
+		if (customer) {
+			getEntries = await sql.andWhere('customer', '=', customer);
+		}
+
+		res.json(getEntries);
+	} catch (e) {
+		console.log(e);
+
+		res.json({ msg: 'unable to pull customer contacts', error: e });
 	}
-
-	res.json(getEntries);
 });
 
 // /contacts -> PATCH -> TABLE -> get all contacts paginated
@@ -48,9 +54,23 @@ putRoute.editById(router, getContactDB, postContactDB, today_now, 'contact_id');
 deleteRoute.deleteRoute(router, postContactDB, today_now, 'contact_id');
 
 // contacts/:id/project -> PATCH -> TABLE -> get projects by that contact paginated
-getTableRoute.getTableData_ById(router, 'project', getContactDB, 'contact_id', getProjectsDB, 'contact');
+getTableRoute.getTableData_ById(
+	router,
+	'project',
+	getContactDB,
+	'contact_id',
+	getProjectsDB,
+	'contact'
+);
 
 // contacts/:id/quotes  -> PATCH -> TABLE -> get quotes by that contact paginated
-getTableRoute.getTableData_ById(router, 'quotes', getContactDB, 'contact_id', getQuotesDB, 'contact_id');
+getTableRoute.getTableData_ById(
+	router,
+	'quotes',
+	getContactDB,
+	'contact_id',
+	getQuotesDB,
+	'contact_id'
+);
 
 module.exports = router;
