@@ -22,12 +22,16 @@ router.post('/', async (req, res) => {
 		// Receive ALL Of PO Detail
 		if (type == 'receive_all') {
 			// Get Relevant PO Detail
-			const response1 = await knex(getPoDetailDB).where('po_detail_id', '=', values.po_detail_id);
+			const response1 = await knex(getPoDetailDB).where(
+				'po_detail_id',
+				'=',
+				values.po_detail_id
+			);
 			let po_detail = response1[0];
-			console.log(po_detail.sum_received_quantity, po_detail, 'made it');
+
 			if (po_detail.quantity > po_detail.sum_received_quantity) {
-				console.log('made it 2');
-				let remaining_quantity_to_receive = po_detail.quantity - po_detail.sum_received_quantity;
+				let remaining_quantity_to_receive =
+					po_detail.quantity - po_detail.sum_received_quantity;
 				newEntryId = await knex(postPoReceivedDB)
 					.insert({ ...values, received_quantity: remaining_quantity_to_receive })
 					.returning('po_receiving_id');
@@ -41,7 +45,11 @@ router.post('/', async (req, res) => {
 		}
 
 		//  -> SELECT OLD po
-		const Old_po = (await knex(getPoDB).select('sum_quantity', 'sum_received_quantity', 'status').where('po_id', '=', po_id))[0];
+		const Old_po = (
+			await knex(getPoDB)
+				.select('sum_quantity', 'sum_received_quantity', 'status')
+				.where('po_id', '=', po_id)
+		)[0];
 		if (Old_po.status == 4 || Old_po.status == 5) {
 			if (Old_po.sum_quantity <= Old_po.sum_received_quantity) {
 				await knex(postPoDB).update({ status: 5 }).where('id', '=', po_id);

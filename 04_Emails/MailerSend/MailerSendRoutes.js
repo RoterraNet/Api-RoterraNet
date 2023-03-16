@@ -9,33 +9,36 @@ router.get('/', async (req, res) => {
 	try {
 		const mailersend = new MailerSend({
 			api_key:
-				'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiNjZlMDdhM2RjYWQxYzA1MzNmYmNjMzhjNTRjN2FhODY0NDNkYWRiMWZkNTFjZjFlMWMwYmVlYTBhZDViNjc1MjEzZWU4NjA0MWIwNGQwY2MiLCJpYXQiOjE2NzA5NTAzMTguNzg2ODE2LCJuYmYiOjE2NzA5NTAzMTguNzg2ODE3LCJleHAiOjQ4MjY2MjM5MTguNzgzMTM2LCJzdWIiOiI0OTQ4OSIsInNjb3BlcyI6WyJlbWFpbF9mdWxsIiwiZG9tYWluc19mdWxsIiwiYWN0aXZpdHlfZnVsbCIsImFuYWx5dGljc19mdWxsIiwidG9rZW5zX2Z1bGwiLCJ3ZWJob29rc19mdWxsIiwidGVtcGxhdGVzX2Z1bGwiLCJzdXBwcmVzc2lvbnNfZnVsbCIsInNtc19mdWxsIiwiZW1haWxfdmVyaWZpY2F0aW9uX2Z1bGwiXX0.QuGrvYLxuNC4JjaH3Faa6RhsEPGN8PwEWoR_DmOR-sVXtzLjXl41o3npDDZtyoxT30wyIhvndrkJ_MwrlAnKFIRLyavYgMoQ8NpZRf9D2VBjkr7k1xP4YsGMutvjN4D_0sAvuTwZoUxfWh3LgnfTn6ha-1EZqEQ_9JQDi_wMHi3-Xms6Jr2Nsb-ikMOg6rBgIdEBmB9k7wZrUnsTD--9fa7lJZLHcLoDDIoGmTR2GVkROKhb09OruULxpngJNzyODTPF7bzSDj3-SByY098-aTvgyFOieMI-0u2fPzv78UPtVY-4d8X2FNZSSSWxVg6wmsGQhqGif36ZXm79kBNT1GJ84nAiF4hBMVL4K9VrMc1VnuRn76RcjG9ETqrxSQ8rrQ2IUEsLzi1eJV95vkwjUL2Z09zYbikTcUoZ0y4h-oII1M_XGE3pcP_onsYDgdW-JALQu2JpwqHD3NY1HM6igXkBB013oNrDPIzhVSp2TQHdv92izU25gz7NEt5ss7Z4DE8f8gD1-fXd6qp6KpoKkPRulU43Et_c2jGPUO1pfpPMVc6OOVl7wD5APArUJaoiFkBkCac-BGiunniEtj9nPmDnUNeHFYEctcusrB6EdVI99ZxvvtkVyiVwPRlWrWJCXzbTVCgDHyeq0Ef7s44JM5xExn2K4JPZjTYZKSepilw',
+				'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiNDc2NTk4YzYwOTU2OGFhNzM0MDMyYjg0ZWM4MzhlMjM2YzQwNWUxOTI1M2UzOGNmYjY2N2MzMmU1MDY4YTE1M2JjM2ZhNDFlYmM4MjQ5YTEiLCJpYXQiOjE2Nzg5ODc3ODEuNDg5MTQ3LCJuYmYiOjE2Nzg5ODc3ODEuNDg5MTUsImV4cCI6NDgzNDY2MTM4MS40ODIyNiwic3ViIjoiNDk0ODkiLCJzY29wZXMiOlsiZW1haWxfZnVsbCIsImRvbWFpbnNfZnVsbCIsImFjdGl2aXR5X2Z1bGwiLCJhbmFseXRpY3NfZnVsbCIsInRva2Vuc19mdWxsIiwid2ViaG9va3NfZnVsbCIsInRlbXBsYXRlc19mdWxsIiwic3VwcHJlc3Npb25zX2Z1bGwiLCJzbXNfZnVsbCIsImVtYWlsX3ZlcmlmaWNhdGlvbl9mdWxsIiwiaW5ib3VuZHNfZnVsbCIsInJlY2lwaWVudHNfZnVsbCIsInNlbmRlcl9pZGVudGl0eV9mdWxsIl19.dap6jtcKGwmD2njH8zKhMIxRarsm9YUiyvavYDebK56D6XyU1pA_y7ZC05qwGLw1FzFK6MSC_4Z5ftTbtgNl2j6GrWZI4IIi1xn1FgyoOwxSQeAH1lNQhbbSMKQdv8d15IfU_-b66GSWndLtLzikfTSpWfI-X-2wTuqKGqvyCTpNCbvjtm9MtVGau6YtRMW-bffymn1agT5t2QA-3hN2LO3T_CL_ok1SpXtxQZTObpJnbCKY8tBuL4ZbOGNV3RkRyP0KO_yFU5uVV93KtHySm3FgNfWQkDRC9d_HuTIykr_oV1QDUMztDaoePRKDHKOmPclJsrNuOo9CGQvvXKfl2lN6Fy84tvTq2gXFoy_yKtotorFJE8f0_Yfl3lXwUyAZVmvNa1ptAcWxLGJylPts-GXj8pnip_4YWkquPAsXzdQnSB39AEEVP8w4OBZZhI7j_wJANR65kJUPvdhbaLD02kEa-j_Fz-UINwUrxfFKdgH4_VaYBFjgIwMvrTi0wYGuuHJQ3tpGoh9Xp2ggOCmm6bC0hCdHKKLpBYZCW5_3Yf5vpObpvUJ7FpHaofsbytlSOyFg-e_aiBq8heAoM8L0T96n7II6pfmbHrPt3O1Kb6gObmH6OmxckNBpukLADw6NR4LI8Cm1LxwpNizkz2hV7xwi8YCvU6_lA7u1yguldc0',
 		});
 
 		const recipients = [new Recipient('halghanim@roterra.com', 'Hasan')];
 
 		const personalization = [
 			{
-				email: 'hasanalghanim@gmail.com',
+				email: 'halghanim@roterra.com',
 				data: {
-					name: 'This is a test',
-					status: 'test',
-					account_name: 'aaa',
-					project_name: 'aaa',
-					support_email: 'test',
+					po: [
+						{
+							name: '55',
+							amount: '444',
+						},
+					],
+					account_name: 'Hasan Al',
 				},
 			},
 		];
 
 		const emailParams = new EmailParams()
-			.setFrom('roterra@roterra.com')
-			.setFromName('TEST From')
+			.setFrom('halghanim@roterra.com')
+			.setFromName('Your Name')
 			.setRecipients(recipients)
 			.setSubject('Subject')
 			.setTemplateId('pq3enl6x2pml2vwr')
 			.setPersonalization(personalization);
 
 		const sendEmail = await mailersend.send(emailParams);
+
 		console.log(sendEmail);
 		res.json(sendEmail);
 	} catch (e) {
