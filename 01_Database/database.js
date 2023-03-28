@@ -50,6 +50,8 @@ exports.getGeneralLedgerDetailsDB = 'roterranet.general_ledger_details2';
 
 exports.getHelixDiameterDB = 'roterranet.helix_diameter1';
 
+exports.getHelixOptionsDB = 'roterranet.helix_options';
+
 exports.getHrFilesDB = 'roterranet.view_hr_files';
 exports.postHrFilesDB = 'roterranet.hr_files';
 
@@ -156,6 +158,9 @@ exports.postProjectsDB = 'roterranet.projects_new2';
 
 exports.getProjectsContactsDB = 'roterranet.view_projects_contacts';
 exports.postProjectsContactsDB = 'roterranet.projects_contacts';
+
+exports.getProjectSheetItemListDB = 'roterranet.view_project_sheet_project_list';
+exports.postProjectSheetItemListDB = 'roterranet.project_sheet_project_list';
 
 exports.getQuotesDB = 'roterranet.view_quotes';
 exports.postQuotesDB = 'roterranet.quotes5';
