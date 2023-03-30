@@ -34,13 +34,16 @@ router.get('/get_sheet/:project_id', authorize(), async (req, res) => {
 				'count',
 				'compression_load',
 				'lateral_load',
-				'tension_load'
+				'tension_load',
+				'deleted',
+				'deleted_on',
+				'deleted_by'
 			)
-			.where({ project_id: project_id })
-			.orderBy('hp_num', 'asc');
+			.andWhere({ project_id: project_id });
 
 		res.json(listOfSheetItems);
 	} catch (error) {
+		console.log(error);
 		res.status(500).json({ msg: 'something went wrong,', error: error });
 	}
 });
@@ -61,6 +64,16 @@ router.put('/updateRow/', authorize(), async (req, res) => {
 
 	const UpdateOne = await knex(postProjectSheetItemListDB)
 		.update({ ...values.update })
+		.where({ id: values.id });
+
+	res.json(UpdateOne);
+});
+
+router.put('/deleteRow/', authorize(), async (req, res) => {
+	const values = req.body;
+	console.log(values);
+	const UpdateOne = await knex(postProjectSheetItemListDB)
+		.update({ ...values.delete })
 		.where({ id: values.id });
 
 	res.json(UpdateOne);
