@@ -162,6 +162,9 @@ exports.postProjectsContactsDB = 'roterranet.projects_contacts';
 exports.getProjectSheetItemListDB = 'roterranet.view_project_sheet_project_list';
 exports.postProjectSheetItemListDB = 'roterranet.project_sheet_project_list';
 
+exports.getProjectSheetItemListDetailsDB = 'roterranet.view_project_sheet_item_detail';
+exports.postProjectSheetItemListDetailsDB = 'roterranet.project_sheet_item_detail';
+
 exports.getQuotesDB = 'roterranet.view_quotes';
 exports.postQuotesDB = 'roterranet.quotes5';
 

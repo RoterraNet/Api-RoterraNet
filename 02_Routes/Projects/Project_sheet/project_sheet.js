@@ -59,9 +59,6 @@ router.get('/options/', authorize(), async (req, res) => {
 
 router.put('/updateRow/', authorize(), async (req, res) => {
 	const values = req.body;
-
-	console.log(values.update);
-
 	const UpdateOne = await knex(postProjectSheetItemListDB)
 		.update({ ...values.update })
 		.where({ id: values.id });
@@ -83,8 +80,6 @@ router.post('/newRows/', authorize(), async (req, res) => {
 	const { amountOfNewRows, created_by, created_on, project_id } = req.body;
 
 	for (let i = 0; amountOfNewRows > i; i++) {
-		console.log('addone');
-
 		const addToDb = await knex(postProjectSheetItemListDB).insert({
 			created_by,
 			created_on,
