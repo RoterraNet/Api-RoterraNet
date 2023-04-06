@@ -14,9 +14,9 @@ router.get('/allEquipment', authorize(), async (req, res) => {
 	const rawSql = knex.raw(`CONCAT(year, ' ', make_model ) as tip`);
 	const allEquipment = await knex(getEquipmentDB)
 		.select('equipment_id as id', 'unit_number as title', 'type', rawSql)
-		.where({ deleted: 0 })
-		.whereIn('type', [4, 21, 7, 23, 16])
-		.orderBy('unit_number', 'asc');
+		.whereNotNull('equipment_schedule_row')
+		.andWhere({ deleted: 0 })
+		.orderBy('equipment_schedule_row', 'asc');
 
 	res.json(allEquipment);
 });
@@ -24,8 +24,8 @@ router.get('/allEquipment', authorize(), async (req, res) => {
 router.get('/allOptions', authorize(), async (req, res) => {
 	const allEquipment = await knex(getEquipmentDB)
 		.select('equipment_id as value', 'unit_number as label')
-		.where({ deleted: 0 })
-		.whereIn('asset_type', ['Excavator', 'Skidsteer'])
+		.whereNotNull('equipment_schedule_row')
+		.andWhere({ deleted: 0 })
 		.orderBy('unit_number', 'asc');
 
 	const allOptions = await knex(getProjectsDB)
