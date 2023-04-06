@@ -4,7 +4,10 @@ const {
 	getProjectSheetItemListDB,
 	getPipesDB,
 	getHelixOptionsDB,
+	postProjectSheetItemListDetailsDB,
+	getProjectSheetItemListDetailsDB,
 } = require('../../../01_Database/database');
+
 const router = express.Router();
 const knex = require('../../../01_Database/connection');
 const authorize = require('../../Authorization/authorization');
@@ -59,11 +62,48 @@ router.get('/options/', authorize(), async (req, res) => {
 
 router.put('/updateRow/', authorize(), async (req, res) => {
 	const values = req.body;
-	const UpdateOne = await knex(postProjectSheetItemListDB)
-		.update({ ...values.update })
-		.where({ id: values.id });
 
-	res.json(UpdateOne);
+	const checkPileListRows = await knex(getProjectSheetItemListDetailsDB)
+		.select('id')
+		.where({ project_sheet_item_list: values.id })
+		.andWhere({ deleted: false });
+
+	if (checkPileListRows.length === 0) {
+		const updateOneObject = await knex(postProjectSheetItemListDB)
+			.update({ ...values.update })
+			.where({ id: values.id })
+			.returning('*');
+
+		const activeCount = await knex(getProjectSheetItemListDetailsDB)
+			.count()
+			.where({ project_id: updateOneObject[0].project_id })
+			.andWhere({ deleted: false });
+
+		let totalCount = parseInt(activeCount[0].count) + 1;
+
+		for (let i = 0; i < values.update.count; i++) {
+			console.log('totalCount', totalCount);
+			const insertArray = {
+				project_id: updateOneObject[0].project_id,
+				item_number: totalCount,
+				project_sheet_item_list: updateOneObject[0].id,
+			};
+			const listOfSheetItemsDetail = await knex(postProjectSheetItemListDetailsDB).insert({
+				...insertArray,
+				created_on: new Date(),
+			});
+			totalCount++;
+		}
+
+		console.log('add to detail by count');
+	} else {
+		console.log('noirmal update');
+		// 	const updateOne = await knex(postProjectSheetItemListDB)
+		// .update({ ...values.update })
+		// .where({ id: values.id });
+	}
+
+	res.json(checkPileListRows);
 });
 
 router.put('/deleteRow/', authorize(), async (req, res) => {
@@ -88,6 +128,18 @@ router.post('/newRows/', authorize(), async (req, res) => {
 	}
 
 	res.json('addeOne');
+});
+
+router.post('/updatePileSchedule/', authorize(), async (req, res) => {
+	const { created_by, created_on, project_id } = req.body;
+
+	const addToDb = await knex(postProjectSheetItemListDB).insert({
+		created_by,
+		created_on,
+		project_id,
+	});
+
+	res.json(addToDb);
 });
 
 router.post('/fakeAdd/', async (req, res) => {
