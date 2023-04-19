@@ -85,6 +85,7 @@ app.use('/plasmarunsheets', require('./02_Routes/plasma_run_sheet'));
 
 app.use('/rca', require('./02_Routes/rca'));
 
+app.use('/roterranet_versions', require('./02_Routes/RoterranetVersions/roterranet_versions'));
 // ACCESSIBLE IN FILE projects.js ///////////////////////////////////////////////////////////
 // po_notes 							=> Joined Route
 // po_contacts 							=> Joined Route

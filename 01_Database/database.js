@@ -113,6 +113,10 @@ exports.getPlasma_run_sheet_sizesDB = 'roterranet.view_plasma_run_sheet_sizes';
 exports.getPlasma_run_sheet_helix_sizesDB = 'roterranet.view_plasma_run_sheet_helix_sizes';
 exports.postPlasma_run_sheet_helix_sizesDB = 'roterranet.plasma_run_sheet_helix_sizes';
 
+exports.getRoterraNetVersionsDB = 'roterranet.view_roterranet_version';
+exports.postRoterraNetVersionsDB = 'roterranet.roterranet_version';
+// exports.postRoterraNetVersionIdDB = 'roterranet.roterranet_version_id';
+
 exports.getRcaDB = 'roterranet.view_rca';
 exports.postRcaDB = 'roterranet.rca';
 

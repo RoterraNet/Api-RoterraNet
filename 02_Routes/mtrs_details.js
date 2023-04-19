@@ -32,38 +32,37 @@ router.post('/', async (req, res) => {
 		.where({ mtr_id: values.mtr_id })
 		.andWhere({ deleted: 0 });
 
-	const dbRes = getAllHeats.map((entry) => {
-		console.log(parseInt(entry.heat), parseInt(values.heat));
+	// const dbRes = getAllHeats.map((entry) => {
+	// 	console.log(parseInt(entry.heat), parseInt(values.heat));
 
-		if (parseInt(entry.heat) === parseInt(values.heat)) {
-			return true;
-		} else {
-			return false;
-		}
-	});
-	console.log(dbRes.includes(false));
-	if (dbRes.includes(true)) {
-		console.log('dont add');
-		return res.send({ msg: 'Heat Already Exists' });
-	} else {
-		console.log('add');
+	// 	if (parseInt(entry.heat) === parseInt(values.heat)) {
+	// 		return true;
+	// 	} else {
+	// 		return false;
+	// 	}
+	// });
+	// console.log(dbRes.includes(false));
+	// if (dbRes.includes(true)) {
+	// 	console.log('dont add');
+	// 	return res.send({ msg: 'Heat Already Exists' });
+	// } else {
+	// 	console.log('add');
 
-		const postNewMTR = await knex(postMaterialTrackingDetails)
-			.insert({
-				heat: values.heat,
-				mtr_id: values.mtr_id,
-				hsheet: values.hsheet,
-				pipe: values.pipe,
-				plate: values.plate,
-				wsheet: values.wsheet,
-				plate_steel_grade: values.plate_steel_grade,
-				created_on: values.created_on,
-				created_by: values.created_by,
-			})
-			.returning('mtr_id');
+	const postNewMTR = await knex(postMaterialTrackingDetails)
+		.insert({
+			heat: values.heat,
+			mtr_id: values.mtr_id,
+			hsheet: values.hsheet,
+			pipe: values.pipe,
+			plate: values.plate,
+			wsheet: values.wsheet,
+			plate_steel_grade: values.plate_steel_grade,
+			created_on: values.created_on,
+			created_by: values.created_by,
+		})
+		.returning('mtr_id');
 
-		return res.send({ mtr_id: postNewMTR[0] });
-	}
+	return res.send({ mtr_id: postNewMTR[0] });
 });
 
 router.get('/:id', async (req, res) => {

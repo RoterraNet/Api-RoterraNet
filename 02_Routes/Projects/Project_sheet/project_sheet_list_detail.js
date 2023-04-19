@@ -12,6 +12,7 @@ const { todayDate } = require('../../../03_Utils/formatDates');
 router.get('/get_sheet_list_detail/:project_id', async (req, res) => {
 	const { project_id } = req.params;
 	const { start, size } = req.query;
+
 	try {
 		const listOfSheetItems = await knex(getProjectSheetItemListDetailsDB)
 			.select(
@@ -80,10 +81,6 @@ router.put('/build_list/', async (req, res) => {
 			.select('id', 'project_id', 'count')
 			.andWhere({ project_id: project_id })
 			.andWhere({ deleted: false });
-
-		const deleteOldRows = await knex(postProjectSheetItemListDetailsDB)
-			.update({ deleted: true })
-			.where({ project_id: project_id });
 
 		let item_number = 1;
 		for (let i = 0; i < listOfSheetItems.length; i++) {

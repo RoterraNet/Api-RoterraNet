@@ -101,7 +101,8 @@ router.get(`/table`, authorize({ project_read: true }), async (req, res) => {
 			'project_status',
 			'project_technology',
 			'contract_total',
-			'invoiced_total'
+			'invoiced_total',
+			'created_on'
 		)
 		.modify((builder) => {
 			if (!!parsedColumnFilters.length) {
