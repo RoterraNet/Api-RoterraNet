@@ -208,7 +208,7 @@ router.get('/optionsList', async (req, res) => {
 		.select('workorder_id', 'workorder_name')
 		.whereNotNull('workorder_name')
 		.orderBy('workorder_name', 'desc')
-		.limit(500);
+		.limit(1000);
 
 	const idSizeList = await knex(getPlasma_run_sheet_helix_sizesDB)
 		.select('id', 'name')

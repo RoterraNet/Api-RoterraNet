@@ -107,6 +107,7 @@ router.get('/project/stats/:id', async (req, res) => {
 		.groupBy('project_id')
 		.returning('*');
 
+	console.log(getWorkOrderTable);
 	res.status(202).send(getWorkOrderTable);
 });
 
