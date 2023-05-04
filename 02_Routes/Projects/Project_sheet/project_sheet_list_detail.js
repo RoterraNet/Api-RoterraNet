@@ -12,12 +12,12 @@ const { todayDate } = require('../../../03_Utils/formatDates');
 router.get('/get_sheet_list_detail/:project_id', async (req, res) => {
 	const { project_id } = req.params;
 	const { start, size } = req.query;
-
+	console.log(start, size);
 	try {
 		const listOfSheetItems = await knex(getProjectSheetItemListDetailsDB)
 			.select(
 				'id',
-				'project_sheet_item_list',
+				'project_sheet_item_list_id',
 				'hp_num',
 				'compression_load',
 				'lateral_load',
@@ -36,13 +36,15 @@ router.get('/get_sheet_list_detail/:project_id', async (req, res) => {
 				'installed_by',
 				'installed_on',
 				'notes',
+				'deleted_item',
 				'batter_angle',
 				'predrilled_on',
 				'predrilled_by',
-				'predrilled_depth'
+				'predrilled_depth',
+				'deleted'
 			)
 			.where({ project_id: project_id })
-			.andWhere({ deleted: false })
+			// .andWhere({ deleted: false })
 			.orderBy('item_number', 'asc')
 			.paginate({
 				perPage: size,
@@ -76,6 +78,7 @@ router.get('/get_hp_options/:project_id', async (req, res) => {
 
 router.put('/build_list/', async (req, res) => {
 	const { project_id } = req.body;
+	console.log('build');
 	try {
 		const listOfSheetItems = await knex(getProjectSheetItemListDB)
 			.select('id', 'project_id', 'count')
@@ -116,6 +119,21 @@ router.put('/update_up/', async (req, res) => {
 			.where({ id: id });
 
 		res.json(updateHpNum);
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ msg: 'something went wrong,', error: error });
+	}
+});
+
+router.put('/deleteRow/', async (req, res) => {
+	const { id, update } = req.body;
+
+	try {
+		const deleteRow = await knex(postProjectSheetItemListDetailsDB)
+			.update({ ...update })
+			.where({ id: id });
+
+		res.json(deleteRow);
 	} catch (error) {
 		console.log(error);
 		res.status(500).json({ msg: 'something went wrong,', error: error });

@@ -57,7 +57,7 @@ router.get('/options/', authorize(), async (req, res) => {
 	const rawSql = knex.raw(`CONCAT(od, ' ', '(', wall ,')') as pipe, id`);
 	const pipeOptions = await knex(getPipesDB).select(rawSql).orderBy('od', 'asc');
 	const helixOptions = await knex(getHelixOptionsDB)
-		.select('id', 'helix')
+		.select('id ', 'helix ')
 		.orderBy('helix', 'asc');
 	res.json({ pipe: pipeOptions, helix: helixOptions });
 });
@@ -79,7 +79,7 @@ router.put('/updateRow/', authorize(), async (req, res) => {
 		} else {
 			const checkPileListRows = await knex(getProjectSheetItemListDetailsDB)
 				.select('id')
-				.where({ project_sheet_item_list: values.id })
+				.where({ project_sheet_item_list_id: values.id })
 				.andWhere({ deleted: false });
 
 			if (checkPileListRows.length === 0) {
@@ -100,7 +100,7 @@ router.put('/updateRow/', authorize(), async (req, res) => {
 					const insertArray = {
 						project_id: updateOneObject[0].project_id,
 						item_number: totalCount,
-						project_sheet_item_list: updateOneObject[0].id,
+						project_sheet_item_list_id: updateOneObject[0].id,
 					};
 					const listOfSheetItemsDetail = await knex(
 						postProjectSheetItemListDetailsDB
