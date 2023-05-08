@@ -30,7 +30,11 @@ router.get('/getStats/:project_id', authorize(), async (req, res) => {
 				quantity_completed_pipe =
 					quantity_completed_pipe + parseInt(each.quantity_completed_pipe);
 			});
-			return { quantity, quantity_completed_shop, quantity_completed_pipe };
+			return {
+				quantity,
+				quantity_completed_shop,
+				quantity_completed_pipe,
+			};
 		};
 
 		const allStats = { ...totalOrder(), ...projectStats[0] };
