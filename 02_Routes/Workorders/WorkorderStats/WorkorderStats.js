@@ -22,11 +22,11 @@ router.get(`/table`, async (req, res) => {
 			'pipe_length',
 			'helix_1_thickness',
 			'helix_2_thickness',
-			'helix_4_thickness',
+			'helix_3_thickness',
 			'helix_4_thickness',
 			'helix_1_diameter',
 			'helix_2_diameter',
-			'helix_4_diameter',
+			'helix_3_diameter',
 			'helix_4_diameter',
 			'workorder_item_description'
 		)
