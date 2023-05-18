@@ -50,6 +50,7 @@ app.use('/general_ledger', require('./02_Routes/general_ledger'));
 app.use('/helix_diameter', require('./02_Routes/helix_diameter'));
 
 app.use('/hrfiles', require('./02_Routes/hr_files'));
+app.use('/humanResources', require('./02_Routes/HumanResources/HumanResourcesDashboard'));
 
 app.use('/calendarevents', require('./02_Routes/calendar_events'));
 app.use('/industries', require('./02_Routes/industries'));
