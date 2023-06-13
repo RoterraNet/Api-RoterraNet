@@ -35,7 +35,7 @@ router.get('/', async (req, res) => {
 		.where(`workorder_id`, '=', id)
 		.andWhere('deleted', '=', 0)
 		.orderBy('workorder_item_line_item', 'asc');
-	console.log(getEntry);
+	console.log('getEntry');
 	res.json(getEntry);
 });
 

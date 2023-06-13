@@ -23,7 +23,7 @@ hr_email_schedule = require('./06_Scheduled_Cron_Jobs/hr_email_schedule');
 
 scheduled_quotes_emails();
 hr_email_schedule();
-// birthday_auto_schedule();
+birthday_auto_schedule();
 
 // ROUTES ARE ALL HERE -> look at app.use("/") -> this gives you an idea of the url
 const baseRouter = require('./02_Routes/01_base_Router');
@@ -123,6 +123,7 @@ app.use('/user_notifications_settings', require('./02_Routes/notification_settin
 app.use('/user_item_tracker', require('./02_Routes/user_item_tracker'));
 app.use('/user_previous_employment', require('./02_Routes/users_previous_emplyoment'));
 
+app.use('/users_hierarchy', require('./02_Routes/Users/UsersHierarchy/usersHierarchy'));
 app.use('/workorders', require('./02_Routes/workorders'));
 app.use('/workorderheats', require('./02_Routes/workorders_heats'));
 app.use('/workorderitemsdetails', require('./02_Routes/workorders_items_details'));

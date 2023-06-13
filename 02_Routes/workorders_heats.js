@@ -10,7 +10,7 @@ const getPlasmaRunSheetItemsDB = database.getPlasmaRunSheetItemsDB;
 const subMonths = require('date-fns/subMonths');
 const format = require('date-fns/format');
 
-const sixMonthAgo = format(subMonths(new Date(), 6), 'yyyy-MM-dd');
+const sixMonthAgo = format(subMonths(new Date(), 18), 'yyyy-MM-dd');
 
 // /workorders/:id/heats -> GET ALL Heat for that Workorder
 router.get('/:id/heats', async (req, res) => {

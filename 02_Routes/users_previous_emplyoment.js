@@ -17,7 +17,8 @@ router.get('/:id', async (req, res) => {
 			'start_date',
 			'end_date',
 			'id',
-			'reason'
+			'reason',
+			'total_days'
 		)
 		.where({ user_id: user_id })
 		.andWhere({ deleted: false })

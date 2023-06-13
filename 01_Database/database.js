@@ -222,6 +222,9 @@ exports.postItemTrackingDB = 'roterranet.users_item_tracking';
 exports.getUsersAllowancesDB = 'roterranet.view_users_allowance';
 exports.postUsersAllowanceDB = 'roterranet.users_allowance';
 
+exports.getUsersReviewsDB = 'roterranet.view_users_reviews';
+exports.postUsersReviewsDB = 'roterranet.users_reviews';
+
 exports.getUsersBenefitsDB = 'roterranet.view_users_benefits';
 exports.postUsersBenefitsDB = 'roterranet.users_benefits';
 
@@ -237,6 +240,8 @@ exports.postUsersCoursesDB = 'roterranet.users_courses';
 exports.getUsersPermissionsDB = 'roterranet.view_users_permissions';
 
 exports.getUserRightsDB = 'roterranet.user_rights'; // Change to users_rights => one day
+
+exports.getUsersHierarchyDB = 'roterranet.view_users_hierarchy';
 
 exports.getWorkordersDB = 'roterranet.view_workorders';
 exports.postWorkordersDB = 'roterranet.workorders_new'; // switch to regular workorders

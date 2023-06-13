@@ -1,4 +1,4 @@
-var { cron } = require('node-cron');
+var cron = require('node-cron');
 const {
 	get_birthdays,
 	post_birthdays,
@@ -8,12 +8,20 @@ const {
 
 module.exports = () => {
 	// At 06:00 on every day runs once
-	cron.schedule('0 6 * * *', async () => {
-		await get_birthdays().then((res) =>
-			Object.keys(res).length === 0 ? null : post_birthdays(res)
-		);
-		await get_start_dates().then((res) =>
-			Object.keys(res).length === 0 ? null : post_anniversaries(res)
-		);
+
+	// '0 6 * * *',
+
+	cron.schedule('29 8 * * *', async () => {
+		console.log('cron');
+
+		await get_birthdays().then((res) => {
+			console.log(res);
+			Object.keys(res).length === 0 ? null : post_birthdays(res);
+		});
+
+		await get_start_dates().then((res) => {
+			console.log(res);
+			Object.keys(res).length === 0 ? null : post_anniversaries(res);
+		});
 	});
 };
