@@ -22,7 +22,9 @@ router.get('/', async (req, res) => {
 
 	// ?type=active -> Get plates
 	if (type == 'active') {
-		getEntries = await knex(getPlatesDB).select('thickness as plate_dimensions', 'id').orderBy('sortorder', 'asc');
+		getEntries = await knex(getPlatesDB)
+			.select('thickness as plate_dimensions', 'id')
+			.orderBy('sortorder', 'asc');
 	}
 
 	res.json(getEntries);

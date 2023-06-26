@@ -3,6 +3,7 @@ const router = express.Router();
 const knex = require('../01_Database/connection');
 const XLSX = require('xlsx');
 var nodeExcel = require('excel-export');
+const authorize = require('./Authorization/authorization');
 
 router.get('/', async (req, res) => {
 	res.render('Index');
@@ -20,8 +21,34 @@ router.get('/doggy', async (req, res) => {
 			start_time: Date.now(),
 			end_time: null,
 			timesheets: [
-				{ workorder_id: 3, workorder: '81135678-1', Line: 1, Quantity: 169, helix1: "1/2 X 16'", helix2: "1/2 X 16'", helix3: "1/2 X 16'", helix4: "1/2 X 16'", other: 'CCMC', Cut: 75, Welder: 75, QC: 75 },
-				{ workorder_id: 4, workorder: '81135678-1', Line: 1, Quantity: 169, helix1: "1/2 X 16'", helix2: "1/2 X 16'", helix3: "1/2 X 16'", helix4: "1/2 X 16'", other: 'CCMC', Cut: 75, Welder: 75, QC: 75 },
+				{
+					workorder_id: 3,
+					workorder: '81135678-1',
+					Line: 1,
+					Quantity: 169,
+					helix1: "1/2 X 16'",
+					helix2: "1/2 X 16'",
+					helix3: "1/2 X 16'",
+					helix4: "1/2 X 16'",
+					other: 'CCMC',
+					Cut: 75,
+					Welder: 75,
+					QC: 75,
+				},
+				{
+					workorder_id: 4,
+					workorder: '81135678-1',
+					Line: 1,
+					Quantity: 169,
+					helix1: "1/2 X 16'",
+					helix2: "1/2 X 16'",
+					helix3: "1/2 X 16'",
+					helix4: "1/2 X 16'",
+					other: 'CCMC',
+					Cut: 75,
+					Welder: 75,
+					QC: 75,
+				},
 			],
 		},
 		{
@@ -35,12 +62,59 @@ router.get('/doggy', async (req, res) => {
 			start_time: Date.now(),
 			end_time: Date.now(),
 			timesheets: [
-				{ workorder_id: 1, workorder: '81135678-1', Line: 1, Quantity: 169, helix1: "1/2 X 16'", helix2: "1/2 X 16'", helix3: "1/2 X 16'", helix4: "1/2 X 16'", other: 'CCMC', Cut: 75, Welder: 75, QC: 75 },
-				{ workorder_id: 2, workorder: '81135678-1', Line: 1, Quantity: 169, helix1: "1/2 X 16'", helix2: "1/2 X 16'", helix3: "1/2 X 16'", helix4: "1/2 X 16'", other: 'CCMC', Cut: 75, Welder: 75, QC: 75 },
+				{
+					workorder_id: 1,
+					workorder: '81135678-1',
+					Line: 1,
+					Quantity: 169,
+					helix1: "1/2 X 16'",
+					helix2: "1/2 X 16'",
+					helix3: "1/2 X 16'",
+					helix4: "1/2 X 16'",
+					other: 'CCMC',
+					Cut: 75,
+					Welder: 75,
+					QC: 75,
+				},
+				{
+					workorder_id: 2,
+					workorder: '81135678-1',
+					Line: 1,
+					Quantity: 169,
+					helix1: "1/2 X 16'",
+					helix2: "1/2 X 16'",
+					helix3: "1/2 X 16'",
+					helix4: "1/2 X 16'",
+					other: 'CCMC',
+					Cut: 75,
+					Welder: 75,
+					QC: 75,
+				},
 			],
 		},
-		{ user_id: 3, first_name: 'James', last_name: 'Bob', Job: 'Welder', position_name: 'Welder', station_name: 'Welding Station 1', task_name: 'Welding', start_time: Date.now(), end_time: Date.now(), timesheets: null },
-		{ user_id: 3, first_name: 'James', last_name: 'Bob', Job: 'Welder', position_name: 'Welder', station_name: 'Welding Station 1', task_name: 'Welding', start_time: null, timesheets: null },
+		{
+			user_id: 3,
+			first_name: 'James',
+			last_name: 'Bob',
+			Job: 'Welder',
+			position_name: 'Welder',
+			station_name: 'Welding Station 1',
+			task_name: 'Welding',
+			start_time: Date.now(),
+			end_time: Date.now(),
+			timesheets: null,
+		},
+		{
+			user_id: 3,
+			first_name: 'James',
+			last_name: 'Bob',
+			Job: 'Welder',
+			position_name: 'Welder',
+			station_name: 'Welding Station 1',
+			task_name: 'Welding',
+			start_time: null,
+			timesheets: null,
+		},
 	];
 	res.json({ dog: data });
 });
@@ -53,7 +127,9 @@ router.post('/search', function (req, res, next) {
 router.get('/search', async (req, res) => {
 	console.log(req.query.q);
 	const content = req.query.q;
-	const customerInfo = await knex('roterranet.customer').where('name', 'like', `%${content}%`).first();
+	const customerInfo = await knex('roterranet.customer')
+		.where('name', 'like', `%${content}%`)
+		.first();
 
 	res.render('Find', { customerInfo });
 });
@@ -107,7 +183,18 @@ router.post('/pagination', async (req, res) => {
 	if (search.length == 0) {
 		// sql = "SELECT * FROM roterranet.users LEFT JOIN roterranet.positions ON users.position = positions.position_id LEFT JOIN roterranet.company = company.company_id ON users.company WHERE deleted_by IS NULL ORDER BY first_name ASC LIMIT 10 OFFSET" + page * 10
 		user_info = await knex
-			.select('users.user_id', 'users.first_name', 'users.last_name', 'users.work_email', 'users.forklift', 'users.skidsteer', 'users.crane', 'users.loader', 'positions.position_name', 'company.legal_name')
+			.select(
+				'users.user_id',
+				'users.first_name',
+				'users.last_name',
+				'users.work_email',
+				'users.forklift',
+				'users.skidsteer',
+				'users.crane',
+				'users.loader',
+				'positions.position_name',
+				'company.legal_name'
+			)
 			.from('roterranet.users')
 			.leftJoin('roterranet.positions', 'users.position', 'positions.position_id')
 			.leftJoin('roterranet.company', 'users.company', 'company.company_id')
@@ -121,13 +208,26 @@ router.post('/pagination', async (req, res) => {
 	} else {
 		// sql = "SELECT * FROM roterranet.users LEFT JOIN roterranet.positions ON users.position = positions.position_id LEFT JOIN roterranet.company = company.company_id WHERE deleted_by IS NULL AND (first_name ilike %" + search + "% or last_name ilike %" + search + "%) ORDER BY first_name ASC LIMIT 10 OFFSET" + page * 10
 		user_info = await knex
-			.select('users.user_id', 'users.first_name', 'users.last_name', 'users.work_email', 'users.forklift', 'users.skidsteer', 'users.crane', 'users.loader', 'positions.position_name', 'company.legal_name')
+			.select(
+				'users.user_id',
+				'users.first_name',
+				'users.last_name',
+				'users.work_email',
+				'users.forklift',
+				'users.skidsteer',
+				'users.crane',
+				'users.loader',
+				'positions.position_name',
+				'company.legal_name'
+			)
 			.from('roterranet.users')
 			.leftJoin('roterranet.positions', 'users.position', 'positions.position_id')
 			.leftJoin('roterranet.company', 'users.company', 'company.company_id')
 			.where('deleted_by', null)
 			.where((builder) => {
-				builder.where('first_name', 'ilike', `%${search}%`).orWhere('last_name', 'ilike', `%${search}%`);
+				builder
+					.where('first_name', 'ilike', `%${search}%`)
+					.orWhere('last_name', 'ilike', `%${search}%`);
 			})
 			.orderBy('first_name', 'ASC')
 			.limit(10)
@@ -137,7 +237,9 @@ router.post('/pagination', async (req, res) => {
 		user_total = await knex('roterranet.users')
 			.where('deleted_by', null)
 			.where((builder) => {
-				builder.where('first_name', 'ilike', `%${search}%`).orWhere('last_name', 'ilike', `%${search}%`);
+				builder
+					.where('first_name', 'ilike', `%${search}%`)
+					.orWhere('last_name', 'ilike', `%${search}%`);
 			})
 			.count();
 	}
@@ -147,8 +249,14 @@ router.post('/pagination', async (req, res) => {
 });
 
 router.get('/excel', async (req, res) => {
-	res.setHeader('Content-Disposition', "attachment; filename='alltest1'; filename*=UTF-8''alltest1.xlsx");
-	res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+	res.setHeader(
+		'Content-Disposition',
+		"attachment; filename='alltest1'; filename*=UTF-8''alltest1.xlsx"
+	);
+	res.setHeader(
+		'Content-Type',
+		'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+	);
 
 	data = await knex.from('roterranet.users').limit(20);
 

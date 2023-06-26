@@ -14,9 +14,10 @@ const postNcrDB = database.postNcrDB;
 const getNcrDepartmentsDB = database.getNcrDepartmentsDB;
 
 router.get(`/table`, async (req, res) => {
-	const page = req.query.page;
-	const perPage = req.query.perPage;
-
+	const { start, size, filters, sorting, globalFilter } = req.query;
+	const parsedColumnFilters = JSON.parse(filters);
+	const parsedColumnSorting = JSON.parse(sorting);
+	const sql = knex.raw('LEFT(detail, 50) AS summary ');
 	const paginatedTable = await knex(getNcrDB)
 		.select(
 			'id',
@@ -25,8 +26,12 @@ router.get(`/table`, async (req, res) => {
 			'created_by_name',
 			'created_by',
 			'classification',
+			'department_label',
+			'customer_name',
+			'supplier_name',
 			'supplier_id',
 			'customer_id',
+			'classification_name',
 			'internal_department',
 			'defect_code',
 			'detail',
@@ -34,15 +39,63 @@ router.get(`/table`, async (req, res) => {
 			'status',
 			'labor_cost',
 			'other_cost',
-			'material_cost'
+			'material_cost',
+			'total_value',
+			'rca_id',
+			sql
 		)
 		.where({ deleted: false })
+		.modify((builder) => {
+			if (!!parsedColumnFilters.length) {
+				parsedColumnFilters.map((filter) => {
+					const { id: columnId, value: filterValue } = filter;
+					if (columnId === 'total_value') {
+						builder.whereBetween(
+							columnId,
+							filterValue.map((each) => (each === '' ? 0 : parseFloat(each)))
+						);
+					} else {
+						builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+					}
+				});
+			}
+			if (!!parsedColumnSorting.length) {
+				parsedColumnSorting.map((sort) => {
+					const { id: columnId, desc: sortValue } = sort;
+					const sorter = sortValue ? 'desc' : 'acs';
+					console.log(columnId, sortValue, sorter);
+					builder.orderBy(columnId, sorter);
+				});
+			} else {
+				builder.orderBy('id', 'desc');
+			}
+		})
 		.paginate({
-			perPage: perPage,
-			currentPage: page,
+			perPage: size,
+			currentPage: start,
 			isLengthAware: true,
 		});
 
+	res.json(paginatedTable);
+});
+
+router.get(`/table/download`, authorize(), async (req, res) => {
+	const sql = knex.raw('LEFT(detail, 50) AS summary ');
+	const paginatedTable = await knex(getNcrDB)
+		.select(
+			'id',
+			'created_on',
+			'created_by_name',
+			'classification',
+			'department_label',
+			'classification_name',
+			'internal_department',
+			'defect_code',
+			'status',
+			'total_value',
+			sql
+		)
+		.where({ deleted: false });
 	res.json(paginatedTable);
 });
 

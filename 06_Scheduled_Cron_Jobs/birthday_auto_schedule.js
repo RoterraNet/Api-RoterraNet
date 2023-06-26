@@ -11,7 +11,7 @@ module.exports = () => {
 
 	// '0 6 * * *',
 
-	cron.schedule('29 8 * * *', async () => {
+	cron.schedule('0 7 * * *', async () => {
 		console.log('cron');
 
 		await get_birthdays().then((res) => {
