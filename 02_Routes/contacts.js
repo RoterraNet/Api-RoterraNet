@@ -35,6 +35,51 @@ router.get('/', async (req, res) => {
 	res.json(getEntries);
 });
 
+router.get('/table/', async (req, res) => {
+	const { start, size, filters, sorting, globalFilter } = req.query;
+
+	const parsedColumnFilters = JSON.parse(filters);
+	const parsedColumnSorting = JSON.parse(sorting);
+
+	const paginatedTable = await knex(getContactDB)
+		.select(
+			'full_name',
+			'contact_id',
+			'sales_type_name',
+			'title',
+			'phone',
+			'email',
+			'city',
+			'province'
+		)
+		.modify((builder) => {
+			if (!!parsedColumnFilters.length) {
+				parsedColumnFilters.map((filter) => {
+					const { id: columnId, value: filterValue } = filter;
+					builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+				});
+			}
+			if (!!parsedColumnSorting.length) {
+				parsedColumnSorting.map((sort) => {
+					const { id: columnId, desc: sortValue } = sort;
+					const sorter = sortValue ? 'desc' : 'acs';
+					builder.orderBy(columnId, sorter);
+				});
+			} else {
+				builder.orderBy('first_name', 'asc');
+			}
+		})
+		.where({ deleted: 0 })
+
+		.paginate({
+			perPage: size,
+			currentPage: start,
+			isLengthAware: true,
+		});
+
+	res.status(200).json(paginatedTable);
+});
+
 // /customer/:id/contacts  -> PATCH -> TABLE -> get quotes by that cutomer paginated
 
 router.patch('/:id/contacts', async (req, res) => {
