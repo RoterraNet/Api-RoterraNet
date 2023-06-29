@@ -129,7 +129,7 @@ app.use('/workorderheats', require('./02_Routes/workorders_heats'));
 app.use('/workorderitemsdetails', require('./02_Routes/workorders_items_details'));
 app.use(
 	'/workorder_update_line_items',
-	require('./02_Routes/workorders/Workorder/WorkorderLineItems')
+	require('./02_Routes/Workorders/Workorder/WorkorderLineItems')
 );
 
 app.use('/workorderinspections', require('./02_Routes/workorders_items_details_inspections'));
