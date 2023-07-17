@@ -7,12 +7,12 @@ const {
 const router = express.Router();
 const knex = require('../../../01_Database/connection');
 const authorize = require('../../Authorization/authorization');
-const { todayDate } = require('../../../03_Utils/formatDates');
 
 router.get('/get_sheet_list_detail/:project_id', async (req, res) => {
 	const { project_id } = req.params;
-	const { start, size } = req.query;
-	console.log(start, size);
+	const { start, size, deleted } = req.query;
+	console.log(req.query);
+
 	try {
 		const listOfSheetItems = await knex(getProjectSheetItemListDetailsDB)
 			.select(
@@ -44,7 +44,7 @@ router.get('/get_sheet_list_detail/:project_id', async (req, res) => {
 				'deleted'
 			)
 			.where({ project_id: project_id })
-			// .andWhere({ deleted: false })
+			.andWhere({ deleted: deleted })
 			.orderBy('item_number', 'asc')
 			.paginate({
 				perPage: size,
@@ -59,7 +59,7 @@ router.get('/get_sheet_list_detail/:project_id', async (req, res) => {
 	}
 });
 
-router.get('/get_hp_options/:project_id', async (req, res) => {
+router.get('/get_hp_options/:project_id', authorize(), async (req, res) => {
 	const { project_id } = req.params;
 
 	try {
@@ -67,8 +67,8 @@ router.get('/get_hp_options/:project_id', async (req, res) => {
 			.select('hp_num', 'id')
 			.where({ project_id: project_id })
 			.andWhere({ deleted: false })
+			.orderByRaw('LENGTH(hp_num)')
 			.orderBy('hp_num', 'asc');
-
 		res.json(listOfSheetItems);
 	} catch (error) {
 		console.log(error);
@@ -76,7 +76,7 @@ router.get('/get_hp_options/:project_id', async (req, res) => {
 	}
 });
 
-router.put('/build_list/', async (req, res) => {
+router.put('/build_list/', authorize(), async (req, res) => {
 	const { project_id } = req.body;
 	console.log('build');
 	try {
@@ -110,7 +110,7 @@ router.put('/build_list/', async (req, res) => {
 	}
 });
 
-router.put('/update_up/', async (req, res) => {
+router.put('/update_up/', authorize(), async (req, res) => {
 	const { id, update } = req.body;
 
 	try {
@@ -125,7 +125,7 @@ router.put('/update_up/', async (req, res) => {
 	}
 });
 
-router.put('/deleteRow/', async (req, res) => {
+router.put('/deleteRow/', authorize(), async (req, res) => {
 	const { id, update } = req.body;
 
 	try {

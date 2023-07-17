@@ -35,6 +35,54 @@ router.get('/', async (req, res) => {
 	res.json(getEntry);
 });
 
+router.get('/table/', async (req, res) => {
+	const { start, size, filters, sorting, globalFilter } = req.query;
+
+	const parsedColumnFilters = JSON.parse(filters);
+	const parsedColumnSorting = JSON.parse(sorting);
+
+	const paginatedTable = await knex(getCustomerDB)
+		.select(
+			'name',
+			'industry1_name',
+			'customer_type_name',
+			'customer_id',
+			'website',
+			'blacklisted',
+			'phone',
+			'email',
+			'city',
+			'province'
+		)
+
+		.modify((builder) => {
+			if (!!parsedColumnFilters.length) {
+				parsedColumnFilters.map((filter) => {
+					const { id: columnId, value: filterValue } = filter;
+					builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+				});
+			}
+			if (!!parsedColumnSorting.length) {
+				parsedColumnSorting.map((sort) => {
+					const { id: columnId, desc: sortValue } = sort;
+					const sorter = sortValue ? 'desc' : 'acs';
+					builder.orderBy(columnId, sorter);
+				});
+			} else {
+				builder.orderBy('name', 'asc');
+			}
+		})
+		.where({ deleted: 0 })
+
+		.paginate({
+			perPage: size,
+			currentPage: start,
+			isLengthAware: true,
+		});
+
+	res.status(200).json(paginatedTable);
+});
+
 // /customer -> PATCH -> TABLE -> get all customers paginated
 getTableRoute.getTableData(router, getCustomerDB);
 

@@ -15,6 +15,7 @@ const { todayDate } = require('../../../03_Utils/formatDates');
 
 router.get('/get_sheet/:project_id', authorize(), async (req, res) => {
 	const { project_id } = req.params;
+	const { deleted } = req.query;
 	try {
 		const listOfSheetItems = await knex(getProjectSheetItemListDB)
 			.select(
@@ -44,7 +45,10 @@ router.get('/get_sheet/:project_id', authorize(), async (req, res) => {
 				'item_count'
 			)
 			.andWhere({ project_id: project_id })
-			.orderBy('hp_num', 'asc');
+			.orderByRaw('LENGTH(hp_num)')
+			.orderBy('hp_num', 'asc')
+
+			.where({ deleted: deleted });
 
 		res.json(listOfSheetItems);
 	} catch (error) {
@@ -62,21 +66,44 @@ router.get('/options/', authorize(), async (req, res) => {
 	res.json({ pipe: pipeOptions, helix: helixOptions });
 });
 
+router.put('/updateOneRow/', authorize(), async (req, res) => {
+	const { id, update } = req.body;
+
+	try {
+		const updateOneCll = await knex(postProjectSheetItemListDB)
+			.update({ ...update })
+			.where({ id: id });
+		res.status(202).json({
+			color: 'success',
+			msg: 'Update Completed press refresh to load most recent',
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({
+			error: error,
+			color: 'error',
+			msg: 'Unable to update. Try again later',
+		});
+	}
+});
 router.put('/updateRow/', authorize(), async (req, res) => {
 	const values = req.body;
 	delete values?.update?.item_count;
 	try {
+		console.log(values?.update);
 		const totalOfPiles = await knex(getProjectSheetItemListDetailsDB)
 			.select('id')
 			.where({ project_id: values?.update?.project_id })
 			.andWhere({ deleted: false });
 
 		if (totalOfPiles.length === 0) {
+			// Updates Project schedule WITHOUT updating the pile list
 			const updateOneObject = await knex(postProjectSheetItemListDB)
 				.update({ ...values.update })
 				.where({ id: values.id })
 				.returning('*');
 		} else {
+			// checks if new Pile in schedule is in pile list
 			const checkPileListRows = await knex(getProjectSheetItemListDetailsDB)
 				.select('id')
 				.where({ project_sheet_item_list_id: values.id })
