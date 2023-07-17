@@ -3,7 +3,7 @@ const router = express.Router();
 const knex = require('../01_Database/connection');
 const XLSX = require('xlsx');
 var nodeExcel = require('excel-export');
-const authorize = require('./Authorization/authorization');
+
 
 router.get('/', async (req, res) => {
 	res.render('Index');
