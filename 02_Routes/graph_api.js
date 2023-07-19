@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const qs = require('qs');
-
+const { getQuotesGraphApiDB } = require('../01_Database/database');
+const knex = require('../01_Database/connection');
 /**
  * Function that Gets token from Graph api.
  * @author   Hasan Alghanim
@@ -31,6 +32,15 @@ router.get('/', async (req, res) => {
 			console.log(error);
 			res.status(500).json(error);
 		});
+});
+
+router.get('/site_id', async (req, res) => {
+	const { quote_id } = req.query;
+
+	const getSiteId = await knex(getQuotesGraphApiDB)
+		.where('start_id', '<=', quote_id)
+		.andWhere('end_id', '>=', quote_id);
+	res.json(getSiteId);
 });
 
 module.exports = router;

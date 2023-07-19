@@ -46,6 +46,8 @@ router.get('/table/', async (req, res) => {
 			'full_name',
 			'contact_id',
 			'sales_type_name',
+			'customer_name',
+			'customer as customer_id',
 			'title',
 			'phone',
 			'email',

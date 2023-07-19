@@ -184,6 +184,8 @@ exports.postQuotesStatusDB = 'roterranet.quotes_status';
 exports.getQuotesPermissionsDB = 'roterranet.quotes_permissions';
 exports.postQuotesPermissionsDB = 'roterranet.quotes_permissions';
 
+exports.getQuotesGraphApiDB = 'roterranet.quotes_graph_api';
+
 exports.getSalesTypeDB = 'roterranet.sales_type';
 
 exports.getSuppliersDB = 'roterranet.view_suppliers';

@@ -5,14 +5,27 @@ const { getQuotesDB } = require('../../01_Database/database');
 const router = express.Router();
 
 router.get(`/table`, authorize(), async (req, res) => {
-	const { start, size, filters, sorting, globalFilter } = req.query;
+	const { start, size, filters, sorting, selectedQuery } = req.query;
 
 	const parsedColumnFilters = JSON.parse(filters);
 	const parsedColumnSorting = JSON.parse(sorting);
+	const paredSelectedQuery = JSON.parse(selectedQuery);
 
 	const paginatedTable = await knex(getQuotesDB)
 		.select()
 		.modify((builder) => {
+			console.log(!!paredSelectedQuery.label);
+			if (!!paredSelectedQuery.label) {
+				const { column_name, query, user_id } = paredSelectedQuery.value;
+
+				if (Array.isArray(query)) {
+					builder.whereIn(column_name, query);
+					if (user_id) builder.andWhere({ assigned_to_id: user_id });
+				} else {
+					builder.whereRaw(`${column_name}::text iLIKE ?`, [`%${query}%`]);
+				}
+			}
+
 			if (!!parsedColumnFilters.length) {
 				parsedColumnFilters.map((filter) => {
 					const { id: columnId, value: filterValue } = filter;
