@@ -2,6 +2,7 @@ const express = require('express');
 const knex = require('../../01_Database/connection');
 const authorize = require('../Authorization/authorization');
 const { getQuotesDB } = require('../../01_Database/database');
+const { format } = require('date-fns');
 const router = express.Router();
 
 router.get(`/table`, authorize(), async (req, res) => {
@@ -10,11 +11,11 @@ router.get(`/table`, authorize(), async (req, res) => {
 	const parsedColumnFilters = JSON.parse(filters);
 	const parsedColumnSorting = JSON.parse(sorting);
 	const paredSelectedQuery = JSON.parse(selectedQuery);
+	console.log(parsedColumnFilters);
 
 	const paginatedTable = await knex(getQuotesDB)
 		.select()
 		.modify((builder) => {
-			console.log(!!paredSelectedQuery.label);
 			if (!!paredSelectedQuery.label) {
 				const { column_name, query, user_id } = paredSelectedQuery.value;
 
@@ -30,7 +31,34 @@ router.get(`/table`, authorize(), async (req, res) => {
 				parsedColumnFilters.map((filter) => {
 					const { id: columnId, value: filterValue } = filter;
 
-					builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+					if (columnId === 'due_date') {
+						if (!filterValue?.start && !filterValue?.finish) {
+							return;
+						} else if (!filterValue?.start) {
+							builder.where(
+								columnId,
+								'<=',
+								`"${format(new Date(filterValue?.finish), 'yyyy-MM-dd')}"`
+							);
+						} else if (!filterValue?.finish) {
+							builder.where(
+								columnId,
+								'>=',
+								`"${format(new Date(filterValue?.start), 'yyyy-MM-dd')}"`
+							);
+						} else {
+							builder.whereBetween(columnId, [
+								`"${format(new Date(filterValue?.start), 'yyyy-MM-dd')} 00:00:00"`,
+								`"${format(new Date(filterValue?.finish), 'yyyy-MM-dd')} 20:00:00"`,
+							]);
+						}
+					} else {
+						if (Array.isArray(filterValue) && filterValue.length > 0) {
+							builder.whereIn(columnId, filterValue);
+						} else {
+							builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+						}
+					}
 				});
 			}
 			if (!!parsedColumnSorting.length) {
