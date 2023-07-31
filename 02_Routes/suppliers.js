@@ -35,6 +35,49 @@ router.get('/', async (req, res) => {
 	res.json(getEntries);
 });
 
+router.get(`/table`, async (req, res) => {
+	const { start, size, filters, sorting } = req.query;
+
+	const parsedColumnFilters = JSON.parse(filters);
+	const parsedColumnSorting = JSON.parse(sorting);
+
+	const paginatedTable = await knex(getSuppliersDB)
+		.select('supplier_id', 'name', 'phone', 'email', 'class', 'status_name', 'status_bg_color')
+		.modify((builder) => {
+			if (!!parsedColumnFilters.length) {
+				parsedColumnFilters.map((filter) => {
+					const { id: columnId, value: filterValue } = filter;
+
+					if (Array.isArray(filterValue) && filterValue.length > 0) {
+						builder.whereIn(columnId, filterValue);
+					} else {
+						builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+					}
+				});
+			}
+			if (!!parsedColumnSorting.length) {
+				parsedColumnSorting.map((sort) => {
+					const { id: columnId, desc: sortValue } = sort;
+
+					const sorter = sortValue ? 'desc' : 'acs';
+					console.log(columnId, sortValue, sorter);
+					builder.orderBy(columnId, sorter);
+				});
+			} else {
+				builder.orderBy('name', 'asc');
+			}
+		})
+		.where({ deleted: 0 })
+
+		.paginate({
+			perPage: size,
+			currentPage: start,
+			isLengthAware: true,
+		});
+
+	res.status(200).json(paginatedTable);
+});
+
 // /suppliers -> PATCH -> TABLE -> get all suppliers paginated
 getTableRoute.getTableData(router, getSuppliersDB);
 
