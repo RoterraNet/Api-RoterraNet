@@ -108,7 +108,19 @@ getRoute.getById(router, getPoDB, 'po_id');
 // 				=> Sent Email To Admin (Morgan) notifying about PO
 
 // po/:id -> PUT -> edit one po
-po_edit(router);
+router.put('/updatePoDetail/', async (req, res) => {
+	const { id, update } = req.body;
+	console.log(id, update);
+	try {
+		const updatePoDetail = await knex(postPoDB).update(update).where({ id: id });
+
+		res.json({ color: 'success', msg: 'General Detail were updated' });
+	} catch (e) {
+		console.log(e);
+		res.json({ error: e, msg: 'Something went wrong. Check Error', color: 'error' });
+	}
+});
+// po_edit(router);
 
 // po/:id -> DELETE -> delete one po
 router.delete('/:id', async (req, res) => {

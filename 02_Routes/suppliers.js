@@ -31,7 +31,6 @@ router.get('/', async (req, res) => {
 			.distinctOn('name')
 			.orderBy('name', 'asc');
 	}
-
 	res.json(getEntries);
 });
 
@@ -78,8 +77,32 @@ router.get(`/table`, async (req, res) => {
 	res.status(200).json(paginatedTable);
 });
 
+// /suppliers -> GET
+router.get('/approved_suppliers', async (req, res) => {
+	getEntries = await knex(getSuppliersDB)
+		.select('name', 'supplier_id')
+		.where('deleted', '=', 0)
+		.andWhere({ status: 2 })
+		.distinctOn('name')
+		.orderBy('name', 'asc');
+
+	res.json(getEntries);
+});
+
 // /suppliers -> PATCH -> TABLE -> get all suppliers paginated
 getTableRoute.getTableData(router, getSuppliersDB);
+
+router.put('/updateSupplier', async (req, res) => {
+	const { id, update } = req.body;
+	try {
+		const postSupplier = await knex(postSuppliersDB).update(update).where({ supplier_id: id });
+		console.log(id, update);
+		res.json('...');
+	} catch (e) {
+		res.status = 500;
+		res.json({ error: e, msg: 'Something went wrong. Check Error' });
+	}
+});
 
 // /suppliers -> POST -> create new supplier
 

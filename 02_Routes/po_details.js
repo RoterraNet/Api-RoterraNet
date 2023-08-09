@@ -28,9 +28,12 @@ router.use('/:id/po_received', require('./po_received'));
 // /po/:id/po_details => Get All
 router.get('/', async (req, res) => {
 	const { id } = req.params;
-	console.log(req.params);
-	const getEntry = await knex(getPoDetailDB).select('*').where(`po_id`, '=', id).orderBy('po_detail_id', 'desc');
-	console.log(getEntry);
+
+	const getEntry = await knex(getPoDetailDB)
+		.select('*')
+		.where(`po_id`, '=', id)
+		.orderBy('po_detail_id', 'desc');
+
 	res.json(getEntry);
 });
 
@@ -39,14 +42,28 @@ getTableRoute.getTableData(router, getPoDetailDB);
 
 // po -> POST -> create new quote
 // SENDS EMAIL!!!
-postFunctionRoute.newEntry_function(router, getPoDetailDB, postPoDetailDB, today_now, 'id', quotes_add_fn);
+postFunctionRoute.newEntry_function(
+	router,
+	getPoDetailDB,
+	postPoDetailDB,
+	today_now,
+	'id',
+	quotes_add_fn
+);
 
 // po/:id -> GET -> get one quote
 getRoute.getById(router, getPoDetailDB, 'po_detail_id');
 
 // po/:id -> PUT -> edit one quote
 // SENDS EMAIL!!!
-putFunctionRoute.editById_mail(router, getPoDetailDB, postPoDetailDB, today_now, 'id', edit_quote_mail);
+putFunctionRoute.editById_mail(
+	router,
+	getPoDetailDB,
+	postPoDetailDB,
+	today_now,
+	'id',
+	edit_quote_mail
+);
 
 // po/:id -> DELETE -> delete one quote
 deleteRoute.deleteRoute(router, postPoDetailDB, today_now, 'id');
