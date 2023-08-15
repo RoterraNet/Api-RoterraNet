@@ -120,7 +120,7 @@ router.put('/updatePoDetail/', async (req, res) => {
 		res.json({ error: e, msg: 'Something went wrong. Check Error', color: 'error' });
 	}
 });
-// po_edit(router);
+po_edit(router);
 
 // po/:id -> DELETE -> delete one po
 router.delete('/:id', async (req, res) => {

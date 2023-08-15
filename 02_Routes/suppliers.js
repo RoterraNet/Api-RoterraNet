@@ -41,7 +41,7 @@ router.get(`/table`, async (req, res) => {
 	const parsedColumnSorting = JSON.parse(sorting);
 
 	const paginatedTable = await knex(getSuppliersDB)
-		.select('supplier_id', 'name', 'phone', 'email', 'class', 'status_name', 'status_bg_color')
+		.select('supplier_id','status', 'name', 'phone', 'email', 'class', 'status_name', 'status_bg_color')
 		.modify((builder) => {
 			if (!!parsedColumnFilters.length) {
 				parsedColumnFilters.map((filter) => {

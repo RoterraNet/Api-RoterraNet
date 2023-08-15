@@ -133,6 +133,7 @@ exports.po_edit = (router) => {
 		const { values } = req.body;
 		const { type } = req.query;
 
+		console.log(values);
 		//	-> GET NEW po, po_detail
 		let Submitted_po_details = values.po_details;
 		delete values.po_details;
@@ -236,6 +237,7 @@ exports.po_edit = (router) => {
 			// console.log(2.1);
 			delete Submitted_po.po_id;
 			await knex(postPoDB).update(Submitted_po).where('id', '=', po_id);
+
 			po_message = await po_approval_process(user_id, po_id);
 			// If you are trying to update PO Details
 		} else {
