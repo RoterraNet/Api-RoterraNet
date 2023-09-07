@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const knex = require('../01_Database/connection');
-const { attachPaginate } = require('knex-paginate');
-attachPaginate();
 
 const deleteRoute = require('./RouteCreaters/delete');
 const postRoute = require('./RouteCreaters/post');

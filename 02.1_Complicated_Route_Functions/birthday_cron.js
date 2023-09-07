@@ -7,7 +7,7 @@ const formatDistanceToNowStrict = require('date-fns/formatDistanceToNowStrict');
 // retruns users alias if there is ones. if no alias, returns first name
 const get_birthdays = async () => {
 	const getUser = knex.raw(
-		" CASE WHEN alias_first_name = '' THEN first_name ELSE alias_first_name END AS first_name"
+		" CASE WHEN alias_first_name = '' THEN first_name ELSE alias_first_name END AS first_name, last_name"
 	);
 	const getBirthday = knex.raw(
 		'EXTRACT(MONTH from birthday)  = EXTRACT(MONTH from now()) and EXTRACT(DAY from birthday)  = EXTRACT(DAY from now()) and deleted = 0'
@@ -21,7 +21,7 @@ const get_birthdays = async () => {
 // Maps the object inserting the info into the NEWS DB table
 const post_birthdays = async (body) => {
 	await body.map(async (i) => {
-		const subject = `Happy Birthday ${i.first_name}`;
+		const subject = `Happy Birthday ${i.first_name} ${i.last_name}`;
 		const news_description = `It's ${i.first_name}'s Birthday. Have a great day!`;
 		await knex(postNewsDB).insert({
 			department: 999999,

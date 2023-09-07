@@ -11,7 +11,7 @@ router.get(`/table`, authorize(), async (req, res) => {
 	const parsedColumnFilters = JSON.parse(filters);
 	const parsedColumnSorting = JSON.parse(sorting);
 	const paredSelectedQuery = JSON.parse(selectedQuery);
-	console.log(parsedColumnFilters);
+	console.log(start, size);
 
 	const paginatedTable = await knex(getQuotesDB)
 		.select()

@@ -93,6 +93,18 @@ putRoute.editById(
 	'workorder_item_detail_id'
 );
 
+router.put('/:id/actual_heat', async (req, res) => {
+	const { id } = req.params;
+	const body = req.body;
+
+	const editedEntryId = await knex(postWorkordersItemsDetailsDB)
+		.update(body)
+		.where({ workorder_item_detail_id: id })
+		.returning('workorder_item_detail_id');
+
+	res.json(editedEntryId);
+});
+
 // Special Route Function => MTR Heat Verification
 const putRoute_editPipeHeat = (router, url_info, heat_name, heat_name_unique) => {
 	// Vary API URL based on

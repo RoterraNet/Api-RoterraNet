@@ -71,6 +71,8 @@ app.use('/plates', require('./02_Routes/plates'));
 app.use('/po', require('./02_Routes/po'));
 app.use('/po_permissions', require('./02_Routes/po_permissions'));
 app.use('/po_status', require('./02_Routes/po_status'));
+app.use('/poAnalytics', require('./02_Routes/po/poAnalytics'));
+
 // po_details => Joined Route 		=> Accessible in po_details.js file
 app.use('/po_advanced_search', require('./02_Routes/po_advanced_search'));
 app.use('/po_edited', require('./02_Routes/po_edited'));

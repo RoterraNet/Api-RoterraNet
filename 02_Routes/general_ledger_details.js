@@ -10,6 +10,7 @@ router.get('/', async (req, res) => {
 	const { id } = req.params;
 	let getEntries;
 
+	console.log(id);
 	if (id === 0) {
 		getEntries = await knex(getGeneralLedgerDetailsDB)
 			.select(

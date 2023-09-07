@@ -29,7 +29,6 @@ router.use('/:id/po_received', require('./po_received'));
 // /po/:id/po_details => Get All
 router.get('/', async (req, res) => {
 	const { id } = req.params;
-
 	const getEntry = await knex(getPoDetailDB)
 		.select('*')
 		.where(`po_id`, '=', id)
@@ -80,7 +79,8 @@ router.post('/updatePoDetail', async (req, res) => {
 			'gl_id',
 			'gl_detail_id'
 		)
-		.where({ po_id: po_id });
+		.where({ po_id: po_id })
+		.andWhere({ deleted: false });
 
 	const fieldsToInsert = previousPoDetail.map((field) => ({
 		po_edited_id: newEditedPoId[0],
@@ -106,7 +106,7 @@ router.post('/updatePoDetail', async (req, res) => {
 
 	const addNewItemsToPoDetail = await knex(database.postPoDetailDB).insert(newItems);
 
-	const po_message = await po_approval_process(created_by, po_id);
+	// const po_message = await po_approval_process(created_by, po_id);
 
 	res.json({ po_id: po_id, po_message: po_message });
 });
