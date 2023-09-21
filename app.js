@@ -100,7 +100,7 @@ app.use('/quotes_status', require('./02_Routes/quotes_status'));
 // po_notes 							=> Joined Route
 // po_customers							=> Joined Route
 app.use('/quotes', require('./02_Routes/quotes'));
-app.use('/quotes_', require('./02_Routes/quotes/quotes'));
+app.use('/quotes_', require('./02_Routes/Quotes/quotes'));
 app.use('/quotes_analytics', require('./02_Routes/quotes_analytics'));
 
 app.use('/sales_type', require('./02_Routes/sales_type.js'));
