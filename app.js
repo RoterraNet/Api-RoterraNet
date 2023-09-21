@@ -155,9 +155,9 @@ app.use('/MailerSendRoutes', require('./04_Emails/MailerSend/MailerSendRoutes'))
 app.use('/workorderfiles', require('./02_Routes/workorder_files'));
 app.use('/workorders_status', require('./02_Routes/workorders_status'));
 
-const PORT = process.env.PORT || 9000;
-const ADDRESS = 'localhost';
+const PORT = process.env.PORT;
+const ADDRESS = process.env.ADDRESS;
 
-app.listen(PORT, (ADDRESS) => {
-	console.log('http://localhost:' + PORT);
+app.listen(PORT, () => {
+	console.log(ADDRESS + PORT);
 });
