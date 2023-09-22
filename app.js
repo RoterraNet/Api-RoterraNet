@@ -10,7 +10,29 @@ app.set('view engine', 'ejs');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: '*', 'Access-Control-Allow-Methods': '*' }));
+
+var allowedOrigins = [
+	'https://www.roterranet.com',
+	'https://roterranet.com',
+	'http://www.roterranet.com',
+	'http://roterranet.com',
+];
+app.use(
+	cors({
+		origin: function (origin, callback) {
+			// allow requests with no origin
+			// (like mobile apps or curl requests)
+			if (!origin) return callback(null, true);
+			if (allowedOrigins.indexOf(origin) === -1) {
+				const msg =
+					'The CORS policy for this site does not ' +
+					'allow access from the specified Origin.';
+				return callback(new Error(msg), false);
+			}
+			return callback(null, true);
+		},
+	})
+);
 
 app.use(express.json());
 app.use(logger('dev'));
