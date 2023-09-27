@@ -6,16 +6,13 @@ module.exports = {
 		client: 'pg',
 
 		connection: {
-			host: 'roterranetusa.caymnesynqcw.us-west-2.rds.amazonaws.com',
-			port: '5432',
-			user: 'postgres',
-			database: 'postgres',
-			password: 'H9vftA0CP6nS2kbXyIkg',
+			host: process.env.DB_HOST,
+			port: process.env.DP_PORT,
+			user: process.env.DB_USERNAME,
+			database: process.env.DB_DATABASE_NAME,
+			password: process.env.DB_PASSWORD,
 			ssl: { rejectUnauthorized: false },
 		},
-
-		// connection:
-		// 	'postgresql://postgres:H9vftA0CP6nS2kbXyIkg@roterranetusa.caymnesynqcw.us-west-2.rds.amazonaws.com:5432/postgres',
 
 		// connection: 'postgresql://postgres:Qzpmal10@192.168.2.2:5434/roterranet',
 		// connection: 'postgresql://postgres:root@localhost:5432/roterranet',

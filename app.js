@@ -11,16 +11,11 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
-var allowedOrigins = [
-	'https://www.roterranet.com',
-	'https://roterranet.com',
-	'http://www.roterranet.com',
-	'http://roterranet.com',
-];
+var allowedOrigins = ['https://www.roterranet.com'];
 app.use(
 	cors({
-		origin: allowedOrigins,
-		methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT', 'PATCH'],
+		origin: 'https://www.roterranet.com',
+		methods: '*',
 	})
 );
 
