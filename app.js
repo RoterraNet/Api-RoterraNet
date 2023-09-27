@@ -11,7 +11,13 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors({ origin: 'https://www.roterranet.com' }));
+const corsOptions = {
+	origin: 'https://www.roterranet.com',
+	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+	credentials: true,
+	optionsSuccessStatus: 204,
+};
+app.use(cors(corsOptions));
 
 app.use(express.json());
 app.use(logger('dev'));
