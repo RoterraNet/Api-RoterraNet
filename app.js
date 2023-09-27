@@ -11,13 +11,7 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
-var allowedOrigins = ['https://www.roterranet.com'];
-app.use(
-	cors({
-		origin: 'https://www.roterranet.com',
-		methods: '*',
-	})
-);
+app.use(cors({ origin: 'https://www.roterranet.com' }));
 
 app.use(express.json());
 app.use(logger('dev'));
