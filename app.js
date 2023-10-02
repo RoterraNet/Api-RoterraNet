@@ -12,7 +12,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
-	origin: ['*', 'https://www.roterranet.com'],
+	origin: ['*', 'https://www.roterranet.com', 'http://localhost:3000'],
 	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 	credentials: true,
 	optionsSuccessStatus: 204,
