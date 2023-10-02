@@ -1,4 +1,4 @@
-const knex = require('../../../01_Database/connection');
+// const knex = require('../../../01_Database/connection');
 const database = require('../../../01_Database/database');
 const getUsersDB = database.getUsersDB;
 const getUsersPermissionsDB = database.getUsersPermissionsDB;
