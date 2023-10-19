@@ -34,9 +34,16 @@ router.get('/', async (req, res) => {
 		});
 });
 
+router.get('/site_id', async (req, res) => {
+	const { quote_id } = req.query;
+	const getSiteId = await knex(getQuotesGraphApiDB)
+		.where('start_id', '<=', quote_id)
+		.andWhere('end_id', '>=', quote_id);
+	res.json(getSiteId);
+});
+
 router.get('/site_id/quotes', async (req, res) => {
 	const { quote_id } = req.query;
-
 	const getSiteId = await knex(getQuotesGraphApiDB)
 		.where('start_id', '<=', quote_id)
 		.andWhere('end_id', '>=', quote_id);
