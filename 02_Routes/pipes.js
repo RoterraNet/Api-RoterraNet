@@ -13,6 +13,7 @@ const postPipesDB = database.postPipesDB;
 const getPipesDB = database.getPipesDB;
 
 const datefns = require('date-fns');
+const authorize = require('./Authorization/authorization');
 const today_now = datefns.format(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS');
 
 // /pipes -> GET
@@ -22,11 +23,65 @@ router.get('/', async (req, res) => {
 
 	// ?type=active -> Get pipes
 	if (type == 'active') {
-		getEntries = await knex.raw(`select od || ' (' || wall || ')' as pipe_dimensions, id from ${getPipesDB} order by stocked_sizes desc, od_decimal`);
+		getEntries = await knex.raw(
+			`select od || ' (' || wall || ')' as pipe_dimensions, id from ${getPipesDB} order by stocked_sizes desc, od_decimal`
+		);
 		getEntries = getEntries.rows;
 	}
 
 	res.json(getEntries);
+});
+
+router.get(`/table`, authorize(), async (req, res) => {
+	const { start, size, filters, sorting, globalFilter } = req.query;
+
+	const parsedColumnFilters = JSON.parse(filters);
+	const parsedColumnSorting = JSON.parse(sorting);
+
+	const paginatedTable = await knex(getPipesDB)
+		.select('*')
+		.modify((builder) => {
+			if (!!parsedColumnFilters.length) {
+				parsedColumnFilters.map((filter) => {
+					const { id: columnId, value: filterValue } = filter;
+					console.log(columnId);
+
+					builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+				});
+			}
+			if (!!parsedColumnSorting.length) {
+				parsedColumnSorting.map((sort) => {
+					const { id: columnId, desc: sortValue } = sort;
+
+					const sorter = sortValue ? 'desc' : 'acs';
+					console.log(columnId, sortValue, sorter);
+					builder.orderBy(columnId, sorter);
+				});
+			} else {
+				builder.orderBy('id', 'desc');
+			}
+		})
+
+		.paginate({
+			perPage: size,
+			currentPage: start,
+			isLengthAware: true,
+		});
+
+	res.status(200).json(paginatedTable);
+});
+
+router.post(`/addPipe`, authorize(), async (req, res) => {
+	const body = req.body;
+
+	try {
+		const newPipe = await knex(postPipesDB).insert({ ...body });
+
+		res.status(200).json({ msg: 'New Pipe Size Added' });
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ error: error, msg: 'Check the Error' });
+	}
 });
 
 // /pipes -> PATCH -> TABLE -> get all pipes paginated

@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const qs = require('qs');
-const { getQuotesGraphApiDB } = require('../01_Database/database');
+const { getQuotesGraphApiDB, getProjectsGraphApiDB } = require('../01_Database/database');
 const knex = require('../01_Database/connection');
 /**
  * Function that Gets token from Graph api.
@@ -34,10 +34,19 @@ router.get('/', async (req, res) => {
 		});
 });
 
-router.get('/site_id', async (req, res) => {
+router.get('/site_id/quotes', async (req, res) => {
 	const { quote_id } = req.query;
 
 	const getSiteId = await knex(getQuotesGraphApiDB)
+		.where('start_id', '<=', quote_id)
+		.andWhere('end_id', '>=', quote_id);
+	res.json(getSiteId);
+});
+
+router.get('/site_id/projects', async (req, res) => {
+	const { quote_id } = req.query;
+
+	const getSiteId = await knex(getProjectsGraphApiDB)
 		.where('start_id', '<=', quote_id)
 		.andWhere('end_id', '>=', quote_id);
 	res.json(getSiteId);
