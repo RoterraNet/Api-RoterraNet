@@ -93,6 +93,7 @@ router.get(`/table/download`, authorize(), async (req, res) => {
 			'defect_code',
 			'status',
 			'total_value',
+			'detail',
 			sql
 		)
 		.where({ deleted: false });

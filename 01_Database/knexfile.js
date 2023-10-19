@@ -5,16 +5,16 @@ module.exports = {
 	development: {
 		client: 'pg',
 
-		connection: {
-			host: process.env.DB_HOST,
-			port: process.env.DB_PORT,
-			user: process.env.DB_USERNAME,
-			database: process.env.DB_DATABASE_NAME,
-			password: process.env.DB_PASSWORD,
-			ssl: { rejectUnauthorized: false },
-		},
+		// connection: {
+		// 	host: process.env.DB_HOST,
+		// 	port: process.env.DB_PORT,
+		// 	user: process.env.DB_USERNAME,
+		// 	database: process.env.DB_DATABASE_NAME,
+		// 	password: process.env.DB_PASSWORD,
+		// 	ssl: { rejectUnauthorized: false },
+		// },
 
-		// connection: 'postgresql://postgres:Qzpmal10@192.168.2.2:5434/roterranet',
+		connection: 'postgresql://postgres:Qzpmal10@192.168.2.2:5434/roterranet',
 		// connection: 'postgresql://postgres:root@localhost:5432/roterranet',
 		pool: {
 			min: 0,
