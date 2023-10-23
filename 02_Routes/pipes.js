@@ -71,6 +71,20 @@ router.get(`/table`, authorize(), async (req, res) => {
 	res.status(200).json(paginatedTable);
 });
 
+router.get('/autoGen/:id', async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const raw = knex.raw(`od || ' (' || wall || ')' as pipe_dimensions`);
+		const getPipe = await knex(getPipesDB).select('*', raw).where({ id: id });
+
+		res.json(getPipe);
+	} catch (error) {
+		console.log(error);
+		res.json({ msg: 'error', error: error });
+	}
+});
+
 router.post(`/addPipe`, authorize(), async (req, res) => {
 	const body = req.body;
 

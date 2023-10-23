@@ -51,11 +51,11 @@ router.get('/site_id/quotes', async (req, res) => {
 });
 
 router.get('/site_id/projects', async (req, res) => {
-	const { quote_id } = req.query;
+	const { project_id } = req.query;
 
 	const getSiteId = await knex(getProjectsGraphApiDB)
-		.where('start_id', '<=', quote_id)
-		.andWhere('end_id', '>=', quote_id);
+		.where('start_id', '<=', project_id)
+		.andWhere('end_id', '>=', project_id);
 	res.json(getSiteId);
 });
 

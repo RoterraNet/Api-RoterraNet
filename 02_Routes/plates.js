@@ -30,6 +30,19 @@ router.get('/', async (req, res) => {
 	res.json(getEntries);
 });
 
+router.get('/autoGen/:id', async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const getPlate = await knex(getPlatesDB).where({ id: id });
+
+		res.json(getPlate);
+	} catch (error) {
+		console.log(error);
+		res.json({ msg: 'error', error: error });
+	}
+});
+
 // /plates -> PATCH -> TABLE -> get all plates paginated
 getTableRoute.getTableData(router, getPlatesDB);
 
