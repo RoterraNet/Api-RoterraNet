@@ -26,6 +26,8 @@ exports.sendMail = (mailOptions) => {
 			email_html: mailOptions.text,
 			email_error: false,
 		};
+
+		console.log(error);
 		try {
 			if (error) {
 				// Send Email to Email Log DB => with error message

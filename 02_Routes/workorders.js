@@ -339,6 +339,7 @@ router.put('/:id/status', async (req, res) => {
 deleteRoute.deleteRoute(router, postWorkordersDB, today_now, 'workorder_id');
 
 router.put('/workorder/approval', async (req, res) => {
+	console.log(req.body);
 	const { workorder_id, user_id } = req.body.values;
 
 	let workorderApprovalMessage;
@@ -429,7 +430,7 @@ router.put('/workorder/approval', async (req, res) => {
 		}
 
 		// Email to requester Manager
-		// workorder_self_approval_email(created_workorder, workorderItemsDetail, managerWorkEmail);
+		workorder_self_approval_email(created_workorder, workorderItemsDetail, managerWorkEmail);
 
 		// // goes to manuf Group
 		workorder_self_approval_email(

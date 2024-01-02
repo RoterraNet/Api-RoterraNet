@@ -85,6 +85,39 @@ router.get('/autoGen/:id', async (req, res) => {
 	}
 });
 
+router.post('/checkDriveHoles/', async (req, res) => {
+	try {
+		const { pipe_id, driveholesize, driveholespacing1, driveholespacing2, driveholespacing3 } =
+			req.body;
+
+		const getPipe = await knex(getPipesDB).where({ id: pipe_id });
+		const pipe_data = getPipe[0];
+
+		console.log({
+			pipe_id,
+			driveholesize,
+			driveholespacing1,
+			driveholespacing2,
+			driveholespacing3,
+		});
+
+		console.log(pipe_data);
+		if (
+			driveholesize === pipe_data.drive_hole_size &&
+			driveholespacing1 === pipe_data.drive_hole_spacing_1 &&
+			driveholespacing2 === pipe_data.drive_hole_spacing_2 &&
+			driveholespacing3 === pipe_data.drive_hole_spacing_3
+		) {
+			res.json({ roterra_pipe: true });
+		} else {
+			res.json({ roterra_pipe: false });
+		}
+	} catch (error) {
+		console.log(error);
+		res.json({ msg: 'error', error: error });
+	}
+});
+
 router.post(`/addPipe`, authorize(), async (req, res) => {
 	const body = req.body;
 

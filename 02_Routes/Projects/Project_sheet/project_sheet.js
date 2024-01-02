@@ -3,9 +3,13 @@ const {
 	postProjectSheetItemListDB,
 	getProjectSheetItemListDB,
 	getPipesDB,
-	getHelixOptionsDB,
+
 	postProjectSheetItemListDetailsDB,
 	getProjectSheetItemListDetailsDB,
+	getPlatesDB,
+	getWorkordersDB,
+	postWorkordersDB,
+	getProjectsDB,
 } = require('../../../01_Database/database');
 
 const router = express.Router();
@@ -19,18 +23,23 @@ router.get('/get_sheet/:project_id', authorize(), async (req, res) => {
 	try {
 		const listOfSheetItems = await knex(getProjectSheetItemListDB)
 			.select(
-				'id',
+				'id as item_id',
 				'hp_num',
 				'project_id',
 				'pile_type',
-				'helix_1',
+				'pipe_id',
+				'helix_1_diameter',
 				'helix_1_id',
-				'helix_2',
+				'helix_1',
+				'helix_2_diameter',
 				'helix_2_id',
-				'helix_3',
+				'helix_2',
+				'helix_3_diameter',
 				'helix_3_id',
-				'helix_4',
+				'helix_3',
+				'helix_4_diameter',
 				'helix_4_id',
+				'helix_4',
 				'helix_spacing',
 				'min_embedment_depth',
 				'pile_length',
@@ -42,7 +51,9 @@ router.get('/get_sheet/:project_id', authorize(), async (req, res) => {
 				'deleted',
 				'deleted_on',
 				'deleted_by',
-				'item_count'
+				'item_count',
+				'cost',
+				'sale_price'
 			)
 			.andWhere({ project_id: project_id })
 			.orderByRaw('LENGTH(hp_num)')
@@ -60,12 +71,59 @@ router.get('/get_sheet/:project_id', authorize(), async (req, res) => {
 router.get('/options/', authorize(), async (req, res) => {
 	const rawSql = knex.raw(`CONCAT(od, ' ', '(', wall ,')') as pipe, id`);
 	const pipeOptions = await knex(getPipesDB).select(rawSql).orderBy('od', 'asc');
-	const helixOptions = await knex(getHelixOptionsDB)
-		.select('id ', 'helix ')
-		.orderBy('helix', 'asc');
+	const helixOptions = await knex(getPlatesDB)
+		.select('thickness as plate_dimensions', 'id')
+		.orderBy('sortorder', 'asc');
 	res.json({ pipe: pipeOptions, helix: helixOptions });
 });
 
+router.put('/updateMultiRow/', authorize(), async (req, res) => {
+	const {
+		id,
+		update: { pipes, updated_on, updated_by },
+	} = req.body;
+
+	try {
+		pipes.map(async (pipe) => {
+			await knex(postProjectSheetItemListDB)
+				.update({
+					hp_num: pipe.hp_num,
+					pile_type: pipe.pipe_id,
+					helix_1_diameter: pipe.helix_1_diameter,
+					helix_1_id: pipe.helix_1_id,
+					helix_2_diameter: pipe.helix_2_diameter,
+					helix_2_id: pipe.helix_2_id,
+					helix_3_diameter: pipe.helix_3_diameter,
+					helix_3_id: pipe.helix_3_id,
+					helix_4_diameter: pipe.helix_4_diameter,
+					helix_4_id: pipe.helix_4_id,
+					helix_spacing: pipe.helix_spacing,
+					min_embedment_depth: pipe.min_embedment_depth,
+					pile_length: pipe.pile_length,
+					min_torque: pipe.min_torque,
+					count: pipe.count,
+					compression_load: pipe.compression_load,
+					lateral_load: pipe.lateral_load,
+					tension_load: pipe.tension_load,
+					cost: pipe.cost,
+					sale_price: pipe.sale_price,
+				})
+				.where({ id: pipe.item_id });
+		});
+
+		res.status(202).json({
+			color: 'success',
+			msg: 'Update Successful',
+		});
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({
+			error: error,
+			color: 'error',
+			msg: 'Unable to update. Try again later',
+		});
+	}
+});
 router.put('/updateOneRow/', authorize(), async (req, res) => {
 	const { id, update } = req.body;
 
@@ -191,6 +249,67 @@ router.post('/updatePileSchedule/', authorize(), async (req, res) => {
 	});
 
 	res.json(addToDb);
+});
+
+router.post('/createWorkorder/', authorize(), async (req, res) => {
+	const {
+		created_on,
+		created_by,
+		deleted,
+		rush,
+		special_requirements,
+		project_id,
+		status,
+		pipes,
+	} = req.body;
+
+	try {
+		workorderNameFromProject = await knex(getProjectsDB)
+			.select('workorder_id')
+			.where({ project_id: project_id });
+
+		getTotalWorkOrdersOnProject = await knex(getWorkordersDB)
+			.count('project_id')
+			.where({ project_id: project_id })
+			.returning('count', 'workorder_name');
+
+		if (getTotalWorkOrdersOnProject[0].count !== 0) {
+			result = await knex(postWorkordersDB)
+				.insert({
+					created_on: created_on,
+					created_by_id: created_by,
+					deleted: deleted,
+					rush: rush,
+					special_requirements: special_requirements,
+					status: status,
+					project_id: project_id,
+					purchaser_id: created_by,
+					workorder_name: `${workorderNameFromProject[0].workorder_id}-${getTotalWorkOrdersOnProject[0].count}`,
+				})
+				.returning('*');
+		} else {
+			result = await knex(postWorkordersDB)
+				.insert({
+					created_on: created_on,
+					created_by_id: created_by,
+					deleted: deleted,
+					rush: rush,
+					special_requirements: special_requirements,
+					status: status,
+					project_id: project_id,
+					purchaser_id: created_by,
+					workorder_name: workorderNameFromProject[0].workorder_id,
+				})
+				.returning('workorder_id');
+		}
+
+		console.log(getTotalWorkOrdersOnProject);
+		res.statusCode = 202;
+		res.json('test');
+	} catch (error) {
+		console.log(error);
+		res.json('addToDb');
+	}
 });
 
 router.post('/fakeAdd/', async (req, res) => {

@@ -106,7 +106,7 @@ router.post('/updatePoDetail', async (req, res) => {
 
 	const addNewItemsToPoDetail = await knex(database.postPoDetailDB).insert(newItems);
 
-	// const po_message = await po_approval_process(created_by, po_id);
+	const po_message = await po_approval_process(created_by, po_id);
 
 	res.json({ po_id: po_id, po_message: po_message });
 });
