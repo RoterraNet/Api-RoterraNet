@@ -88,23 +88,23 @@ router.post('/updatePoDetail', async (req, res) => {
 		...field,
 	}));
 	const newEditedPoDetailId = await knex(database.postPoDetailEditedDB).insert(fieldsToInsert);
-	const deletePreviousPoDetail = await knex(postPoDetailDB)
-		.update({ deleted: true })
-		.where({ po_id: po_id })
-		.andWhere({ deleted: false });
-	const newItems = po_details.map((field) => ({
-		po_id: po_id,
-		quantity: field.quantity,
-		description: field.description,
-		part_number: field.part_number,
-		gl_id: field.gl_id,
-		gl_detail_id: field.gl_detail_id,
-		expected_date: field.expected_date,
-		unit_price: field.unit_price,
-		extended_cost: field.extended_cost,
-	}));
 
-	const addNewItemsToPoDetail = await knex(database.postPoDetailDB).insert(newItems);
+	const addNewItemsToPoDetail = po_details.forEach(async (each) => {
+		const updateObj = {
+			quantity: each.quantity,
+			description: each.description,
+			part_number: each.part_number,
+			gl_id: each.gl_id,
+			gl_detail_id: each.gl_detail_id,
+			extended_cost: each.extended_cost,
+			unit_price: each.unit_price,
+			expected_date: each.expected_date,
+		};
+
+		const updateExistingPoDetail = await knex(database.postPoDetailDB)
+			.update(updateObj)
+			.where({ id: each.po_detail_id });
+	});
 
 	const po_message = await po_approval_process(created_by, po_id);
 

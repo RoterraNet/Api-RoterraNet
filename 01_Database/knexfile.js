@@ -14,8 +14,9 @@ module.exports = {
 		// 	ssl: { rejectUnauthorized: false },
 		// },
 
-		connection: 'postgresql://postgres:Qzpmal10@192.168.2.2:5434/roterranet',
-		// connection: 'postgresql://postgres:root@localhost:5432/roterranet',
+		// connection: 'postgresql://postgres:Qzpmal10@192.168.2.2:5434/roterranet',
+		connection: 'postgresql://postgres:root@localhost:5432/roterranet',
+
 		pool: {
 			min: 0,
 			max: 10,

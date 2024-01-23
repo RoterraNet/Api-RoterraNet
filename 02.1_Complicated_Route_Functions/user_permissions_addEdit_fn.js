@@ -120,7 +120,6 @@ exports.AddUpdateAllUserPermissions = async (values, user_id) => {
 };
 
 const AddUpdatePermissions = async (postPermissionDB, permissions_names, values, user_id) => {
-	console.log('made it 2');
 	// create object of permissions
 	let new_permissions = {};
 	permissions_names.forEach((permission_name) => {
@@ -136,15 +135,9 @@ const AddUpdatePermissions = async (postPermissionDB, permissions_names, values,
 	// 		No => insert permissions
 	const response = await knex(postPermissionDB).select('user_id').where('user_id', '=', user_id);
 	const UpdatePermissions = response[0]?.user_id;
-	console.log(UpdatePermissions, response, new_permissions);
+
 	try {
 		if (UpdatePermissions) {
-			console.log(
-				knex(postPermissionDB)
-					.update(new_permissions)
-					.where('user_id', '=', user_id)
-					.toString()
-			);
 			await knex(postPermissionDB).update(new_permissions).where('user_id', '=', user_id);
 		} else {
 			await knex(postPermissionDB).insert({ user_id: user_id, ...new_permissions });
