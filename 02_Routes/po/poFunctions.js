@@ -28,7 +28,10 @@ exports.po_approval_process = async (user_id, po_id) => {
 	let po_message = '';
 
 	//	-> SELECT all po_details
-	let Created_po_details = await knex(getPoDetailDB).select('*').where('po_id', '=', po_id);
+	let Created_po_details = await knex(getPoDetailDB)
+		.select('*')
+		.where('po_id', '=', po_id)
+		.where({ deleted: false });
 
 	//	-> po_total_cost < user.po_limit
 	//  => Approved => Update PO DB - Status = 4 (approved) => CREATE entry PO_id DB to give PO a name
@@ -37,23 +40,19 @@ exports.po_approval_process = async (user_id, po_id) => {
 
 		const response4 = await knex(postPoIdDB).where({ po_id: po_id });
 		const check_if_po = response4[0]?.po_id;
-		console.log(check_if_po);
 		if (check_if_po !== undefined) {
 			po_name = check_if_po.id;
 		} else {
-			console.log();
 			const response5 = await knex(postPoIdDB).insert({ po_id: po_id }).returning('id');
-			console.log(response5);
 			po_name = response5[0];
-			console.log(2, po_name);
 		}
 		//      => Update Status Of PO => Approved
 		await knex(postPoDB).where({ id: po_id }).update({ status: 4 });
 		// 		=> Sent Email To Admin (Morgan) notifying about PO
 		// 		=> Sent Email To Prez (Gene) notifying about PO
 
-		// po_approved_email(Created_po, Created_po_details, 'mresler@roterra.com');
-		// po_approved_email(Created_po, Created_po_details, 'gene@roterra.com');
+		po_approved_email(Created_po, Created_po_details, 'mresler@roterra.com');
+		po_approved_email(Created_po, Created_po_details, 'gene@roterra.com');
 
 		po_message = `PO is Approved. PO # is ${po_name}`;
 	}
@@ -68,7 +67,7 @@ exports.po_approval_process = async (user_id, po_id) => {
 		//		=> Find Manager with Approval Limit High Enough
 		const manager_info = await recursiveFindManagerWithPOLimit(user_id, po_total_cost);
 		//		=> Send Manager Email to Approve PO
-		// po_request_approval_email(Created_po, Created_po_details, manager_info.work_email);
+		po_request_approval_email(Created_po, Created_po_details, manager_info.work_email);
 
 		// 		=> Sent Email To Admin (Morgan) notifying about PO
 		// po_request_approval_email(Created_po, Created_po_details, 'mresler@roterra.com');

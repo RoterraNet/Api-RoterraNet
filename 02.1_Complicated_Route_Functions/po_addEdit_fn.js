@@ -178,7 +178,8 @@ exports.po_edit = (router) => {
 					.where('po_id', '=', po_id);
 				let created_po_details = await knex(getPoDetailDB)
 					.select('*')
-					.where('po_id', '=', po_id);
+					.where('po_id', '=', po_id)
+					.where({ deleted: false });
 
 				await knex(getUsersDB)
 					.select('manager')
@@ -395,7 +396,10 @@ const po_approval_process = async (user_id, po_id) => {
 	let po_message = '';
 
 	//	-> SELECT all po_details
-	let Created_po_details = await knex(getPoDetailDB).select('*').where('po_id', '=', po_id);
+	let Created_po_details = await knex(getPoDetailDB)
+		.select('*')
+		.where('po_id', '=', po_id)
+		.where({ deleted: false });
 
 	//	-> po_total_cost < user.po_limit
 	//  => Approved => Update PO DB - Status = 4 (approved) => CREATE entry PO_id DB to give PO a name
