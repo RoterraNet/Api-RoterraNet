@@ -101,9 +101,16 @@ router.post('/updatePoDetail', async (req, res) => {
 			expected_date: each.expected_date,
 		};
 
-		const updateExistingPoDetail = await knex(database.postPoDetailDB)
-			.update(updateObj)
-			.where({ id: each.po_detail_id });
+		if (!each.po_detail_id) {
+			const addNewPoDetail = await knex(database.postPoDetailDB).insert({
+				...updateObj,
+				po_id: po_id,
+			});
+		} else {
+			const updateExistingPoDetail = await knex(database.postPoDetailDB)
+				.update(updateObj)
+				.where({ id: each.po_detail_id });
+		}
 	});
 
 	const po_message = await po_approval_process(created_by, po_id);
