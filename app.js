@@ -12,7 +12,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
-	origin: ['*', 'http://localhost:3000','http://192.168.2.73:3000' ],
+	origin: ['*', 'http://localhost:3000', 'http://192.168.2.73:3000'],
 	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 	credentials: true,
 	optionsSuccessStatus: 204,
@@ -41,6 +41,8 @@ app.use('/activities', require('./02_Routes/activities'));
 app.use('/auth', require('./02_Routes/Authentication/authUser'));
 
 app.use('/contacts', require('./02_Routes/contacts'));
+app.use('/contactsQuotes', require('./02_Routes/Contacts/contactsQuotes.js'));
+app.use('/contactsProjects', require('./02_Routes/Contacts/contactProjects.js'));
 app.use('/courses', require('./02_Routes/courses'));
 app.use('/customers', require('./02_Routes/customers'));
 app.use('/customer_types', require('./02_Routes/customer_types'));

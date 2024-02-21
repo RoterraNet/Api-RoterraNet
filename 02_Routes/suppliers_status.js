@@ -7,7 +7,7 @@ const getSuppliersStatusDB = database.getSuppliersStatusDB;
 
 // /suppliers_status -> GET ALL
 router.get('/', async (req, res) => {
-	const getEntries = await knex(getSuppliersStatusDB).select('*').whereIn('id', [2, 3]).orderBy('status_order', 'asc');
+	const getEntries = await knex(getSuppliersStatusDB).select('*').orderBy('status_order', 'asc');
 
 	res.json(getEntries);
 });

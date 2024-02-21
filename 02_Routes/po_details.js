@@ -99,6 +99,7 @@ router.post('/updatePoDetail', async (req, res) => {
 			extended_cost: each.extended_cost,
 			unit_price: each.unit_price,
 			expected_date: each.expected_date,
+			deleted: each.deleted,
 		};
 
 		if (!each.po_detail_id) {
