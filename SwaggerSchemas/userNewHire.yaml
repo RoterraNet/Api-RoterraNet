@@ -1,0 +1,75 @@
+components:
+    schemas:
+        NewHire:
+            type: object
+            required:
+                - user_id
+                - position_id
+                - completed
+                - created_on
+                - created_by
+            properties:
+                id:
+                    type: integer
+                    description: ID for the new hire
+                user_id:
+                    type: integer
+                    description: User's ID
+                position_id:
+                    type: integer
+                    description: ID for the user's position
+                completed:
+                    type: boolean
+                created_on:
+                    type: string
+                    format: date-time
+                created_by:
+                    type: integer
+                    description: ID for the user who created
+                updated_on:
+                    type: string
+                    format: date-time
+                updated_by:
+                    type: integer
+                    description: ID for the user who last updated
+                deleted_on:
+                    type: string
+                    format: date-time
+                deleted_by:
+                    type: integer
+                    description: ID for the user who deleted
+                deleted:
+                    type: boolean
+            example:
+                user_id: 614
+                preferred_name: Hasan AlGhanim
+                position_name: Accountant
+                completed: false
+                id: 10
+        UpdateNewHire:
+            type: object
+            required:
+                - id
+                - completed
+                - updated_on
+                - updated_by
+            properties:
+                id:
+                    type: integer
+                    description: ID for the new hire
+                update:
+                    type: object
+                    properties:
+                        updated_on:
+                            type: string
+                            format: date-time
+                        updated_by:
+                            type: integer
+                        completed:
+                            type: boolean
+            example:
+                id: 555
+                update:
+                    updated_on: '2024-04-08T21:55:07.614Z'
+                    updated_by: 614
+                    completed: true

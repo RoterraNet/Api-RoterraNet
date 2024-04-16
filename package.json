@@ -19,6 +19,7 @@
 		"excel-export": "^0.5.1",
 		"express": "^4.17.1",
 		"faker": "^5.0.0",
+		"glob": "^10.3.12",
 		"js-file-download": "^0.4.12",
 		"jsonwebtoken": "^9.0.0",
 		"knex": "^0.21.21",
@@ -33,6 +34,8 @@
 		"pdf-lib": "^1.16.0",
 		"pg": "^8.3.2",
 		"qs": "^6.10.3",
+		"swagger-jsdoc": "^6.2.8",
+		"swagger-ui-express": "^5.0.0",
 		"xlsx": "^0.16.9"
 	}
 }

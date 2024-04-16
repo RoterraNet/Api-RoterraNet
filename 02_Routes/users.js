@@ -4,7 +4,6 @@ const datefns = require('date-fns');
 const database = require('../01_Database/database');
 const knex = require('../01_Database/connection');
 const addUpdate_users_permisions = require('../02.1_Complicated_Route_Functions/user_permissions_addEdit_fn');
-
 const deleteRoute = require('./RouteCreaters/delete');
 const postRoute = require('./RouteCreaters/post');
 const getRoute = require('./RouteCreaters/get');
@@ -20,6 +19,7 @@ const getUsersPermissionsDB = database.getUsersPermissionsDB;
 const UsersImages = database.UsersImages;
 
 const XLSX = require('xlsx');
+const userDashboardController = require('./Users/usersDashboard/newHiresController');
 const today_now = datefns.format(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS');
 
 ///users -> GET
@@ -202,16 +202,13 @@ router.post('/', async (req, res) => {
 	const newValues = { ...values, first_aider: values.first_aider === true ? 1 : 2 };
 	const user_info = getUser_Data(newValues);
 
-	let newEntryId;
-
-	console.log({ user_id });
+	// console.log({ user_id });
 	try {
 		console.log(knex(postUsersDB).insert(user_info).returning('user_id').toString());
-		newEntryId = await knex(postUsersDB).insert(user_info).returning('user_id');
-		const user_id = newEntryId[0];
+		newEntryId = await knex(postUsersDB).insert(user_info).returning('*');
+		const user_id = newEntryId[0].user_id;
 		// This function is in 02.1 Complicated Functions
 		await addUpdate_users_permisions.AddUpdateAllUserPermissions(values, user_id);
-
 		await knex(database.getNotificationSettingsDB)
 			.insert({
 				user_id: user_id,
@@ -219,13 +216,20 @@ router.post('/', async (req, res) => {
 			.onConflict('user_id')
 			.merge()
 			.returning('*');
+
+		userDashboardController.createNewHireCheck({
+			user_id: user_id,
+			position_id: newEntryId[0].position_id,
+			created_by: newEntryId[0].created_by,
+			created_on: newEntryId[0].created_on,
+		});
 	} catch (e) {
 		console.log(e);
 		return res.status(400).send({
 			message: 'This is an error!',
 		});
 	}
-	res.json(newEntryId);
+	res.json('newEntryId');
 });
 
 // /user/:id -> GET -> get one user
@@ -258,6 +262,8 @@ router.delete('/:id', async (req, res) => {
 				senority_debit: senority_debit,
 			})
 			.where('user_id', '=', id);
+
+		//HERE!
 	} else {
 		deletedEntry = await knex(postUsersDB)
 			.update({

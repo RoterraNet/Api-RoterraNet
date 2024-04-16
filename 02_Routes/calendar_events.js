@@ -24,7 +24,7 @@ that has a RETURN_DATE that has NOT been past todays date
 and a DATE (leaving date) that has yet to come */
 router.get('/current', async (req, res) => {
 	const rawData = knex.raw(
-		"date at time zone 'MST' as date, return_date at time zone 'MST' as return_date, id, description, location, start_time, end_time, created_by, category, user_id, created_by_name, event_name, category_name"
+		"date at time zone 'MST' as date, return_date at time zone 'MST' as return_date, id, description, location, start_time, end_time, created_by, category, user_id, created_by_name, event_name, category_name,image"
 	);
 	const getInAndOut = await knex(getInAndOutDB)
 		.select(rawData)

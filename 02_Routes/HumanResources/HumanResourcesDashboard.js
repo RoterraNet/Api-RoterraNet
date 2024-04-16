@@ -3,12 +3,47 @@ const {
 	getUsersBenefitsDB,
 	getUsersReviewsDB,
 	postUsersReviewsDB,
+	getUsersDB,
+	postUsersOnboardingDB,
+	postUsersDB,
 } = require('../../01_Database/database');
 const router = express.Router();
 const knex = require('../../01_Database/connection');
 const { format } = require('date-fns');
 
 const authorize = require('../Authorization/authorization');
+
+router.get(`/getNewHires`, async (req, res) => {
+	const { page, perPage } = req.query;
+
+	// const newHires = await knex(getUsersDB)
+	// 	.leftJoin(postUsersOnboardingDB, postUsersDB, 'roterranet.users_onboarding.user_id')
+	// 	.whereNull('onboarding.user_id')
+	// 	.select('users.*')
+	// 	.toString();
+
+	const newHires = await knex('roterranet.view_users')
+		.leftJoin(
+			'roterranet.users_onboarding',
+			'roterranet.view_users.user_id',
+			'roterranet.users_onboarding.user_id'
+		)
+		.where('roterranet.view_users.deleted', 0)
+		.whereNull('roterranet.users_onboarding.user_id')
+		.select('roterranet.view_users.*');
+
+	// .select()
+	// 	.where({ deleted: 0 })
+	// 	.whereRaw("start_date::date > '2024-03-03'")
+	// 	.orderBy('start_date', 'desc')
+	// .paginate({
+	// 	perPage: 10,
+	// 	currentPage: 1,
+	// 	isLengthAware: true,
+	// });
+
+	res.status(200).json(newHires);
+});
 
 router.get(`/table`, async (req, res) => {
 	const { page, perPage, monthYear } = req.query;

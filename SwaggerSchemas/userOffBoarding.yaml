@@ -1,0 +1,75 @@
+components:
+    schemas:
+        UserOffBoarding:
+            type: object
+            required:
+                - user_id
+                - last_workday
+                - completed
+                - created_on
+                - created_by
+            properties:
+                id:
+                    type: integer
+                    description: ID for the new hire
+                user_id:
+                    type: integer
+                    description: User's ID
+                last_workday:
+                    type: string
+                    format: date-time
+                completed:
+                    type: boolean
+                created_on:
+                    type: string
+                    format: date-time
+                created_by:
+                    type: integer
+                    description: ID for the user who created
+                updated_on:
+                    type: string
+                    format: date-time
+                updated_by:
+                    type: integer
+                    description: ID for the user who last updated
+                deleted_on:
+                    type: string
+                    format: date-time
+                deleted_by:
+                    type: integer
+                    description: ID for the user who deleted
+                deleted:
+                    type: boolean
+            example:
+                user_id: 614
+                preferred_name: Hasan AlGhanim
+                last_workday: 2021-June-15
+                completed: false
+                id: 10
+        UpdateUserOffBoarding:
+            type: object
+            required:
+                - id
+                - completed
+                - updated_on
+                - updated_by
+            properties:
+                id:
+                    type: integer
+                    description: ID for the new hire
+                update:
+                    type: object
+                    properties:
+                        updated_on:
+                            type: string
+                            format: date-time
+                        updated_by:
+                            type: integer
+                        completed:
+                            type: boolean
+            example:
+                id: 555
+                update:
+                    updated_on: '2024-04-08T21:55:07.614Z'
+                    updated_by: 614
+                    completed: true

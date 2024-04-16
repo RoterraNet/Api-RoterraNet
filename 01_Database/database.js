@@ -209,6 +209,14 @@ exports.postUsersDB = 'roterranet.users';
 exports.getUsersSignOutDB = 'roterranet.view_user_sign_out';
 exports.postUsersSignOutDB = 'roterranet.user_sign_out';
 
+//
+exports.getUsersNewUsersCheckList = 'roterranet.view_users_new_users_checklist';
+exports.postUsersNewUsersCheckList = 'roterranet.users_new_users_checklist';
+
+exports.getUsersOffBoardingCheckList = 'roterranet.view_users_offboarding_checklist';
+exports.postUsersOffBoardingCheckList = 'roterranet.users_offboarding_checklist';
+
+//
 exports.getUsersEmploymentRecordDB = 'roterranet.view_users_employment_records';
 exports.postUsersEmploymentRecordDB = 'roterranet.users_employment_records';
 

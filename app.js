@@ -6,6 +6,8 @@ const path = require('path');
 const methodOverride = require('method-override');
 require('dotenv').config();
 
+const { swaggerDocs: V1SwaggerDocs } = require('./swagger.js');
+
 app.set('view engine', 'ejs');
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -36,6 +38,9 @@ birthday_auto_schedule();
 const baseRouter = require('./02_Routes/01_base_Router');
 
 app.use('/', baseRouter);
+
+app.use('/api/v1', require('./apiV1.js'));
+
 app.use('/activities', require('./02_Routes/activities'));
 
 app.use('/auth', require('./02_Routes/Authentication/authUser'));
@@ -169,4 +174,5 @@ const ADDRESS = process.env.ADDRESS;
 
 app.listen(PORT, () => {
 	console.log(ADDRESS + PORT);
+	V1SwaggerDocs(app, PORT);
 });
