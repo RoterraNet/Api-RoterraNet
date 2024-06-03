@@ -467,9 +467,12 @@ router.get('/tableDownload/download', async (req, res) => {
 
 	const newSearch = [];
 	search.map((each) => {
-		queryParams[each] === 'true' && newSearch.push(each);
+		console.log(each);
+
+		each !== 'only_deleted' && queryParams[each] === 'true' && newSearch.push(each);
 	});
 
+	console.log(queryParams);
 	const data = await knex(users)
 		.select(newSearch)
 		.from(users)
@@ -477,9 +480,23 @@ router.get('/tableDownload/download', async (req, res) => {
 		.orderBy('preferred_name', 'asc')
 
 		.modify((builder) => {
-			if (queryParams?.['roterranet.view_users.deleted'] !== 'true') {
+			if (queryParams?.only_deleted == 'true') {
+				const parsedDeletedDate = JSON.parse(queryParams.only_deleted_dates);
+
+				builder.where({ [`${users}.deleted`]: 1 });
+				builder.whereBetween(`${users}.deleted_on`, [
+					parsedDeletedDate.deleted_start_date || '1900-01-01',
+					parsedDeletedDate.deleted_end_date || new Date(),
+				]);
+			}
+
+			if (
+				queryParams?.['roterranet.view_users.deleted'] !== 'true' &&
+				queryParams?.only_deleted == 'false'
+			) {
 				builder.where({ [`${users}.deleted`]: 0 });
 			}
+
 			if (queryParams?.['roterranet.view_users.birthday'] == 'true') {
 				const parsedBirthdays = JSON.parse(queryParams.birthday_dates);
 				builder.whereBetween(`${users}.birthday`, [

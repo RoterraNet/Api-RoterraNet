@@ -26,13 +26,15 @@ app.use(logger('dev'));
 app.use(methodOverride('_method'));
 
 // Scheduled Jobs (Cron)
-scheduled_quotes_emails = require('./06_Scheduled_Cron_Jobs/quotes_emails_schedule');
-birthday_auto_schedule = require('./06_Scheduled_Cron_Jobs/birthday_auto_schedule');
-hr_email_schedule = require('./06_Scheduled_Cron_Jobs/hr_email_schedule');
+const scheduled_quotes_emails = require('./06_Scheduled_Cron_Jobs/quotes_emails_schedule');
+const birthday_auto_schedule = require('./06_Scheduled_Cron_Jobs/birthday_auto_schedule');
+const hr_email_schedule = require('./06_Scheduled_Cron_Jobs/hr_email_schedule');
+const PostgressBackup = require('./06_Scheduled_Cron_Jobs/PostgressBackup.js');
 
 scheduled_quotes_emails();
 hr_email_schedule();
 birthday_auto_schedule();
+// PostgressBackup();
 
 // ROUTES ARE ALL HERE -> look at app.use("/") -> this gives you an idea of the url
 const baseRouter = require('./02_Routes/01_base_Router');

@@ -22,7 +22,7 @@ const today_now = datefns.format(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS');
 router.get('/', async (req, res) => {
 	const { customer } = req.query;
 	const sql = knex(getContactDB)
-		.select('contact_id', 'full_name')
+		.select('contact_id', 'full_name', 'email')
 		.where('deleted', '=', 0)
 		.orderBy('full_name', 'asc');
 	let getEntries;

@@ -41,47 +41,6 @@ router.use('/:id/projects_notes', require('./projects_notes'));
 // /project -> PATCH -> TABLE -> get all projects paginated
 getTableRoute.getTableData(router, getProjectsDB);
 
-// router.get(`/table`, async (req, res) => {
-// 	const page = req.query.page;
-// 	const perPage = req.query.perPage;
-
-// 	const search = Object.keys(JSON.parse(req.query.search));
-// 	const newArrayCleaned = [];
-
-// 	search.map((each) => {
-// 		const parsedObj = JSON.parse(req.query.search)[each];
-// 		parsedObj.filterBy !== '' && newArrayCleaned.push(parsedObj);
-// 	});
-
-// 	const paginatedTable = await knex(getProjectsDB)
-// 		.select(
-// 			'workorder_id',
-// 			'id',
-// 			'project',
-// 			'customer_name',
-// 			'customer_id',
-// 			'contact_id',
-// 			'contact_name',
-// 			'projectmanager_name',
-// 			'project_status',
-// 			'project_technology',
-// 			'contract_total',
-// 			'invoiced_total'
-// 		)
-// 		.modify((builder) => {
-// 			SearchBuilder(newArrayCleaned, builder);
-// 		})
-// 		.orderBy('project_id', 'desc')
-
-// 		.paginate({
-// 			perPage: perPage,
-// 			currentPage: page,
-// 			isLengthAware: true,
-// 		});
-
-// 	res.json(paginatedTable);
-// });
-
 router.get(`/table`, authorize({ project_read: true }), async (req, res) => {
 	const { start, size, filters, sorting, globalFilter } = req.query;
 
