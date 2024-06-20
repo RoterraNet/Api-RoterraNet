@@ -10,12 +10,15 @@ const {
 	getWorkordersDB,
 	postWorkordersDB,
 	getProjectsDB,
+	postWorkordersItemsDB,
 } = require('../../../01_Database/database');
 
 const router = express.Router();
 const knex = require('../../../01_Database/connection');
 const authorize = require('../../Authorization/authorization');
 const { todayDate } = require('../../../03_Utils/formatDates');
+const { formatProjectSheetPipes } = require('./project_sheet_functions');
+const { result } = require('lodash');
 
 router.get('/get_sheet/:project_id', authorize(), async (req, res) => {
 	const { project_id } = req.params;
@@ -272,9 +275,9 @@ router.post('/createWorkorder/', authorize(), async (req, res) => {
 			.count('project_id')
 			.where({ project_id: project_id })
 			.returning('count', 'workorder_name');
-
+		let workorder_id = [];
 		if (getTotalWorkOrdersOnProject[0].count !== 0) {
-			result = await knex(postWorkordersDB)
+			workorder_id = await knex(postWorkordersDB)
 				.insert({
 					created_on: created_on,
 					created_by_id: created_by,
@@ -288,7 +291,7 @@ router.post('/createWorkorder/', authorize(), async (req, res) => {
 				})
 				.returning('*');
 		} else {
-			result = await knex(postWorkordersDB)
+			workorder_id = await knex(postWorkordersDB)
 				.insert({
 					created_on: created_on,
 					created_by_id: created_by,
@@ -303,9 +306,19 @@ router.post('/createWorkorder/', authorize(), async (req, res) => {
 				.returning('workorder_id');
 		}
 
-		console.log(getTotalWorkOrdersOnProject);
+		const new_workorder_id = workorder_id[0].workorder_id;
+
+		const formattedPipes = await formatProjectSheetPipes(
+			new_workorder_id,
+			pipes,
+			created_on,
+			created_by
+		);
+
+		const addWorkorderItemsToDB = await knex(postWorkordersItemsDB).insert(formattedPipes);
+
 		res.statusCode = 202;
-		res.json('test');
+		res.json(new_workorder_id);
 	} catch (error) {
 		console.log(error);
 		res.json('addToDb');
