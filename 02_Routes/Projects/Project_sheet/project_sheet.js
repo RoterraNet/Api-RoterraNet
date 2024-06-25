@@ -269,13 +269,13 @@ router.post('/createWorkorder/', authorize(), async (req, res) => {
 	try {
 		workorderNameFromProject = await knex(getProjectsDB)
 			.select('workorder_id')
-			.where({ project_id: project_id });
+			.where({ id: project_id });
 
 		getTotalWorkOrdersOnProject = await knex(getWorkordersDB)
 			.count('project_id')
 			.where({ project_id: project_id })
 			.returning('count', 'workorder_name');
-		let workorder_id = [];
+		let workorder_id;
 		if (getTotalWorkOrdersOnProject[0].count !== 0) {
 			workorder_id = await knex(postWorkordersDB)
 				.insert({
@@ -321,7 +321,7 @@ router.post('/createWorkorder/', authorize(), async (req, res) => {
 		res.json(new_workorder_id);
 	} catch (error) {
 		console.log(error);
-		res.json('addToDb');
+		res.json({ msg: 'something went wrong', error: error });
 	}
 });
 
