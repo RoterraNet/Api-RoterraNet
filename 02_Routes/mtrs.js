@@ -28,8 +28,6 @@ getTableRoute.getTableData(router, getMaterialTracking);
 router.post('/', async (req, res) => {
 	const { values } = req.body;
 
-	console.log('values', values);
-
 	try {
 		const postNewMTR = await knex(postMaterialTracking)
 			.insert({
@@ -50,6 +48,36 @@ router.post('/', async (req, res) => {
 
 		res.status = 202;
 		res.json({ msg: 'New MTR was created', newMTR: postNewMTR[0] });
+	} catch (e) {
+		console.log('e', e);
+		res.status = 500;
+		res.json({ error: e, msg: 'Something went wrong. Check Error' });
+	}
+});
+
+router.post('/addMTR', async (req, res) => {
+	const { values } = req.body;
+
+	try {
+		// const postNewMTR = await knex(postMaterialTracking)
+		// 	.insert({
+		// 		created_by: values.created_by,
+		// 		created_on: values.created_on,
+		// 		po_id: values.po_id,
+		// 		po_detail_id: values.po_detail_id,
+
+		// 		manufacture: values.manufacture,
+		// 		supplier: values.supplier,
+		// 		company: values.company,
+		// 	})
+		// 	.returning('mtr_id');
+
+		// const poUpdateId = await knex(database.postPoDetailDB)
+		// 	.where({ id: values.po_detail_id })
+		// 	.update({ mtr_id: postNewMTR[0] });
+
+		res.status = 202;
+		res.json({ msg: 'New MTR was created' });
 	} catch (e) {
 		console.log('e', e);
 		res.status = 500;

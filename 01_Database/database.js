@@ -6,6 +6,8 @@ exports.postActivitiesDB = 'roterranet.activities';
 exports.getCalendarCategoriesDB = 'roterranet.calendar_categories';
 exports.postCalendarCategoriesDB = 'roterranet.calendar_categories';
 
+exports.postCalendarLocationsDB = 'roterranet.calendar_locations';
+
 exports.getContactDB = 'roterranet.view_contact';
 exports.postContactDB = 'roterranet.contact';
 

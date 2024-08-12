@@ -41,7 +41,16 @@ router.get(`/table`, async (req, res) => {
 	const parsedColumnSorting = JSON.parse(sorting);
 
 	const paginatedTable = await knex(getSuppliersDB)
-		.select('supplier_id','status', 'name', 'phone', 'email', 'class', 'status_name', 'status_bg_color')
+		.select(
+			'supplier_id',
+			'status',
+			'name',
+			'phone',
+			'email',
+			'class',
+			'status_name',
+			'status_bg_color'
+		)
 		.modify((builder) => {
 			if (!!parsedColumnFilters.length) {
 				parsedColumnFilters.map((filter) => {
@@ -143,5 +152,34 @@ putRoute.editById(router, getSuppliersDB, postSuppliersDB, today_now, 'supplier_
 
 // /suppliers/:id -> DELETE -> delete one supplier
 deleteRoute.deleteRoute(router, postSuppliersDB, today_now, 'supplier_id');
+
+// router.post('/consolidate', async (req, res) => {
+// 	const { values } = req.body;
+// 	console.log(values);
+// 	try {
+// 		const mainSupplierId = values[0];
+// 		const secondSupplierId = values[1];
+
+// 		await knex(database.postPoDB)
+// 			.update({ supplier: mainSupplierId })
+// 			.where({ supplier: secondSupplierId });
+// 		const updateSupplier = await knex(postSuppliersDB)
+// 			.update({
+// 				deleted: 1,
+// 				deleted_by: 614,
+// 				deleted_on: new Date(),
+// 				status: 2,
+// 			})
+// 			.where({ supplier_id: secondSupplierId });
+
+// 		console.log('consolidate supplier');
+// 		res.status = 202;
+// 		res.json({ msg: 'consolidated' });
+// 	} catch (e) {
+// 		res.status = 500;
+// 		console.log(e);
+// 		res.json({ error: e, msg: 'Something went wrong. Check Error' });
+// 	}
+// });
 
 module.exports = router;

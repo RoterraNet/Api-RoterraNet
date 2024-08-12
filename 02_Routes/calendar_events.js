@@ -126,15 +126,21 @@ router.get('/categories', async (req, res) => {
 
 //  GETS ALL DATA FROM TABLE AND CONVERTS NAMES TO ALLOW CALENDER TO BE USED
 router.get('/all', async (req, res) => {
-	const { start, end } = req.query;
+	const { start, end, location } = req.query;
 
 	try {
 		const query = knex.raw(
-			"id, created_by,user_id, date at time zone 'MST' AS start, return_date at time zone 'MST' AS end, category_name, category, location, description, CASE WHEN category = 1 THEN CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END ELSE event_name END title, CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END detail,  CASE WHEN category = 1 THEN '#2e7d32' WHEN category = 2 THEN '#d32f2f' WHEN category = 3 THEN '#9c27b0' WHEN category = 4 THEN '#ed6c02' END color"
+			"id, created_by,user_id, date at time zone 'MST' AS start, return_date at time zone 'MST' AS end, category_name, category, location, location_id, description, CASE WHEN category = 1 THEN CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END ELSE event_name END title, CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END detail,  CASE WHEN category = 1 THEN '#2e7d32' WHEN category = 2 THEN '#d32f2f' WHEN category = 3 THEN '#9c27b0' WHEN category = 4 THEN '#ed6c02' END color"
 		);
 		const getInAndOut = await knex(getInAndOutDB)
 			.select(query)
 			.whereBetween('date', [start, end])
+			.modify((builder) => {
+				if (location !== 'all') {
+					builder.andWhere({ location_id: location });
+				}
+			})
+
 			.orderBy('id', 'desc');
 
 		res.send(getInAndOut);
@@ -147,6 +153,15 @@ router.get('/:id', async (req, res) => {
 	const { id } = req.params;
 	const getOne = await knex(getInAndOutDB).where({ id: id });
 	res.json(getOne);
+});
+
+router.get('/calendarLocations/123', async (req, res) => {
+	const calendarLocations = await knex(database.postCalendarLocationsDB)
+		.select('id', 'location_name')
+		.where({
+			deleted: false,
+		});
+	res.json(calendarLocations);
 });
 
 module.exports = router;
