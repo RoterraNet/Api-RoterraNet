@@ -2,13 +2,9 @@ require('dotenv').config();
 const axios = require('axios');
 
 const smtp2GoTemplateSendMail = async ({ to, subject, templateId, templateData }) => {
-	// const apiKey = process.env.SMTP2GO_API_KEY;
+	const apiKey = process.env.SMTP2GO_API_KEY;
 
-	const apiKey = 'api-E35681F9D89043B4A15C218687F508E9';
-
-	const apiUrl = 'https://api.smtp2go.com/v3/email/send';
-
-	// const apiUrl = 'https://api.smtp2go.com/v3/';
+	const apiUrl = process.env.SMTP2GO_API_URL;
 
 	const emailData = {
 		api_key: apiKey,
