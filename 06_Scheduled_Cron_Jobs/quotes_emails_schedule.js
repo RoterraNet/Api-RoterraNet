@@ -15,10 +15,16 @@ module.exports = () => {
 	cron.schedule('0 7 * * 1-5', async () => {
 		// await manager_daily_mail();
 
-		await estimator_daily_mail();
-		await engineer_daily_mail();
+		try {
+			console.log('sending emails');
+			await estimator_daily_mail();
+			await engineer_daily_mail();
 
-		await estimator_daily_followUp_email();
+			await estimator_daily_followUp_email();
+			console.log('sending emails sent');
+		} catch (error) {
+			console.log('error', error);
+		}
 	});
 	// At 07:00 on every Friday.
 	// cron.schedule('0 7 * * 5', async () => {

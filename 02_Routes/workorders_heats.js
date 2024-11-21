@@ -26,6 +26,7 @@ router.get('/:id/heats', async (req, res) => {
 
 	const getAllEntry = await knex(getWorkordersHeatsDB)
 		.select('heat')
+		.distinctOn('heat')
 		.modify((builder) => {
 			if (type == 'plate') {
 				builder.whereIn('plate', convertStringToNum);
@@ -33,8 +34,7 @@ router.get('/:id/heats', async (req, res) => {
 				builder.where({ pipe: id });
 			}
 		})
-		.andWhereBetween('created_on', [sixMonthAgo, format(new Date(), 'yyyy-MM-dd')])
-		.orderBy('id', 'desc');
+		.andWhereBetween('created_on', [sixMonthAgo, format(new Date(), 'yyyy-MM-dd')]);
 
 	res.json(getAllEntry);
 });

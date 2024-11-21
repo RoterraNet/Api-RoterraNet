@@ -58,7 +58,7 @@ const endOfTable = `</table></body></html>`;
 // ESTIMATOR EMAIL Template
 exports.createQuoteSummaryEmailEstimators = (data) => {
 	const headersOfTable = `
-	<h2>Assigned To: ${data[0].assigned_to_name}<h2>
+	<h2>Assigned To: ${data.assigned_to_name}<h2>
 	<table>
 	<tr>
 		<th class="header">Quote ID</th>
@@ -110,7 +110,7 @@ exports.createQuoteSummaryEmailEstimators = (data) => {
 // ENGINEER EMAIL Template
 exports.createQuoteSummaryEmailEngineers = (data) => {
 	const headersOfTable = `
-	<h2>Assigned To: ${data[0].eng_contact_name}<h2>
+	<h2>Assigned To: ${data.eng_contact_name}<h2>
 	<table>
 	<tr>
 		<th class="header">Quote id</th>

@@ -24,7 +24,7 @@ that has a RETURN_DATE that has NOT been past todays date
 and a DATE (leaving date) that has yet to come */
 router.get('/current', async (req, res) => {
 	const rawData = knex.raw(
-		"date at time zone 'MST' as date, return_date at time zone 'MST' as return_date, id, description, location, start_time, end_time, created_by, category, user_id, created_by_name, event_name, category_name,image"
+		"date at time zone 'MST' as date, return_date at time zone 'MST' as return_date, id, description, location, start_time, end_time, created_by, category, user_id, created_by_name, event_name, category_name,image, location,location_id"
 	);
 	const getInAndOut = await knex(getInAndOutDB)
 		.select(rawData)
@@ -99,11 +99,11 @@ router.post('/', async (req, res) => {
 		return newArrayOfDates;
 	};
 
-	const fieldsToInsert = checkDateValues(values).map((field) => {
-		return field;
-	});
-	const getInAndOut = await knex(postInAndOutDB).insert(fieldsToInsert).returning('*');
-	console.log(getInAndOut);
+	// const fieldsToInsert = checkDateValues(values).map((field) => {
+	// 	return field;
+	// });
+	const postInAndOut = await knex(postInAndOutDB).insert(values).returning('*');
+	console.log(postInAndOut);
 	try {
 	} catch (error) {
 		console.log(error);
@@ -120,8 +120,15 @@ putRoute.editById(router, getInAndOutDB, postInAndOutDB, today_now, 'id');
 // /calendarevent/categories' -> GET
 // GETS the list of catergories for dropdown menu
 router.get('/categories', async (req, res) => {
-	const getCategories = await knex(getCalendarCategoriesDB);
-	res.json(getCategories);
+	try {
+		const deleted = req.query;
+		console.log(deleted);
+		const getCategories = await knex(getCalendarCategoriesDB).where({ deleted: deleted });
+		res.json(getCategories);
+	} catch (error) {
+		console.log(error);
+		res.json({ msg: 'Something went wrong', error: error });
+	}
 });
 
 //  GETS ALL DATA FROM TABLE AND CONVERTS NAMES TO ALLOW CALENDER TO BE USED
@@ -130,10 +137,12 @@ router.get('/all', async (req, res) => {
 
 	try {
 		const query = knex.raw(
-			"id, created_by,user_id, date at time zone 'MST' AS start, return_date at time zone 'MST' AS end, category_name, category, location, location_id, description, CASE WHEN category = 1 THEN CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END ELSE event_name END title, CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END detail,  CASE WHEN category = 1 THEN '#2e7d32' WHEN category = 2 THEN '#d32f2f' WHEN category = 3 THEN '#9c27b0' WHEN category = 4 THEN '#ed6c02' END color"
+			`id, created_by,user_id, date at time zone 'MST' AS start, return_date at time zone 'MST' AS end, category_name, category, location, location_id, description, 
+			CASE WHEN category = 1 THEN CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END ELSE event_name END title, 
+			CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END detail`
 		);
 		const getInAndOut = await knex(getInAndOutDB)
-			.select(query)
+			.select(query, 'color')
 			.whereBetween('date', [start, end])
 			.modify((builder) => {
 				if (location !== 'all') {

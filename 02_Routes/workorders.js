@@ -624,5 +624,5 @@ router.get('/test/test/:id', async (req, res) => {
 		insertedAmount = 0;
 	}
 
-	res.json(allItems);
+	res.json(itemsDetail);
 });

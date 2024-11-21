@@ -45,4 +45,45 @@ const router = express.Router();
  */
 router.get('/getLocations', authorize({}), CalendarEventsController.getLocations);
 
+/**
+ * @openapi
+ * /api/v1/calendar/CalendarEventsRouter/getCategories/:
+ *   get:
+ *     summary: Gets a list of all Categories for calendar
+ *     tags:
+ *       - Calendar
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         description: JWT token for authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/mtrAddNew'
+ *     responses:
+ *       '200':
+ *         description: A list of all Categories Locations
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/mtrAddNew'
+ *     securitySchemes:
+ *       bearerAuth:
+ *         type: http
+ *         scheme: bearer
+ *         bearerFormat: JWT
+ *         description: |
+ *           JWT token for authorization.
+ *           You can obtain a token by logging in and using the /api/auth/login endpoint.
+ */
+router.get('/getCategories', authorize({}), CalendarEventsController.getCategories);
 module.exports = router;

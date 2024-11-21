@@ -63,6 +63,68 @@ router.get('/onBoardingQuestions', authorize({}), usersBoardingController.getOnb
  *         scheme: bearer
  *         bearerFormat: JWT
  */
-router.get('/onBoardingAnswers', authorize({}), usersBoardingController.updateOnBoardingAnswers);
+router.post('/onBoardingAnswers', authorize({}), usersBoardingController.updateOnBoardingAnswers);
+/**
+ * @openapi
+ * /api/v1/users/usersBoarding/terminationReason:
+ *   post:
+ *     summary: Termination reason
+ *     tags:
+ *       - Users Termination reason
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         description: JWT token for authorization
+ *         required: true
+ *     responses:
+ *       '200':
+ *         description: Termination reason
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Termination reason'
+ *     securitySchemes:
+ *       bearer:
+ *         type: http
+ *         scheme: bearer
+ *         bearerFormat: JWT
+ */
+router.post('/terminationReason', authorize({}), usersBoardingController.addTerminationReason);
+
+/**
+ * @openapi
+ * /api/v1/users/usersBoarding/terminationReason:
+ *   get:
+ *     summary: Termination reason
+ *     tags:
+ *       - Users Termination reason
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         description: JWT token for authorization
+ *         required: true
+ *     responses:
+ *       '200':
+ *         description: Termination reason
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Termination reason'
+ *     securitySchemes:
+ *       bearer:
+ *         type: http
+ *         scheme: bearer
+ *         bearerFormat: JWT
+ */
+
+router.get('/terminationReason', authorize({}), usersBoardingController.getTerminationReason);
 
 module.exports = router;

@@ -52,7 +52,7 @@ exports.estimator_daily_mail = async () => {
 		.distinct('assigned_to_id')
 		.where('status', '=', 0)
 		.andWhere('final_completed_by_id', '=', 0)
-		.andWhere('deleted', '=', 0).and;
+		.andWhere('deleted', '=', 0);
 
 	for (let i = 0; i < estimators_ids_with_open_quotes.length; i++) {
 		const estimator_id = estimators_ids_with_open_quotes[i].assigned_to_id;
