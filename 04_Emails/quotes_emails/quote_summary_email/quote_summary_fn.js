@@ -52,12 +52,12 @@ exports.estimator_daily_mail = async () => {
 		.distinct('assigned_to_id')
 		.where('status', '=', 0)
 		.andWhere('final_completed_by_id', '=', 0)
-		.andWhere('deleted', '=', 0);
+		.andWhere('assigned_to_user_status', '=', 0);
 
 	for (let i = 0; i < estimators_ids_with_open_quotes.length; i++) {
 		const estimator_id = estimators_ids_with_open_quotes[i].assigned_to_id;
 		const estimators_work_email = await knex(getUsersDB)
-			.select('work_email')
+			.select('work_email', 'preferred_name')
 			.where('user_id', '=', estimator_id);
 		const estimators_open_quotes = await knex(getQuotesDB)
 			.select('*')
@@ -69,9 +69,13 @@ exports.estimator_daily_mail = async () => {
 			])
 			.andWhere('assigned_to_id', '=', estimator_id)
 			.orderBy('due_date', 'asc');
+
 		sendMail(
 			makeEmailObject(
-				createQuoteSummaryEmailEstimators(estimators_open_quotes),
+				createQuoteSummaryEmailEstimators({
+					data: estimators_open_quotes,
+					name: estimators_work_email[0].preferred_name,
+				}),
 				estimators_work_email[0].work_email,
 				'Assigned Open Quotes'
 			)
@@ -84,12 +88,12 @@ exports.estimator_daily_followUp_email = async () => {
 		.distinct('assigned_to_id')
 		.where('status', '=', 5)
 		.andWhere('follow_up', '=', true)
-		.andWhere('deleted', '=', 0);
+		.andWhere('assigned_to_user_status', '=', 0);
 
 	for (let i = 0; i < estimators_ids_with_follow_ups.length; i++) {
 		const estimator_id = estimators_ids_with_follow_ups[i].assigned_to_id;
 		const estimators_work_email = await knex(getUsersDB)
-			.select('work_email')
+			.select('work_email', 'preferred_name')
 			.where('user_id', '=', estimator_id);
 
 		const estimators_follow_ups = await knex(getQuotesDB)
@@ -102,7 +106,10 @@ exports.estimator_daily_followUp_email = async () => {
 
 		const sentMail = sendMail(
 			makeEmailObject(
-				createQuoteSummaryEmailEstimators(estimators_follow_ups),
+				createQuoteSummaryEmailEstimators({
+					data: estimators_follow_ups,
+					name: estimators_work_email[0].preferred_name,
+				}),
 				estimators_work_email[0].work_email,
 				'Todays Quote Follow Ups'
 			)
@@ -117,25 +124,27 @@ exports.engineer_daily_mail = async () => {
 		.distinct('eng_contact_id')
 		.where('eng_required', '=', true)
 		.andWhere('eng_completed_by_id', '=', 0)
-		.andWhere('deleted', '=', 0);
+		.andWhere('eng_user_status', '=', 0);
 
 	arrayOfMailObjects = [];
 	for (let i = 0; i < engineers_ids_with_open_quotes.length; i++) {
 		const engineers_id = engineers_ids_with_open_quotes[i].eng_contact_id;
 
 		const engineers_work_email = await knex(getUsersDB)
-			.select('work_email')
-			.where('user_id', '=', engineers_id);
+			.select('work_email', 'preferred_name')
+			.where({ user_id: engineers_id });
 		// const engineers_open_quotes = await knex(getQuotesDB).select('*').where('eng_required', '=', true).andWhere('eng_completed_by_id', '=', 0);
 		const engineers_open_quotes = await knex(getQuotesDB)
 			.select('*')
-			.whereIn('quote_status_description', ['2. Engineering'])
-			.andWhere('eng_contact_id', '=', engineers_id)
-			.orderBy('due_date', 'asc');
+			.where({ quote_status_description: 'Awaiting Eng' })
+			.andWhere({ eng_contact_id: engineers_id });
 
 		sendMail(
 			makeEmailObject(
-				createQuoteSummaryEmailEngineers(engineers_open_quotes),
+				createQuoteSummaryEmailEngineers({
+					data: engineers_open_quotes,
+					name: engineers_work_email[0].preferred_name,
+				}),
 				engineers_work_email[0].work_email,
 				'Engineering Open Quotes'
 			)
