@@ -9,9 +9,10 @@ const updateGeneralInformation = async (req, res) => {
         const data = await knex(postUsersDB)
             .update(body.update)
             .where({user_id: body.user_id});
-        res.send('data');
+            res.status(202).json({ message: 'Information has been updated', color: 'success' });
     } catch (e) {
-        console.log(e)
+        res.status(500).json({ message: 'Something Went Wrong', color: 'error', error: e });
+		console.log(e);
     }
 }
 
