@@ -142,7 +142,7 @@ app.use('/user_notifications_settings', require('./02_Routes/notification_settin
 app.use('/user_item_tracker', require('./02_Routes/user_item_tracker'));
 app.use('/user_previous_employment', require('./02_Routes/users_previous_emplyoment'));
 
-app.use('/users_hierarchy', require('./02_Routes/Users/UsersHierarchy/usersHierarchy'));
+// app.use('/users_hierarchy', require('./02_Routes/Users/UsersHierarchy/usersHierarchy'));
 app.use('/workorders', require('./02_Routes/workorders'));
 app.use('/workorderheats', require('./02_Routes/workorders_heats'));
 app.use('/workorderitemsdetails', require('./02_Routes/workorders_items_details'));
