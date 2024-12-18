@@ -67,30 +67,62 @@
 const express = require('express');
 const router = express.Router();
 
-const { getUsersDB } = require('../../../01_Database/database');
+const { getUsersDB, getOrganizationalChartDB, postOrganizationalChartDB } = require('../../../01_Database/database');
 
 const knex = require('../../../01_Database/connection');
 
 const getAllActiveEmployees = async (req, res) => {
-	const data = await knex(getUsersDB)
-		.select(knex.raw("CONCAT(first_name,' ',last_name) as full_name"), 'position_name', 'user_id', 'image')
-		.where('deleted', '=', 0)
-		.orderBy('first_name', 'asc');
-	
-	data.forEach((user, index) => {
-		data[index] = {
-			nodeLabel: user.full_name,
-			nodeData: {
-				full_name: user.full_name,
-				position_name: user.position_name,
-				image: user.image,
-				user_id: user.user_id
+	try {
+		const data = await knex(getUsersDB)
+			.select(knex.raw("CONCAT(first_name,' ',last_name) as full_name"), 'position_name', 'user_id', 'image')
+			.where('deleted', '=', 0)
+			.orderBy('first_name', 'asc');
+		
+		data.forEach((user, index) => {
+			data[index] = {
+				nodeLabel: user.full_name,
+				nodeData: {
+					full_name: user.full_name,
+					position_name: user.position_name,
+					image: user.image,
+					user_id: user.user_id
+				}
 			}
-		}
-	})
-	res.send(data);
+		})
+		res.status(200).json(data);
+	} catch (e) {
+		res.status(500).json({ message: 'Error getting active employees', color: 'error', error: e })
+		console.log(e)
+	}
+}
+
+const getChartData = async (req, res) => {
+	try {
+		const data = await knex(getOrganizationalChartDB)
+			.select(knex.raw("*"))
+			.orderBy('id', 'desc')
+			.limit("1");
+		res.status(200).json({message: 'Successfully retrieved chart data', color: 'success', data: data})
+	} catch (e) {
+		res.status(500).json({ message: 'Error getting chart data', color: 'error', error: e })
+		console.log(e)
+	}
+	
+}
+
+const postChartData = async (req, res) => {
+	try {
+		console.log(req.body)
+		await knex(postOrganizationalChartDB).insert(req.body);
+		res.status(200).json({message: 'Successfully saved uploaded chart data', color: 'success'});
+	} catch (e) {
+		res.status(500).json({ message: 'Error uploading chart data', color: 'error', error: e })
+		console.log(e)
+	}
 }
 
 module.exports = {
-	getAllActiveEmployees
+	getAllActiveEmployees,
+	getChartData,
+	postChartData
 }

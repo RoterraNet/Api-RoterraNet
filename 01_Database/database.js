@@ -83,6 +83,9 @@ exports.postMaterialTrackingTEST = 'roterranet.material_tracking_test';
 
 exports.getNotificationSettingsDB = 'roterranet.notification_settings';
 
+exports.getOrganizationalChartDB = 'roterranet.organizational_chart';
+exports.postOrganizationalChartDB = 'roterranet.organizational_chart';
+
 exports.getUserNotificationsDB = 'roterranet.notifications';
 exports.postUserNotificationsDB = 'roterranet.notifications';
 
