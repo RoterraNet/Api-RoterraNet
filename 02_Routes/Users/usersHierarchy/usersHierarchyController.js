@@ -74,7 +74,12 @@ const knex = require('../../../01_Database/connection');
 const getAllActiveEmployees = async (req, res) => {
 	try {
 		const data = await knex(getUsersDB)
-			.select(knex.raw("CONCAT(first_name,' ',last_name) as full_name"), 'position_name', 'user_id', 'image')
+			.select(
+				knex.raw(
+					"CASE WHEN alias_first_name = '' THEN CONCAT(first_name,' ',last_name) ELSE CONCAT(alias_first_name,' ',last_name) END as full_name"), 
+					'position_name', 
+					'user_id', 
+					'image')
 			.where('deleted', '=', 0)
 			.orderBy('first_name', 'asc');
 		
