@@ -21,9 +21,9 @@ const getIntranetPermissions = async (req, res) => {
                 'user_read', 'user_create', 'user_update', 'user_delete', 'user_manager',
                 'logistics_read', 'logistics_create', 'logistics_update', 'logistics_delete', 'logistics_manager',
                 'manufacturing', 
-                'plasma_table_operator'
+                'plasma_table_operator',
             )
-            .where('user_id', '=', id);
+            .where({user_id: id});
         res.status(202).json({ message: 'Permissions retrieved', color: 'success', data: data})
     } catch (e) {
         res.status(500).json({ message: 'Error retrieving permissions', color: 'error', error: e });
@@ -47,7 +47,7 @@ const getIntranetLimits = async (req, res) => {
                 'project_limit_other',
                 'workorder_limit_other'
             )
-            .where('user_id', '=', id);
+            .where({user_id: id});
         res.status(202).json({ message: 'Limits retrieved', color: 'success', data: data})
     } catch (e) {
         res.status(500).json({ message: 'Error retrieving limits', color: 'error', error: e });
