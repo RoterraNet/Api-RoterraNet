@@ -4,6 +4,8 @@ const router = express.Router();
 
 const usersInformationController = require('./usersInformationController');
 
-router.put('/updateGeneralInformation', authorize({}), usersInformationController.updateGeneralInformation);
+router.put('/updateUserInformation', authorize({}), usersInformationController.updateGeneralInformation);
+router.get('/getIntranetPermissions/:id', authorize({}), usersInformationController.getIntranetPermissions);
+router.get('/getIntranetLimits/:id', authorize({}), usersInformationController.getIntranetLimits);
 
 module.exports = router;

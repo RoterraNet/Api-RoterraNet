@@ -6,7 +6,7 @@ const { getUsersHierarchyDB } = require('../../../01_Database/database');
 const knex = require('../../../01_Database/connection');
 const authorize = require('../../Authorization/authorization');
 
-router.get('/get_hierarchy', authorize(), async (req, res) => {
+router.get('/get_hierarchy', authorize({}), async (req, res) => {
 	const data = await knex(getUsersHierarchyDB).select();
 
 	function transformData(inputData) {
