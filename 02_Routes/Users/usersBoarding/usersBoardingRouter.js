@@ -93,7 +93,11 @@ router.post('/onBoardingAnswers', authorize({}), usersBoardingController.updateO
  *         scheme: bearer
  *         bearerFormat: JWT
  */
-router.post('/terminationReason', authorize({}), usersBoardingController.addTerminationReason);
+router.post(
+	'/terminationReason',
+	authorize({ user_manager: true }),
+	usersBoardingController.addTerminationReason
+);
 
 /**
  * @openapi
@@ -125,6 +129,16 @@ router.post('/terminationReason', authorize({}), usersBoardingController.addTerm
  *         bearerFormat: JWT
  */
 
-router.get('/terminationReason', authorize({}), usersBoardingController.getTerminationReason);
+router.get(
+	'/terminationReason',
+	authorize({ user_manager: true }),
+	usersBoardingController.getTerminationReason
+);
+
+router.put(
+	'/terminationReason',
+	authorize({ user_manager: true }),
+	usersBoardingController.updateTerminationReason
+);
 
 module.exports = router;
