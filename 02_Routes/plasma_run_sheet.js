@@ -11,7 +11,7 @@ const format = require('date-fns/format');
 const { includes } = require('lodash');
 const authorize = require('./Authorization/authorization');
 
-const sixMonthAgo = format(subMonths(new Date(), 6), 'yyyy-MM-dd');
+const sixMonthAgo = format(subMonths(new Date(), 12), 'yyyy-MM-dd');
 
 const getPlasmaRunSheetsDB = database.getPlasmaRunSheetsDB;
 const postPlasmaRunSheetsDB = database.postPlasmaRunSheetsDB;

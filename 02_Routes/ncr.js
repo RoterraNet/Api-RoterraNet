@@ -42,9 +42,9 @@ router.get(`/table`, async (req, res) => {
 			'material_cost',
 			'total_value',
 			'rca_id',
+			'deleted',
 			sql
 		)
-		.where({ deleted: false })
 		.modify((builder) => {
 			if (!!parsedColumnFilters.length) {
 				parsedColumnFilters.map((filter) => {
@@ -81,22 +81,20 @@ router.get(`/table`, async (req, res) => {
 
 router.get(`/table/download`, authorize(), async (req, res) => {
 	const sql = knex.raw('LEFT(detail, 50) AS summary ');
-	const paginatedTable = await knex(getNcrDB)
-		.select(
-			'id',
-			'created_on',
-			'created_by_name',
-			'classification',
-			'department_label',
-			'classification_name',
-			'internal_department',
-			'defect_code',
-			'status',
-			'total_value',
-			'detail',
-			sql
-		)
-		.where({ deleted: false });
+	const paginatedTable = await knex(getNcrDB).select(
+		'id',
+		'created_on',
+		'created_by_name',
+		'classification',
+		'department_label',
+		'classification_name',
+		'internal_department',
+		'defect_code',
+		'status',
+		'total_value',
+		'detail',
+		sql
+	);
 	res.json(paginatedTable);
 });
 
