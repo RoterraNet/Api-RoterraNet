@@ -89,10 +89,19 @@ const updateIntranetPermissions = async (req, res) => {
 
         AddUpdateAllUserPermissions(updated_permissions, user_id)
         
-        const permission_changes = { changes: [] }
-        for (const p of changed_to_restricted) permission_changes.changes.push(`${p}: true -> false`)
-        for (const p of changed_to_allowed) permission_changes.changes.push(`${p}: false -> true`)
-        permission_changes.changes.sort();
+        const permission_changes = { 
+            changed_to_restricted: changed_to_restricted,
+            changed_to_allowed: changed_to_allowed,
+            num_changed_to_restricted: changed_to_restricted.length,
+            num_changed_to_allowed: changed_to_allowed.length,
+            num_changed: changed_to_allowed.length + changed_to_restricted.length,
+        }
+        // for (const p of changed_to_restricted) permission_changes.changes.push(`${p}: allowed -> restricted`)
+        // for (const p of changed_to_allowed) permission_changes.changes.push(`${p}: restricted -> allowed`)
+        // permission_changes.changes.sort();
+        // permission_changes.num_changed = permission_changes.changes.length;
+        // permission_changes.num_changed_to_restricted = changed_to_restricted.length;
+        // permission_changes.num_changed_to_allowed = changed_to_allowed.length;
         JSON.stringify(permission_changes);
 
         const logData = {
