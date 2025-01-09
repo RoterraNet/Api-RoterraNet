@@ -225,6 +225,9 @@ exports.postUsersEmploymentRecordDB = 'roterranet.users_employment_records';
 exports.getUsersPerformanceReviewDB = 'roterranet.view_user_performance_review';
 exports.postUsersPerformanceReviewDB = 'roterranet.user_performance_review';
 
+exports.getUsersPermissionsLogs = 'roterranet.view_user_permissions_logs';
+exports.postUsersPermissionsLogs = 'roterranet.user_permissions_logs';
+
 exports.getUsersPreviousUsersDB = 'roterranet.view_users_previous_users';
 exports.postUsersPreviousUsersDB = 'roterranet.users_previous_users';
 
