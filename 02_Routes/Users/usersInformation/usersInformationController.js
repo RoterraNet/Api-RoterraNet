@@ -12,7 +12,7 @@ const getIntranetPermissions = async (req, res) => {
     try {
         const { user_id } = req.query;
         console.log(`getting user permissions of user ${user_id}`);
-        const data = await knex(getUsersPermissionsDB)
+        const permissions = await knex(getUsersPermissionsDB)
             .select(
                 'quote_read', 'quote_create', 'quote_update', 'quote_delete', 'quote_manager', 
                 'customer_read', 'customer_create', 'customer_update', 'customer_delete', 'customer_manager',
@@ -25,12 +25,12 @@ const getIntranetPermissions = async (req, res) => {
                 'logistics_read', 'logistics_create', 'logistics_update', 'logistics_delete', 'logistics_manager',
                 'company as welder',
                 'manufacturing', 
-                'plasma_table_operator',
-            )
+                'plasma_table_operator')
             .where({user_id: user_id});
+
         const allowed = [];
         const restricted = [];
-        for (const [key, value] of Object.entries(data[0])) {
+        for (const [key, value] of Object.entries(permissions[0])) {
             if (key === 'welder') {
                 if (value == 1) {
                     restricted.push(key);
@@ -59,6 +59,11 @@ const updateIntranetPermissions = async (req, res) => {
     try {
         const { user_id, update_details } = req.body
         console.log('permission update details', update_details); 
+        
+        // grab full permissions data
+        const full_permissions = await knex(getUsersPermissionsDB)
+            .select('*')
+            .where({user_id: user_id});
 
         const {   
             new_allowed, 
@@ -87,8 +92,10 @@ const updateIntranetPermissions = async (req, res) => {
             }
         }
 
-        AddUpdateAllUserPermissions(updated_permissions, user_id)
-        
+        // update full permissions data 
+        const full_updated = {...full_permissions[0], ...updated_permissions}
+        await AddUpdateAllUserPermissions(full_updated, user_id) // requires entire permission view data for proper updating
+
         const permission_changes = { 
             changed_to_restricted: changed_to_restricted,
             changed_to_allowed: changed_to_allowed,
@@ -96,12 +103,7 @@ const updateIntranetPermissions = async (req, res) => {
             num_changed_to_allowed: changed_to_allowed.length,
             num_changed: changed_to_allowed.length + changed_to_restricted.length,
         }
-        // for (const p of changed_to_restricted) permission_changes.changes.push(`${p}: allowed -> restricted`)
-        // for (const p of changed_to_allowed) permission_changes.changes.push(`${p}: restricted -> allowed`)
-        // permission_changes.changes.sort();
-        // permission_changes.num_changed = permission_changes.changes.length;
-        // permission_changes.num_changed_to_restricted = changed_to_restricted.length;
-        // permission_changes.num_changed_to_allowed = changed_to_allowed.length;
+        
         JSON.stringify(permission_changes);
 
         const logData = {
@@ -115,6 +117,8 @@ const updateIntranetPermissions = async (req, res) => {
         console.log('log to be inserted:', logData)
 
         await knex(postUsersPermissionsLogs).insert(logData)
+
+
         res.status(202).json({ message: 'Permissions sent for updating', color: 'success'})
     } catch (e) {
         res.status(500).json({ message: 'Error updating permissions', color: 'error', error: e });
@@ -122,7 +126,7 @@ const updateIntranetPermissions = async (req, res) => {
     }
 }
 
-const getIntranetLimits = async (req, res) => {
+const getAccountInformation = async (req, res) => {
     try {
         const { user_id } = req.query;
         console.log(`getting user permissions of user ${user_id}`);
@@ -146,12 +150,32 @@ const getIntranetLimits = async (req, res) => {
     }
 }
 
+const updateAccountInformation = async (req, res) => {
+    try {
+        const { user_id, update_details } = req.body
+
+        // grab full permissions data
+        const full_permissions = await knex(getUsersPermissionsDB)
+            .select('*')
+            .where({user_id: user_id});
+        
+        // update full permissions data 
+        const full_updated = {...full_permissions[0], ...update_details}
+        await AddUpdateAllUserPermissions(full_updated, user_id) // requires entire permission view data for proper updating
+
+        res.status(200).json({ message: 'Information has been updated', color: 'success' });
+    } catch (e) {
+        res.status(500).json({ message: 'Error updating information', color: 'error', error: e });
+		console.log(e);
+    }
+};
+
 const updateGeneralInformation = async (req, res) => {
     try {
-        const { user_id, update } = req.body
+        const { user_id, update_details } = req.body
         const body = req.body;
         const data = await knex(postUsersDB)
-            .update(update)
+            .update(update_details)
             .where({user_id: user_id});
         res.status(200).json({ message: 'Information has been updated', color: 'success' });
     } catch (e) {
@@ -163,6 +187,7 @@ const updateGeneralInformation = async (req, res) => {
 module.exports = {
     getIntranetPermissions,
     updateIntranetPermissions,
-    getIntranetLimits,
+    getAccountInformation,
 	updateGeneralInformation,
+    updateAccountInformation
 };
