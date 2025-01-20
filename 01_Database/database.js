@@ -228,6 +228,9 @@ exports.postUsersEmploymentRecordDB = 'roterranet.users_employment_records';
 exports.getUsersPerformanceReviewDB = 'roterranet.view_user_performance_review';
 exports.postUsersPerformanceReviewDB = 'roterranet.user_performance_review';
 
+exports.getUsersPermissionsLogs = 'roterranet.view_user_permissions_logs';
+exports.postUsersPermissionsLogs = 'roterranet.user_permissions_logs';
+
 exports.getUsersPreviousUsersDB = 'roterranet.view_users_previous_users';
 exports.postUsersPreviousUsersDB = 'roterranet.users_previous_users';
 
@@ -258,6 +261,9 @@ exports.getUsersCoursesDB = 'roterranet.view_users_courses';
 exports.postUsersCoursesDB = 'roterranet.users_courses';
 
 exports.getUsersPermissionsDB = 'roterranet.view_users_permissions';
+
+exports.getUsersPermissionsLogsDB = 'roterranet.view_users_permissions_logs'
+exports.postUsersPermissionsLogsDB = 'roterranet.users_permissions_logs'
 
 exports.getUserRightsDB = 'roterranet.user_rights'; // Change to users_rights => one day
 
