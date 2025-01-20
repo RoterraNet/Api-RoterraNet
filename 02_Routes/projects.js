@@ -46,6 +46,7 @@ router.get(`/table`, authorize({ project_read: true }), async (req, res) => {
 
 	const parsedColumnFilters = JSON.parse(filters);
 	const parsedColumnSorting = JSON.parse(sorting);
+	console.log(getProjectsDB)
 
 	const paginatedTable = await knex(getProjectsDB)
 		.select(
@@ -78,6 +79,9 @@ router.get(`/table`, authorize({ project_read: true }), async (req, res) => {
 						builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
 					}
 				});
+			}
+			if (!!globalFilter) {
+				builder.whereRaw(`${getProjectsDB}.*::text iLIKE ?`, [`%${globalFilter}%`]);
 			}
 			if (!!parsedColumnSorting.length) {
 				parsedColumnSorting.map((sort) => {

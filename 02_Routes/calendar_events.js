@@ -136,13 +136,29 @@ router.get('/all', async (req, res) => {
 	const { start, end, location } = req.query;
 
 	try {
+		// const query = knex.raw(
+		// 	`id, created_by,user_id, date at time zone 'MST' AS start, return_date at time zone 'MST' AS end, category_name, category, location, location_id, description,
+		// 	CASE WHEN category = 1 THEN CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END ELSE event_name END title,
+		// 	CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END detail`
+		// );
 		const query = knex.raw(
-			`id, created_by,user_id, date at time zone 'MST' AS start, return_date at time zone 'MST' AS end, category_name, category, location, location_id, description, 
-			CASE WHEN category = 1 THEN CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END ELSE event_name END title, 
+			`CASE WHEN category = 1 THEN CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END ELSE event_name END title, 
 			CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END detail`
 		);
 		const getInAndOut = await knex(getInAndOutDB)
-			.select(query, 'color')
+			.select(
+				query,
+				'color',
+				'id',
+				'created_by',
+				' date as start',
+				'return_date as end',
+				'category_name',
+				'category',
+				'location',
+				'location_id',
+				'description'
+			)
 			.whereBetween('date', [start, end])
 			.modify((builder) => {
 				if (location !== 'all') {

@@ -12,16 +12,13 @@ module.exports = () => {
 	// At 07:00 on every day-of-week from Monday through Friday.
 	// cron.schedule('0,15,30,59 1-59 0-23 * * *', async () => {
 
-	cron.schedule('0 7 * * 1-5', async () => {
+	cron.schedule('* 7 * * 1-5', async () => {
 		// await manager_daily_mail();
 
 		try {
-			console.log('sending emails');
 			await estimator_daily_mail();
 			await engineer_daily_mail();
-
 			await estimator_daily_followUp_email();
-			console.log('sending emails sent');
 		} catch (error) {
 			console.log('error', error);
 		}

@@ -115,9 +115,23 @@ const getTerminationReason = async (req, res) => {
 	}
 };
 
+const updateTerminationReason = async (req, res) => {
+	const { id, update } = req.body;
+
+	console.log(id, update);
+	try {
+		const results = await knex(postUsersPreviousUsersDB).update(update).where({ id: id });
+		res.status(200).json(results);
+	} catch (error) {
+		console.error('Error fetching:', error);
+		res.status(500).json({ error: 'Failed to update data' });
+	}
+};
+
 module.exports = {
 	getOnboardingQuestions,
 	updateOnBoardingAnswers,
 	addTerminationReason,
 	getTerminationReason,
+	updateTerminationReason,
 };
