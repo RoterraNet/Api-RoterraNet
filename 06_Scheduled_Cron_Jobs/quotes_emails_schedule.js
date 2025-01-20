@@ -12,7 +12,7 @@ module.exports = () => {
 	// At 07:00 on every day-of-week from Monday through Friday.
 	// cron.schedule('0,15,30,59 1-59 0-23 * * *', async () => {
 
-	cron.schedule('* 7 * * 1-5', async () => {
+	cron.schedule('0 7 * * *', async () => {
 		// await manager_daily_mail();
 
 		try {
@@ -25,6 +25,6 @@ module.exports = () => {
 	});
 	// At 07:00 on every Friday.
 	// cron.schedule('0 7 * * 5', async () => {
-	// 	// await senior_manager_weekly_mail();
+	// await senior_manager_weekly_mail();
 	// });
 };
