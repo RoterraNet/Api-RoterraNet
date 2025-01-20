@@ -259,6 +259,9 @@ exports.postUsersCoursesDB = 'roterranet.users_courses';
 
 exports.getUsersPermissionsDB = 'roterranet.view_users_permissions';
 
+exports.getUsersPermissionsLogsDB = 'roterranet.view_users_permissions_logs'
+exports.postUsersPermissionsLogsDB = 'roterranet.users_permissions_logs'
+
 exports.getUserRightsDB = 'roterranet.user_rights'; // Change to users_rights => one day
 
 exports.getUsersHierarchyDB = 'roterranet.view_users_hierarchy';

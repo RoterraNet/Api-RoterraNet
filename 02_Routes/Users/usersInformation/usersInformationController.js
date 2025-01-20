@@ -1,10 +1,9 @@
 const express = require('express');
 const knex = require('../../../01_Database/connection');
-const { getUsersDB,
-        postUsersDB,
+const { postUsersDB,
         getUsersPermissionsDB,
-        getUsersPermissionsLogs,
-        postUsersPermissionsLogs
+        getUsersPermissionsLogsDB,
+        postUsersPermissionsLogsDB
  } = require('../../../01_Database/database');
 const { AddUpdateAllUserPermissions } = require('../../../02.1_Complicated_Route_Functions/user_permissions_addEdit_fn');
 
@@ -71,9 +70,8 @@ const updateIntranetPermissions = async (req, res) => {
 
             changed_to_restricted, 
             changed_to_allowed,
-            updated_by_id,
-            updated_by_name,
-            updated_on
+            created_by_id,
+            created_on,
         } = update_details
 
         const updated_permissions = {};
@@ -108,21 +106,34 @@ const updateIntranetPermissions = async (req, res) => {
 
         const logData = {
             user_id: user_id,
-            created_on: updated_on,
-            updated_by_id: updated_by_id,
-            updated_by_name: updated_by_name,
+            created_on: created_on,
+            created_by_id: created_by_id,
             permission_changes: permission_changes
         }
 
         console.log('log to be inserted:', logData)
 
-        await knex(postUsersPermissionsLogs).insert(logData)
+        await knex(postUsersPermissionsLogsDB).insert(logData)
 
 
-        res.status(202).json({ message: 'Permissions sent for updating', color: 'success'})
+        res.status(202).json({ message: 'Permissions successfully updated', color: 'success'})
     } catch (e) {
         res.status(500).json({ message: 'Error updating permissions', color: 'error', error: e });
 		console.log(e);
+    }
+}
+
+const getIntranetPermissionsLogs = async (req, res) => {
+    try {
+        const { user_id } = req.query;
+        console.log(`getting user permissions logs of user ${user_id}`);
+        const data = await knex(getUsersPermissionsLogsDB)
+            .select('created_on', 'created_by_name', 'permission_changes')
+            .where({user_id: user_id});
+        res.status(200).json({ message: 'Permission logs retrieved', color: 'success', data: data})
+    } catch (e) {
+        res.status(500).json({ message: 'Error retrieving permission logs', color: 'error', error: e });
+        console.log(e);
     }
 }
 
@@ -187,6 +198,7 @@ const updateGeneralInformation = async (req, res) => {
 module.exports = {
     getIntranetPermissions,
     updateIntranetPermissions,
+    getIntranetPermissionsLogs,
     getAccountInformation,
 	updateGeneralInformation,
     updateAccountInformation
