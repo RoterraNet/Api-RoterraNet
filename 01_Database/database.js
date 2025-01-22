@@ -57,6 +57,12 @@ exports.getHelixOptionsDB = 'roterranet.helix_options';
 exports.getHrFilesDB = 'roterranet.view_hr_files';
 exports.postHrFilesDB = 'roterranet.hr_files';
 
+exports.getHrTodosBenefitsDB = 'roterranet.view_benefits_todos'
+exports.postHrTodosBenefitsDB = 'roterranet.benefits_todos'
+
+exports.getHrTodosRRSPDB = 'roterranet.view_rrsp_todos'
+exports.postHrTodosRRSPDB = 'roterranet.rrsp_todos'
+
 exports.getInAndOutDB = 'roterranet.view_calendar_3';
 exports.postInAndOutDB = 'roterranet.calendar_events_main';
 
