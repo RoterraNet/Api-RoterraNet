@@ -13,7 +13,7 @@ const getUpcomingBenefitsTodos = async (req, res) => {
     try {
         const benefitsTodosData = await knex(getHrTodosBenefitsDB)
             .select('*')
-            .where({completed: false})
+            // .where({completed: false})
 
         // console.log('benefits todos data', benefitsTodosData)
 

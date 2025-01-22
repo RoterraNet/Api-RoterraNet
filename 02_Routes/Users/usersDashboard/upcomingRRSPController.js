@@ -11,7 +11,7 @@ const getUpcomingRRSPTodos = async (req, res) => {
     try {
         const rrspTodosData = await knex(getHrTodosRRSPDB)
             .select('*')
-            .where({completed: false})
+            // .where({completed: false})
         
         console.log('rrsp todos', rrspTodosData)
 
