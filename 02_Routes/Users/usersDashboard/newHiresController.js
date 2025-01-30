@@ -2,6 +2,7 @@ const knex = require('../../../01_Database/connection');
 const {
 	getUsersNewUsersCheckList,
 	postUsersNewUsersCheckList,
+	postOnboardingChecklists
 } = require('../../../01_Database/database');
 
 const getAllNewHires = async (req, res) => {
@@ -17,6 +18,7 @@ const getAllNewHires = async (req, res) => {
 const createNewHireCheck = async (values) => {
 	try {
 		const addData = await knex(postUsersNewUsersCheckList).insert(values);
+		await knex(postOnboardingChecklists).insert({user_id: values.user_id});
 	} catch (error) {
 		console.error('Error creating new hire check:', error);
 		throw error;
@@ -34,3 +36,4 @@ module.exports = {
 	createNewHireCheck,
 	updateOneNewHireCheck,
 };
+

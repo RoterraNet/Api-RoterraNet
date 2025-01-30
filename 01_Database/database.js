@@ -137,6 +137,9 @@ exports.postRcaTeamMembersDB = 'roterranet.rca_team_members';
 exports.getRcaImprovementsDB = 'roterranet.view_rca_improvments';
 exports.postRcaImprovementsDB = 'roterranet.rca_improvments';
 
+exports.getOnboardingChecklistsDB = 'roterranet.view_onboarding_checklists';
+exports.postOnboardingChecklistsDB = 'roterranet.onboarding_checklists'
+
 exports.postOrderControlDB = 'roterranet.ordercontrol';
 exports.getOrderControlDB = 'roterranet.view_ordercontrol';
 

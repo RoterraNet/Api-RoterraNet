@@ -4,10 +4,17 @@ const router = express.Router();
 const userDashboardController = require('./newHiresController');
 const offBoardingController = require('./offBoardingController');
 const HrTodoController = require('./HrTodoController');
-const upcomingRRSPController = require('./upcomingRRSPController')
-const upcomingBenefitsController = require('./upcomingBenefitsController')
-const upcomingAnniversariesController = require('./upcomingAnniversariesController')
-const testUpcomingTodosController = require('./testUpcomingTodosController')
+const onboardingTodosController = require('./hrDashboard/onboardingTodosController')
+const upcomingRRSPTodosController = require('./hrDashboard/upcomingRRSPTodosController')
+const upcomingBenefitsTodosController = require('./hrDashboard/upcomingBenefitsTodosController')
+const upcomingAnniversariesController = require('./hrDashboard/upcomingAnniversariesController')
+const testUpcomingTodosController = require('./hrDashboard/testUpcomingTodosController')
+const testOnboardingTodosController = require('./hrDashboard/testOnboardingTodosController')
+
+router.get('/onboardingTodos', authorize({}), onboardingTodosController.getOnboardingTodos) 
+router.put('/onboardingTodos', authorize({}), onboardingTodosController.updateOnboardingTodos) 
+
+router.put('/testOnboardingTodos', authorize({}), testOnboardingTodosController.makeOnboardingTodos) 
 
 /**
  * @openapi
@@ -279,7 +286,7 @@ router.get('/todos', authorize({}), HrTodoController.getAllHrTodo);
  *           JWT token for authorization.
  *           You can obtain a token by logging in and using the /api/auth/login endpoint.
  */
-router.get('/upcomingRRSPTodos', authorize({}), upcomingRRSPController.getUpcomingRRSPTodos);
+router.get('/upcomingRRSPTodos', authorize({}), upcomingRRSPTodosController.getUpcomingRRSPTodos);
 
 /**
  * @openapi
@@ -321,7 +328,7 @@ router.get('/upcomingRRSPTodos', authorize({}), upcomingRRSPController.getUpcomi
  *           JWT token for authorization.
  *           You can obtain a token by logging in and using the /api/auth/login endpoint.
  */
-router.put('/upcomingRRSPTodos', authorize({}), upcomingRRSPController.updateRRSPTodos)
+router.put('/upcomingRRSPTodos', authorize({}), upcomingRRSPTodosController.updateRRSPTodos)
 
 /**
  * @openapi
@@ -363,7 +370,7 @@ router.put('/upcomingRRSPTodos', authorize({}), upcomingRRSPController.updateRRS
  *           JWT token for authorization.
  *           You can obtain a token by logging in and using the /api/auth/login endpoint.
  */
-router.get('/upcomingBenefitsTodos', authorize({}), upcomingBenefitsController.getUpcomingBenefitsTodos)
+router.get('/upcomingBenefitsTodos', authorize({}), upcomingBenefitsTodosController.getUpcomingBenefitsTodos)
 
 /**
  * @openapi
@@ -405,9 +412,10 @@ router.get('/upcomingBenefitsTodos', authorize({}), upcomingBenefitsController.g
  *           JWT token for authorization.
  *           You can obtain a token by logging in and using the /api/auth/login endpoint.
  */
-router.put('/upcomingBenefitsTodos', authorize({}), upcomingBenefitsController.updateBenefitsTodos)
+router.put('/upcomingBenefitsTodos', authorize({}), upcomingBenefitsTodosController.updateBenefitsTodos)
 
 router.put('/testUpcomingTodos', authorize({}), testUpcomingTodosController.makeUpcomingTodos) 
+
 
 /**
  * @openapi

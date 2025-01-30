@@ -4,8 +4,8 @@ const {
     getUsersBenefitsDB,
     postHrTodosBenefitsDB,
     postHrTodosRRSPDB,
-} = require('../../../01_Database/database');
-const knex = require('../../../01_Database/connection');
+} = require('../../../../01_Database/database');
+const knex = require('../../../../01_Database/connection');
 
 // WARNING: WILL DELETE ALL CURRENT DATA FROM TODO TABLES AND 
 // ADD ALL UPCOMING TODOS WITHIN A YEAR
@@ -22,7 +22,7 @@ const makeUpcomingTodos = async (req, res) => {
 			.where(getUpcomingRRSP)
 			.andWhere({deleted: 0});
 
-            console.log('upcoming RRSP', upcomingRRSPUsers)
+		console.log('upcoming RRSP', upcomingRRSPUsers)
 		if (upcomingRRSPUsers.length !== 0) {
 			const newTodos = [];
 			for (const user of upcomingRRSPUsers) {
@@ -44,7 +44,7 @@ const makeUpcomingTodos = async (req, res) => {
         await knex(postHrTodosBenefitsDB).delete()
 
 		const getUpcomingBenefits = [
-			['90 days', knex.raw("DATE(effective_date) BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '365 days')")],
+			['Benefits effective', knex.raw("DATE(effective_date) BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '365 days')")],
 			['1 year', knex.raw("DATE(effective_date + INTERVAL '1 year') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '365 days')")],
 			['5 year', knex.raw("DATE(effective_date + INTERVAL '5 years') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '365 days')")],
 			['10 year', knex.raw("DATE(effective_date + INTERVAL '10 years') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '365 days')")],
@@ -61,7 +61,7 @@ const makeUpcomingTodos = async (req, res) => {
 				const newTodos = [];
 				for (const user of upcomingBenefitsUsers) {
 					const { user_id, effective_date } = user;
-                    const due_date = new Date(effective_date)
+                    const due_date = new Date(effective_date);
 					const todo = {
 						user_id: user_id,
 						completed: false,
@@ -69,7 +69,7 @@ const makeUpcomingTodos = async (req, res) => {
 					}
 
 					switch (milestone) {
-						case '90 days':
+						case 'Benefits effective':
                             todo['due_date'] = due_date;
 							todo['confirmed_enrolment'] = false;
 							todo['emailed_details'] = false;
