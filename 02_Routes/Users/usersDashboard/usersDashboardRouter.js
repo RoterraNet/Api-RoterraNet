@@ -5,16 +5,21 @@ const userDashboardController = require('./newHiresController');
 const offBoardingController = require('./offBoardingController');
 const HrTodoController = require('./HrTodoController');
 const onboardingTodosController = require('./hrDashboard/onboardingTodosController')
+const offboardingTodosController = require('./hrDashboard/offboardingTodosController')
 const upcomingRRSPTodosController = require('./hrDashboard/upcomingRRSPTodosController')
 const upcomingBenefitsTodosController = require('./hrDashboard/upcomingBenefitsTodosController')
 const upcomingAnniversariesController = require('./hrDashboard/upcomingAnniversariesController')
 const testUpcomingTodosController = require('./hrDashboard/testUpcomingTodosController')
 const testOnboardingTodosController = require('./hrDashboard/testOnboardingTodosController')
+const testOffboardingTodosController = require('./hrDashboard/testOffboardingTodosController')
 
 router.get('/onboardingTodos', authorize({}), onboardingTodosController.getOnboardingTodos) 
 router.put('/onboardingTodos', authorize({}), onboardingTodosController.updateOnboardingTodos) 
-
 router.put('/testOnboardingTodos', authorize({}), testOnboardingTodosController.makeOnboardingTodos) 
+
+router.get('/offboardingTodos', authorize({}), offboardingTodosController.getOffboardingTodos) 
+router.put('/offboardingTodos', authorize({}), offboardingTodosController.updateOffboardingTodos) 
+router.put('/testOffboardingTodos', authorize({}), testOffboardingTodosController.makeOffboardingTodos) 
 
 /**
  * @openapi
