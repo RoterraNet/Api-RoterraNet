@@ -18,7 +18,7 @@ const getAllNewHires = async (req, res) => {
 const createNewHireCheck = async (values) => {
 	try {
 		const addData = await knex(postUsersNewUsersCheckList).insert(values);
-		await knex(postOnboardingChecklists).insert({user_id: values.user_id});
+		await knex(postOnboardingChecklists).insert({user_id: values.user_id, start_date: start_date});
 	} catch (error) {
 		console.error('Error creating new hire check:', error);
 		throw error;
