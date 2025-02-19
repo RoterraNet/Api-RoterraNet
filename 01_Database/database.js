@@ -57,6 +57,9 @@ exports.getHelixOptionsDB = 'roterranet.helix_options';
 exports.getHrFilesDB = 'roterranet.view_hr_files';
 exports.postHrFilesDB = 'roterranet.hr_files';
 
+exports.getHSEFilesDB = 'roterranet.view_hse_files';
+exports.postHSEFilesDB = 'roterranet.hse_files';
+
 exports.getInAndOutDB = 'roterranet.view_calendar_3';
 exports.postInAndOutDB = 'roterranet.calendar_events_main';
 
@@ -176,6 +179,9 @@ exports.postProjectSheetItemListDetailsDB = 'roterranet.project_sheet_item_detai
 
 exports.getProjectsGraphApiDB = 'roterranet.projects_graph_api';
 
+exports.getQualityFilesDB = 'roterranet.view_quality_files';
+exports.postQualityFilesDB = 'roterranet.quality_files';
+
 exports.getQuotesDB = 'roterranet.view_quotes';
 exports.postQuotesDB = 'roterranet.quotes5';
 
@@ -262,8 +268,8 @@ exports.postUsersCoursesDB = 'roterranet.users_courses';
 
 exports.getUsersPermissionsDB = 'roterranet.view_users_permissions';
 
-exports.getUsersPermissionsLogsDB = 'roterranet.view_users_permissions_logs'
-exports.postUsersPermissionsLogsDB = 'roterranet.users_permissions_logs'
+exports.getUsersPermissionsLogsDB = 'roterranet.view_users_permissions_logs';
+exports.postUsersPermissionsLogsDB = 'roterranet.users_permissions_logs';
 
 exports.getUserRightsDB = 'roterranet.user_rights'; // Change to users_rights => one day
 
