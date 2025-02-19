@@ -38,6 +38,8 @@ const getUpcomingRRSPTodos = async (req, res) => {
 					completed: todo.completed,
 					completed_on: todo.completed_on,
 					completed_by_name: todo.completed_by_name,
+					updated_by_name: todo.updated_by_name,
+					updated_on: todo.updated_on,
 				},
 				checklist: {
 					emailed_details: todo.emailed_details,
@@ -88,8 +90,8 @@ const updateRRSPTodos = async (req, res) => {
 
 			const updatedTodo = {
 				...newTodo.checklist,
-				// updated_by: edited_by,
-				// updated_on: edited_on,
+				updated_by_id: edited_by,
+				updated_on: edited_on,
 			};
 
 			if (newTodo.details.completed == true && oldTodo.details.completed == false) {

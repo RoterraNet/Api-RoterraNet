@@ -172,7 +172,7 @@ const updateOnboardingTodos = async (req, res) => {
 
 			const updatedTodo = {
 				...newTodo.checklist,
-				updated_by: edited_by,
+				updated_by_id: edited_by,
 				updated_on: edited_on,
 			};
 
