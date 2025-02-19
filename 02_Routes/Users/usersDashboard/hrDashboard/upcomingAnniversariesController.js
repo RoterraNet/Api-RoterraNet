@@ -42,7 +42,7 @@ const getUpcomingAnniversaries = async (req, res) => {
 					anniversary_num: nthAnniversary,
 					days_before: daysBefore,
 				});
-			} else if (nthAnniversary % 5 == 0 && daysBefore <= 365) {
+			} else if (nthAnniversary % 5 == 0 && daysBefore <= 90) {
 				majorAnniversaryData.push({
 					user_id: user.user_id,
 					preferred_name: user.preferred_name,
