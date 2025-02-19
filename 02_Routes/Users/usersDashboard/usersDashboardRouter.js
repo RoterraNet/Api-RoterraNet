@@ -4,6 +4,22 @@ const router = express.Router();
 const userDashboardController = require('./newHiresController');
 const offBoardingController = require('./offBoardingController');
 const HrTodoController = require('./HrTodoController');
+const onboardingTodosController = require('./hrDashboard/onboardingTodosController')
+const offboardingTodosController = require('./hrDashboard/offboardingTodosController')
+const upcomingRRSPTodosController = require('./hrDashboard/upcomingRRSPTodosController')
+const upcomingBenefitsTodosController = require('./hrDashboard/upcomingBenefitsTodosController')
+const upcomingAnniversariesController = require('./hrDashboard/upcomingAnniversariesController')
+const testUpcomingTodosController = require('./hrDashboard/testUpcomingTodosController')
+const testOnboardingTodosController = require('./hrDashboard/testOnboardingTodosController')
+const testOffboardingTodosController = require('./hrDashboard/testOffboardingTodosController')
+
+router.get('/onboardingTodos', authorize({}), onboardingTodosController.getOnboardingTodos) 
+router.put('/onboardingTodos', authorize({}), onboardingTodosController.updateOnboardingTodos) 
+router.put('/testOnboardingTodos', authorize({}), testOnboardingTodosController.makeOnboardingTodos) 
+
+router.get('/offboardingTodos', authorize({}), offboardingTodosController.getOffboardingTodos) 
+router.put('/offboardingTodos', authorize({}), offboardingTodosController.updateOffboardingTodos) 
+router.put('/testOffboardingTodos', authorize({}), testOffboardingTodosController.makeOffboardingTodos) 
 
 /**
  * @openapi
@@ -195,7 +211,7 @@ router.post('/offBoarding', authorize({}), offBoardingController.createOffBoardi
 
 /**
  * @openapi
- * /api/v1/users/dashboard/todo:
+ * /api/v1/users/dashboard/todos:
  *   get:
  *     summary: Gets a Summery of what is needed to be done
  *     tags:
@@ -233,5 +249,222 @@ router.post('/offBoarding', authorize({}), offBoardingController.createOffBoardi
  *           JWT token for authorization.
  *           You can obtain a token by logging in and using the /api/auth/login endpoint.
  */
-router.get('/todos', HrTodoController.getAllHrTodo);
+router.get('/todos', authorize({}), HrTodoController.getAllHrTodo);
+
+/**
+ * @openapi
+ * /api/v1/users/dashboard/upcomingRRSPTodos:
+ *   get:
+ *     summary: Get all upcoming RRSP todos
+ *     tags:
+ *       - RRSP todos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         description: JWT token for authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/getUpcomingRRSPTodos'
+ *     responses:
+ *       '200':
+ *         description: A list of all RRSP todos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/getUpcomingRRSPTodos'
+ *     securitySchemes:
+ *       bearerAuth:
+ *         type: http
+ *         scheme: bearer
+ *         bearerFormat: JWT
+ *         description: |
+ *           JWT token for authorization.
+ *           You can obtain a token by logging in and using the /api/auth/login endpoint.
+ */
+router.get('/upcomingRRSPTodos', authorize({}), upcomingRRSPTodosController.getUpcomingRRSPTodos);
+
+/**
+ * @openapi
+ * /api/v1/users/dashboard/newHires:
+ *   put:
+ *     summary: Update all upcoming RRSP todos
+ *     tags:
+ *       - RRSP todos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         description: JWT token for authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/updateRRSPTodos'
+ *     responses:
+ *       '200':
+ *         description: 
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: 
+ *               items:
+ *                 $ref: '#/components/schemas/updateRRSPTodos'
+ *     securitySchemes:
+ *       bearerAuth:
+ *         type: http
+ *         scheme: bearer
+ *         bearerFormat: JWT
+ *         description: |
+ *           JWT token for authorization.
+ *           You can obtain a token by logging in and using the /api/auth/login endpoint.
+ */
+router.put('/upcomingRRSPTodos', authorize({}), upcomingRRSPTodosController.updateRRSPTodos)
+
+/**
+ * @openapi
+ * /api/v1/users/dashboard/upcomingRRSPTodos:
+ *   get:
+ *     summary: Get all upcoming benefits todos
+ *     tags:
+ *       - benefits todos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         description: JWT token for authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/getUpcomingBenefitsTodos'
+ *     responses:
+ *       '200':
+ *         description: A list of all Benefits todos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/getUpcomingBenefitsTodos'
+ *     securitySchemes:
+ *       bearerAuth:
+ *         type: http
+ *         scheme: bearer
+ *         bearerFormat: JWT
+ *         description: |
+ *           JWT token for authorization.
+ *           You can obtain a token by logging in and using the /api/auth/login endpoint.
+ */
+router.get('/upcomingBenefitsTodos', authorize({}), upcomingBenefitsTodosController.getUpcomingBenefitsTodos)
+
+/**
+ * @openapi
+ * /api/v1/users/dashboard/newHires:
+ *   put:
+ *     summary: Update all upcoming benefits todos
+ *     tags:
+ *       - benefits todos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         description: JWT token for authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/updateBenefitsTodos'
+ *     responses:
+ *       '200':
+ *         description: 
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: 
+ *               items:
+ *                 $ref: '#/components/schemas/updateBenefitsTodos'
+ *     securitySchemes:
+ *       bearerAuth:
+ *         type: http
+ *         scheme: bearer
+ *         bearerFormat: JWT
+ *         description: |
+ *           JWT token for authorization.
+ *           You can obtain a token by logging in and using the /api/auth/login endpoint.
+ */
+router.put('/upcomingBenefitsTodos', authorize({}), upcomingBenefitsTodosController.updateBenefitsTodos)
+
+router.put('/testUpcomingTodos', authorize({}), testUpcomingTodosController.makeUpcomingTodos) 
+
+
+/**
+ * @openapi
+ * /api/v1/users/dashboard/upcomingRRSPTodos:
+ *   get:
+ *     summary: Get all upcoming anniversaries
+ *     tags:
+ *       - upcoming anniversaries
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         description: JWT token for authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/getUpcomingAnniversaries'
+ *     responses:
+ *       '200':
+ *         description: A list of all Benefits todos
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/getUpcomingAnniversaries'
+ *     securitySchemes:
+ *       bearerAuth:
+ *         type: http
+ *         scheme: bearer
+ *         bearerFormat: JWT
+ *         description: |
+ *           JWT token for authorization.
+ *           You can obtain a token by logging in and using the /api/auth/login endpoint.
+ */
+router.get('/upcomingAnniversaries', authorize({}), upcomingAnniversariesController.getUpcomingAnniversaries)
+
+
+
+
 module.exports = router;

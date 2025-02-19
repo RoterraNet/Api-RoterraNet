@@ -1,6 +1,6 @@
 const express = require('express');
 const knex = require('../01_Database/connection');
-const { getUsersDB, postNewsDB, getUsersBenefitsDB } = require('../01_Database/database');
+const { getUsersDB, postNewsDB, getUsersBenefitsDB, postHrTodosBenefitsDB, postHrTodosRRSPDB } = require('../01_Database/database');
 const { sendMail } = require('../04_Emails/00_mailer');
 const { hr_probation_email } = require('../04_Emails/hr_emails/hr_probation_email');
 const { hr_performance_review_email } = require('../04_Emails/hr_emails/performanceReviewEMail');
@@ -112,6 +112,115 @@ const benefitsEligibilityReminder = async () => {
 	}
 };
 
+const addHrTodos = async () => {
+	/* 
+	Adds RRSP eligibility and benefits milestones to todo tables 1 month 
+	in advance of actual date, called every morning at 6am
+	 */
+	try {
+		// get all users whose rrsp eligibility is in exactly 1 month
+		const getUpcomingRRSP = knex.raw("DATE(current_date + INTERVAL '1 month') = DATE(rrsp_eligibility)");
+		const upcomingRRSPUsers = await knex(getUsersBenefitsDB)
+			.select('user_id', 'rrsp_eligibility')
+			.where(getUpcomingRRSP)
+			.andWhere({deleted: 0});
+
+		// add to RRSP todo table and assign default values
+		if (upcomingRRSPUsers.length !== 0) {
+			const newTodos = [];
+			for (const user of upcomingRRSPUsers) {
+				const { user_id, rrsp_eligibility } = user;
+				const todo = {
+					user_id: user_id,
+					due_date: rrsp_eligibility,
+                    emailed_details: false,
+					completed: false
+				}
+				newTodos.push(todo)
+			}
+
+			// add to table
+            console.log('adding new rrsp todos:', newTodos)
+			await knex(postHrTodosRRSPDB)
+				.insert(newTodos);
+		}
+
+		// get all users who have a benefit milestone in exactly 1 month
+		const getUpcomingBenefits = [
+			['90 days', knex.raw("DATE(current_date + INTERVAL '1 month') = DATE(effective_date)")],
+			['1 year', knex.raw("DATE(current_date + INTERVAL '1 month') = DATE(effective_date + INTERVAL '1 year')")],
+			['5 year', knex.raw("DATE(current_date + INTERVAL '1 month') = DATE(effective_date + INTERVAL '5 years')")],
+			['10 year', knex.raw("DATE(current_date + INTERVAL '1 month') = DATE(effective_date + INTERVAL '10 years')")],
+		]
+		for (const [milestone, query] of getUpcomingBenefits) {
+			const upcomingBenefitsUsers = await knex(getUsersBenefitsDB)
+				.select('user_id', 'effective_date')
+				.where(query)
+				.andWhere({deleted: 0});
+
+			if (upcomingBenefitsUsers.length !== 0) {
+				const newTodos = [];
+				for (const user of upcomingBenefitsUsers) {
+					const { user_id, effective_date } = user;
+                    const due_date = new Date(effective_date)
+					const todo = {
+						user_id: user_id,
+						completed: false,
+						milestone: milestone
+					}
+
+					// assign default values to benefit todo depending on milestone
+					switch (milestone) {
+						case '90 days':
+                            todo['due_date'] = due_date;
+							todo['confirmed_enrolment'] = false;
+							todo['emailed_details'] = false;
+							todo['added_benefit_deduction'] = false;
+							break;
+
+						case '1 year':
+                            due_date.setFullYear(due_date.getFullYear() + 1)
+                            todo['due_date'] = due_date;
+							todo['emailed_details'] = false;
+							todo['ordered_hsp_card'] = false;
+							todo['updated_benefit_class'] = false;
+							break;
+
+						case '5 year': 
+                            due_date.setFullYear(due_date.getFullYear() + 5)
+                            todo['due_date'] = due_date;
+                            todo['emailed_details'] = false;
+                            todo['updated_hsp_amount'] = false;
+                            todo['updated_benefit_class'] = false;
+                            break;
+
+                        case '10 year': 
+                            due_date.setFullYear(due_date.getFullYear() + 10)
+                            todo['due_date'] = due_date;
+							todo['emailed_details'] = false;
+							todo['updated_hsp_amount'] = false;
+							todo['updated_benefit_class'] = false;
+							break;
+
+						default:
+							break;
+					}
+
+					newTodos.push(todo)
+                }
+
+				// add to table
+                console.log(`adding new benefits todos (${milestone}):`, newTodos)
+				await knex(postHrTodosBenefitsDB)
+					.insert(newTodos);
+			}
+		}
+
+	} catch (error) {
+		console.log('Something went wrong adding HR todos', error);
+	}
+};
+
 const performanceReviewReminder = async () => {
 	try {
 		const getProbationSQL = knex.raw(
@@ -141,4 +250,5 @@ module.exports = {
 	get_probation_period_83_days,
 	benefitsEligibilityReminder,
 	performanceReviewReminder,
+	addHrTodos
 };

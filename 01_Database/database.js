@@ -57,8 +57,12 @@ exports.getHelixOptionsDB = 'roterranet.helix_options';
 exports.getHrFilesDB = 'roterranet.view_hr_files';
 exports.postHrFilesDB = 'roterranet.hr_files';
 
-exports.getHSEFilesDB = 'roterranet.view_hse_files';
-exports.postHSEFilesDB = 'roterranet.hse_files';
+
+exports.getHrTodosBenefitsDB = 'roterranet.view_benefits_todos'
+exports.postHrTodosBenefitsDB = 'roterranet.benefits_todos'
+
+exports.getHrTodosRRSPDB = 'roterranet.view_rrsp_todos'
+exports.postHrTodosRRSPDB = 'roterranet.rrsp_todos'
 
 exports.getInAndOutDB = 'roterranet.view_calendar_3';
 exports.postInAndOutDB = 'roterranet.calendar_events_main';
@@ -133,6 +137,12 @@ exports.postRcaTeamMembersDB = 'roterranet.rca_team_members';
 
 exports.getRcaImprovementsDB = 'roterranet.view_rca_improvments';
 exports.postRcaImprovementsDB = 'roterranet.rca_improvments';
+
+exports.getOffboardingChecklistsDB = 'roterranet.view_offboarding_checklists';
+exports.postOffboardingChecklistsDB = 'roterranet.offboarding_checklists'
+
+exports.getOnboardingChecklistsDB = 'roterranet.view_onboarding_checklists';
+exports.postOnboardingChecklistsDB = 'roterranet.onboarding_checklists'
 
 exports.postOrderControlDB = 'roterranet.ordercontrol';
 exports.getOrderControlDB = 'roterranet.view_ordercontrol';

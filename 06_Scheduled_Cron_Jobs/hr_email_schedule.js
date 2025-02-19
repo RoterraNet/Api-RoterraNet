@@ -5,6 +5,7 @@ const {
 	get_probation_period_83_days,
 	benefitsEligibilityReminder,
 	performanceReviewReminder,
+	addHrTodos,
 } = require('../02.1_Complicated_Route_Functions/hr_cron');
 
 module.exports = () => {
@@ -18,6 +19,7 @@ module.exports = () => {
 		await get_probation_period_83_days();
 
 		await benefitsEligibilityReminder();
+		await addHrTodos();
 		await performanceReviewReminder();
 	});
 };
