@@ -6,6 +6,9 @@ const v1ProjectsRouter = require('./02_Routes/Projects/v1ProjectsRouter');
 const v1MtrRouter = require('./02_Routes/MTRs/v1MtrRouter');
 
 const v1CalendarRouter = require('./02_Routes/calendar/v1CalendarRouter');
+const companyBranding = require('./02_Routes/CompanyBranding/companyBranding');
+
+router.use('/branding', companyBranding);
 
 router.use('/calendar', v1CalendarRouter);
 

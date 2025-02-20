@@ -1,10 +1,15 @@
 // Maintain Alpabetical ORDER!
 
+exports.getCompanyBrandingDB = 'roterranet.company_branding';
+
 exports.getActivitiesDB = 'roterranet.activities';
 exports.postActivitiesDB = 'roterranet.activities';
 
 exports.getCalendarCategoriesDB = 'roterranet.calendar_categories';
 exports.postCalendarCategoriesDB = 'roterranet.calendar_categories';
+
+exports.getCalendarSubCategoriesDB = 'roterranet.calendar_sub_categories';
+exports.postCalendarSubCategoriesDB = 'roterranet.calendar_sub_categories';
 
 exports.postCalendarLocationsDB = 'roterranet.calendar_locations';
 
@@ -262,8 +267,8 @@ exports.postUsersCoursesDB = 'roterranet.users_courses';
 
 exports.getUsersPermissionsDB = 'roterranet.view_users_permissions';
 
-exports.getUsersPermissionsLogsDB = 'roterranet.view_users_permissions_logs'
-exports.postUsersPermissionsLogsDB = 'roterranet.users_permissions_logs'
+exports.getUsersPermissionsLogsDB = 'roterranet.view_users_permissions_logs';
+exports.postUsersPermissionsLogsDB = 'roterranet.users_permissions_logs';
 
 exports.getUserRightsDB = 'roterranet.user_rights'; // Change to users_rights => one day
 

@@ -27,7 +27,7 @@ router.get('/current', async (req, res) => {
 		"date at time zone 'MST' as date, return_date at time zone 'MST' as return_date, id, description, location, start_time, end_time, created_by, category, user_id, created_by_name, event_name, category_name,image, location,location_id"
 	);
 	const getInAndOut = await knex(getInAndOutDB)
-		.select(rawData)
+		.select(rawData, 'sub_category_name')
 		.where(
 			knex.raw(
 				"return_date >= now() + interval '-1 hours' AND current_date + interval '23 hours' >= date"
@@ -61,7 +61,6 @@ router.get('/', async (req, res) => {
 // postRoute.newEntry(router, getInAndOutDB, postInAndOutDB, today_now, 'event_name');
 
 router.post('/', async (req, res) => {
-	console.log('here');
 	const { user_id, values } = req.body;
 
 	const checkDateValues = (reqValues) => {
@@ -136,11 +135,6 @@ router.get('/all', async (req, res) => {
 	const { start, end, location } = req.query;
 
 	try {
-		// const query = knex.raw(
-		// 	`id, created_by,user_id, date at time zone 'MST' AS start, return_date at time zone 'MST' AS end, category_name, category, location, location_id, description,
-		// 	CASE WHEN category = 1 THEN CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END ELSE event_name END title,
-		// 	CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END detail`
-		// );
 		const query = knex.raw(
 			`CASE WHEN category = 1 THEN CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END ELSE event_name END title, 
 			CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END detail`
@@ -150,16 +144,20 @@ router.get('/all', async (req, res) => {
 				query,
 				'color',
 				'id',
+				'user_id',
 				'created_by',
-				' date as start',
+				'date as start',
 				'return_date as end',
 				'category_name',
 				'category',
 				'location',
 				'location_id',
-				'description'
+				'description',
+				'sub_category_name',
+				'sub_category_id'
 			)
-			.whereBetween('date', [start, end])
+			.where('date', '<=', end)
+			.andWhere('return_date', '>=', start)
 			.modify((builder) => {
 				if (location !== 'all') {
 					builder.andWhere({ location_id: location });
