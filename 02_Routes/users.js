@@ -15,6 +15,7 @@ const postUsersDB = database.postUsersDB;
 const getUsersDB = database.getUsersDB;
 const getQuotesDB = database.getQuotesDB;
 const getUsersPermissionsDB = database.getUsersPermissionsDB;
+const postOnboardingChecklistsDB = database.postOnboardingChecklistsDB;
 
 const UsersImages = database.UsersImages;
 
@@ -222,6 +223,7 @@ router.post('/', async (req, res) => {
 			position_id: newEntryId[0].position_id,
 			created_by: newEntryId[0].created_by,
 			created_on: newEntryId[0].created_on,
+			start_date: newEntryId[0].start_date,
 		});
 	} catch (e) {
 		console.log(e);
@@ -244,6 +246,7 @@ router.delete('/:id', async (req, res) => {
 	const { type, senority_debit, start_date, deleted_on, user_id } = req.query;
 	let deletedEntry;
 	if (type === 'activated') {
+		console.log('activate');
 		deletedEntry = await knex(postUsersDB)
 			.update({
 				activated_on: today_now,
@@ -253,6 +256,11 @@ router.delete('/:id', async (req, res) => {
 				senority_debit: senority_debit,
 			})
 			.where('user_id', '=', id);
+		addOnboarding = await knex(postOnboardingChecklistsDB).insert({
+			user_id: id,
+			start_date: start_date,
+		});
+		console.log('added onboarding', addOnboarding);
 	} else if (type === 'deleted') {
 		deletedEntry = await knex(postUsersDB)
 			.update({
@@ -265,6 +273,7 @@ router.delete('/:id', async (req, res) => {
 
 		//HERE!
 	} else {
+		console.log('reactivate');
 		deletedEntry = await knex(postUsersDB)
 			.update({
 				deleted_by: user_id,

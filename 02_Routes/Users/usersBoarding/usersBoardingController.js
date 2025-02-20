@@ -2,6 +2,7 @@ const knex = require('../../../01_Database/connection');
 const {
 	getUsersPreviousUsersDB,
 	postUsersPreviousUsersDB,
+	postOffboardingChecklistsDB,
 } = require('../../../01_Database/database');
 
 const getOnboardingQuestions = async (req, res) => {
@@ -66,7 +67,10 @@ const addTerminationReason = async (req, res) => {
 
 	try {
 		const results = await knex(postUsersPreviousUsersDB).insert(values);
-
+		const offboardingChecklist = await knex(postOffboardingChecklistsDB).insert({
+			user_id: values.user_id,
+			last_workday: values.last_workday,
+		});
 		res.status(200).json(results);
 	} catch (error) {
 		console.error('Error fetching questions and answers:', error);
