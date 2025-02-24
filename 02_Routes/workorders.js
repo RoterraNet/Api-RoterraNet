@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const knex = require('../01_Database/connection');
+const authorize = require('./Authorization/authorization');
 
 const deleteRoute = require('./RouteCreaters/delete');
 const postRoute = require('./RouteCreaters/post');
@@ -41,9 +42,11 @@ router.use('/:id/heats', require('./workorders_heats'));
 // /workorders -> PATCH -> TABLE -> get all workorders paginated
 getTableRoute.getTableData(router, getWorkordersDB);
 
-router.get(`/table`, async (req, res) => {
-	const page = req.query.page;
-	const perPage = req.query.perPage;
+router.get(`/table`, authorize({ workorder_read: true }), async (req, res) => {
+	const { start, size, filters, sorting, globalFilter } = req.query;
+
+	const parsedColumnFilters = JSON.parse(filters);
+	const parsedColumnSorting = JSON.parse(sorting);
 
 	const paginatedTable = await knex(getWorkordersDB)
 		.select(
@@ -68,16 +71,34 @@ router.get(`/table`, async (req, res) => {
 		)
 		.whereNot({ status: 7 })
 		.modify((builder) => {
-			if (req.query.search)
-				builder.andWhereRaw(`${req.query.search}::text iLIKE ?`, [`%${req.query.filter}%`]);
+			if (!!parsedColumnFilters.length) {
+				parsedColumnFilters.map((filter) => {
+					const { id: columnId, value: filterValue } = filter;
+					if (Array.isArray(filterValue) && filterValue.length > 0) {
+						builder.whereIn(columnId, filterValue);
+					} else {
+						builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+					}
+				});
+			}
+			if (!!globalFilter) {
+				builder.whereRaw(`${getWorkordersDB}.*::text iLIKE ?`, [`%${globalFilter}%`]);
+			}
+			if (!!parsedColumnSorting.length) {
+				parsedColumnSorting.map((sort) => {
+					const { id: columnId, desc: sortValue } = sort;
+					const sorter = sortValue ? 'desc' : 'acs';
+					builder.orderBy(columnId, sorter);
+				});
+			}
 		})
 		.paginate({
-			perPage: perPage,
-			currentPage: page,
+			perPage: size,
+			currentPage: start,
 			isLengthAware: true,
 		});
 
-	res.json(paginatedTable);
+	res.status(200).json(paginatedTable);
 });
 
 router.patch('/project/:id', async (req, res) => {
