@@ -103,7 +103,7 @@ exports.AddUpdateAllUserPermissions = async (values, user_id) => {
 		values,
 		user_id
 	);
-	await AddUpdatePermissions('roterranet.users', ['company'], values, user_id);
+	await AddUpdatePermissions('roterranet.users', ['company', 'user_rights'], values, user_id);
 
 	await AddUpdatePermissions(
 		'roterranet.logistics_permissions',
