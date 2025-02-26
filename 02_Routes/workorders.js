@@ -21,7 +21,7 @@ const getUsersDB = database.getUsersDB;
 
 const postWorkordersItemsDetailsDB = database.postWorkordersItemsDetailsDB;
 
-const datefns = require('date-fns');
+const { format } = require('date-fns');
 const {
 	workorder_request_approval_email,
 	workorder_self_approval_email,
@@ -31,7 +31,7 @@ const {
 const { select } = require('../01_Database/connection');
 const { postUserNotification } = require('./userNotifications/userNotifications');
 const { todayDate } = require('../03_Utils/formatDates');
-const today_now = datefns.format(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS');
+const today_now = format(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS');
 
 // JOINED ROUTES   ///////////////////////////////////////////////////////////////////////////////////////////////
 // WORKORDER ITEMS
@@ -74,13 +74,38 @@ router.get(`/table`, authorize({ workorder_read: true }), async (req, res) => {
 			if (!!parsedColumnFilters.length) {
 				parsedColumnFilters.map((filter) => {
 					const { id: columnId, value: filterValue } = filter;
-					if (Array.isArray(filterValue) && filterValue.length > 0) {
-						builder.whereIn(columnId, filterValue);
+					if (columnId === 'required_date') {
+						console.log(filterValue);
+						if (!filterValue?.start && !filterValue?.finish) {
+							return;
+						} else if (!filterValue?.start) {
+							builder.where(
+								columnId,
+								'<=',
+								`"${format(new Date(filterValue?.finish), 'yyyy-MM-dd')}"`
+							);
+						} else if (!filterValue?.finish) {
+							builder.where(
+								columnId,
+								'>=',
+								`"${format(new Date(filterValue?.start), 'yyyy-MM-dd')}"`
+							);
+						} else {
+							builder.whereBetween(columnId, [
+								`"${format(new Date(filterValue?.start), 'yyyy-MM-dd')} 00:00:00"`,
+								`"${format(new Date(filterValue?.finish), 'yyyy-MM-dd')} 20:00:00"`,
+							]);
+						}
 					} else {
-						builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+						if (Array.isArray(filterValue) && filterValue.length > 0) {
+							builder.whereIn(columnId, filterValue);
+						} else {
+							builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+						}
 					}
 				});
 			}
+
 			if (!!globalFilter) {
 				builder.whereRaw(`${getWorkordersDB}.*::text iLIKE ?`, [`%${globalFilter}%`]);
 			}
