@@ -52,26 +52,26 @@ const makeUpcomingTodos = async (req, res) => {
 			[
 				'1 year',
 				knex.raw(
-					"DATE(effective_date + INTERVAL '1 year') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '30 days')"
+					"DATE(start_date + INTERVAL '1 year') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '30 days')"
 				),
 			],
 			[
 				'5 year',
 				knex.raw(
-					"DATE(effective_date + INTERVAL '5 years') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '30 days')"
+					"DATE(start_date + INTERVAL '5 years') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '30 days')"
 				),
 			],
 			[
 				'10 year',
 				knex.raw(
-					"DATE(effective_date + INTERVAL '10 years') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '30 days')"
+					"DATE(start_date + INTERVAL '10 years') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '30 days')"
 				),
 			],
 		];
 
 		for (const [milestone, query] of getUpcomingBenefits) {
 			const upcomingBenefitsUsers = await knex(getUsersBenefitsDB)
-				.select('user_id', 'effective_date')
+				.select('user_id', 'effective_date', 'start_date')
 				.where(query)
 				.andWhere({ deleted: 0 });
 
@@ -79,8 +79,8 @@ const makeUpcomingTodos = async (req, res) => {
 			if (upcomingBenefitsUsers.length !== 0) {
 				const newTodos = [];
 				for (const user of upcomingBenefitsUsers) {
-					const { user_id, effective_date } = user;
-					const due_date = new Date(effective_date);
+					const { user_id, effective_date, start_date } = user;
+					let due_date;
 					const todo = {
 						user_id: user_id,
 						completed: false,
@@ -89,6 +89,7 @@ const makeUpcomingTodos = async (req, res) => {
 
 					switch (milestone) {
 						case 'Benefits effective':
+							due_date = new Date(effective_date);
 							todo['due_date'] = due_date;
 							todo['confirmed_enrolment'] = false;
 							todo['emailed_details'] = false;
@@ -96,6 +97,7 @@ const makeUpcomingTodos = async (req, res) => {
 							break;
 
 						case '1 year':
+							due_date = new Date(start_date);
 							due_date.setFullYear(due_date.getFullYear() + 1);
 							todo['due_date'] = due_date;
 							todo['emailed_details'] = false;
@@ -104,6 +106,7 @@ const makeUpcomingTodos = async (req, res) => {
 							break;
 
 						case '5 year':
+							due_date = new Date(start_date);
 							due_date.setFullYear(due_date.getFullYear() + 5);
 							todo['due_date'] = due_date;
 							todo['emailed_details'] = false;
@@ -112,6 +115,7 @@ const makeUpcomingTodos = async (req, res) => {
 							break;
 
 						case '10 year':
+							due_date = new Date(start_date);
 							due_date.setFullYear(due_date.getFullYear() + 10);
 							todo['due_date'] = due_date;
 							todo['emailed_details'] = false;
