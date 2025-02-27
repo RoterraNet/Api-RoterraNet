@@ -203,7 +203,7 @@ const addHrTodos = async () => {
 
 						case '1 year':
 							due_date = new Date(start_date);
-							setFullYear(due_date.getFullYear() + 1);
+							due_date.setFullYear(due_date.getFullYear() + 1);
 							todo['due_date'] = due_date;
 							todo['emailed_details'] = false;
 							todo['ordered_hsp_card'] = false;
@@ -212,7 +212,7 @@ const addHrTodos = async () => {
 
 						case '5 year':
 							due_date = new Date(start_date);
-							setFullYear(due_date.getFullYear() + 5);
+							due_date.setFullYear(due_date.getFullYear() + 5);
 							todo['due_date'] = due_date;
 							todo['emailed_details'] = false;
 							todo['updated_hsp_amount'] = false;
@@ -221,7 +221,7 @@ const addHrTodos = async () => {
 
 						case '10 year':
 							due_date = new Date(start_date);
-							setFullYear(due_date.getFullYear() + 10);
+							due_date.setFullYear(due_date.getFullYear() + 10);
 							todo['due_date'] = due_date;
 							todo['emailed_details'] = false;
 							todo['updated_hsp_amount'] = false;
