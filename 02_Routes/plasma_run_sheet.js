@@ -8,7 +8,7 @@ const SearchBuilder = require('./RouteCreaters/RouteHelpers/SearchBuilder');
 const { postUserNotification } = require('../02_Routes/userNotifications/userNotifications');
 const subMonths = require('date-fns/subMonths');
 const format = require('date-fns/format');
-const { includes } = require('lodash');
+const { includes, findIndex } = require('lodash');
 const authorize = require('./Authorization/authorization');
 
 const sixMonthAgo = format(subMonths(new Date(), 12), 'yyyy-MM-dd');
@@ -23,16 +23,10 @@ const getPlasma_run_sheet_helix_sizesDB = database.getPlasma_run_sheet_helix_siz
 const getPlasma_run_sheet_sizesDB = database.getPlasma_run_sheet_sizesDB;
 
 router.get(`/table`, async (req, res) => {
-	const page = req.query.page;
-	const perPage = req.query.perPage;
+	const { start, size, filters, sorting, globalFilter } = req.query;
 
-	const search = Object.keys(JSON.parse(req.query.search));
-	const newArrayCleaned = [];
-
-	search.map((each) => {
-		const parsedObj = JSON.parse(req.query.search)[each];
-		parsedObj.filterBy !== '' && newArrayCleaned.push(parsedObj);
-	});
+	const parsedColumnFilters = JSON.parse(filters);
+	const parsedColumnSorting = JSON.parse(sorting);
 
 	const paginatedTable = await knex(getPlasmaRunSheetsDB)
 		.select(
@@ -46,42 +40,102 @@ router.get(`/table`, async (req, res) => {
 			'completed_date',
 			'rush'
 		)
+		.where({ deleted: false })
 		.modify((builder) => {
-			SearchBuilder(newArrayCleaned, builder);
+			if (!!parsedColumnFilters.length) {
+				parsedColumnFilters.map((filter) => {
+					const { id: columnId, value: filterValue } = filter;
+
+					if (columnId === 'workorders') {
+						return;
+					}
+
+					if (columnId === 'created_on' || columnId === 'completed_date') {
+						if (!filterValue?.start && !filterValue?.finish) {
+							return;
+						} else if (!filterValue?.start) {
+							builder.where(
+								columnId,
+								'<=',
+								`"${format(new Date(filterValue?.finish), 'yyyy-MM-dd')}"`
+							);
+						} else if (!filterValue?.finish) {
+							builder.where(
+								columnId,
+								'>=',
+								`"${format(new Date(filterValue?.start), 'yyyy-MM-dd')}"`
+							);
+						} else {
+							builder.whereBetween(columnId, [
+								`"${format(new Date(filterValue?.start), 'yyyy-MM-dd')} 00:00:00"`,
+								`"${format(new Date(filterValue?.finish), 'yyyy-MM-dd')} 20:00:00"`,
+							]);
+						}
+					} else if (Array.isArray(filterValue) && filterValue.length > 0) {
+						builder.whereIn(columnId, filterValue);
+					} else {
+						if (filterValue?.trim())
+							builder.andWhereRaw(`${columnId}::text iLIKE ?`, [
+								`%${filterValue.trim()}%`,
+							]);
+					}
+				});
+			}
+			if (!!globalFilter) {
+				builder.whereRaw(`${getPlasmaRunSheetsDB}.*::text iLIKE ?`, [`%${globalFilter}%`]);
+			}
+			if (!!parsedColumnSorting.length) {
+				parsedColumnSorting.map((sort) => {
+					const { id: columnId, desc: sortValue } = sort;
+					const sorter = sortValue ? 'desc' : 'acs';
+					builder.orderBy(columnId, sorter);
+				});
+			}
 		})
 		.orderBy('completed', 'desc')
 		.orderBy('id', 'desc')
-		.where({ deleted: false })
 		// .distinctOn('id')
-
 		.paginate({
-			perPage: perPage,
-			currentPage: page,
+			perPage: size,
+			currentPage: start,
 			isLengthAware: true,
 		});
+
 	const ids = [];
 	paginatedTable.data.map((each) => {
 		ids.push(each.id);
 	});
 
 	const itemList = await knex(getPlasmaRunSheetItemsDB)
-		.select('plasma_run_sheet_id', 'workorder_name')
+		.select('plasma_run_sheet_id', 'workorder_id', 'workorder_name')
 		.whereIn('plasma_run_sheet_id', ids)
 		.whereNotNull('workorder_name');
 
-	paginatedTable.data.map((each) => {
-		each.workorders = [];
-		itemList.map((eachItem) => {
-			if (
-				eachItem.plasma_run_sheet_id === each.id &&
-				!each.workorders.includes(eachItem.workorder_name)
-			) {
-				each.workorders.push(eachItem.workorder_name);
+	paginatedTable.data.map((sheet) => {
+		sheet.workorders = {};
+		itemList.map((item) => {
+			if (item.plasma_run_sheet_id === sheet.id) {
+				sheet.workorders[item.workorder_id] = item.workorder_name;
 			}
 		});
 	});
 
-	res.json(paginatedTable);
+	const i = parsedColumnFilters.findIndex((filter) => filter.id === 'workorders');
+	if (i != -1 && parsedColumnFilters[i]?.value?.trim() !== '') {
+		const workorderFilter = parsedColumnFilters[i].value.trim();
+		paginatedTable.data = paginatedTable.data.filter((sheet) => {
+			for (const [key, value] of Object.entries(sheet.workorders)) {
+				if (value.includes(workorderFilter)) {
+					console.log('allowed', sheet.workorders);
+					return true;
+				}
+			}
+			console.log('not allowed', sheet.workorders);
+			return false;
+		});
+	}
+
+	res.status(200).json(paginatedTable);
 });
 
 router.get('/:id/sheet', async (req, res) => {
