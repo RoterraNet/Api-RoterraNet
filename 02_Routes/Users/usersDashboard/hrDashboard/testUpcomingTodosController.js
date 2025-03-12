@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const {
+	postHrTodosAnniversariesDB,
+	getUsersDB,
 	getUsersBenefitsDB,
 	postHrTodosBenefitsDB,
 	postHrTodosRRSPDB,
@@ -12,7 +14,7 @@ const knex = require('../../../../01_Database/connection');
 const makeUpcomingTodos = async (req, res) => {
 	try {
 		const getUpcomingRRSP = knex.raw(
-			"DATE(rrsp_eligibility) BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '30 days')"
+			"DATE(rrsp_eligibility) BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '365 days')"
 		);
 
 		await knex(postHrTodosRRSPDB).delete();
@@ -46,25 +48,25 @@ const makeUpcomingTodos = async (req, res) => {
 			[
 				'Benefits effective',
 				knex.raw(
-					"DATE(effective_date) BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '30 days')"
+					"DATE(effective_date) BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '365 days')"
 				),
 			],
 			[
 				'1 year',
 				knex.raw(
-					"DATE(start_date + INTERVAL '1 year') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '30 days')"
+					"DATE(start_date + INTERVAL '1 year') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '365 days')"
 				),
 			],
 			[
 				'5 year',
 				knex.raw(
-					"DATE(start_date + INTERVAL '5 years') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '30 days')"
+					"DATE(start_date + INTERVAL '5 years') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '365 days')"
 				),
 			],
 			[
 				'10 year',
 				knex.raw(
-					"DATE(start_date + INTERVAL '10 years') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '30 days')"
+					"DATE(start_date + INTERVAL '10 years') BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '365 days')"
 				),
 			],
 		];
@@ -132,6 +134,54 @@ const makeUpcomingTodos = async (req, res) => {
 
 				console.log(`benefits todos (${milestone})`, newTodos);
 				await knex(postHrTodosBenefitsDB).insert(newTodos);
+			}
+		}
+
+		await knex(postHrTodosAnniversariesDB).delete();
+
+		activeUsers = await knex(getUsersDB)
+			.select('user_id', 'start_date', 'preferred_name')
+			.where({ deleted: 0 });
+
+		const now = new Date();
+
+		for (const user of activeUsers) {
+			// get what would be user's anniversary this year
+			const anniversaryYear = now.getFullYear() - user.start_date.getFullYear();
+
+			// if upcoming anniversary is not 1st year or greater, skip loop
+			if (anniversaryYear < 1) {
+				continue;
+			}
+
+			// calculate upcoming anniversary date
+			const anniversaryDate = new Date(user.start_date.getTime());
+			anniversaryDate.setFullYear(now.getFullYear());
+
+			// if anniversary is not within 0-90 days, skip loop
+			const daysBefore = Math.round(
+				(anniversaryDate.getTime() - now.getTime()) / (1000 * 3600 * 24)
+			);
+			if (daysBefore < 0 || daysBefore > 90) {
+				continue;
+			}
+
+			if (anniversaryYear % 5 != 0 && daysBefore <= 30) {
+				// regular anniversary
+				await knex(postHrTodosAnniversariesDB).insert({
+					user_id: user.user_id,
+					type: 'regular',
+					anniversary_date: anniversaryDate,
+					anniversary_year: anniversaryYear,
+				});
+			} else if (anniversaryYear % 5 == 0 && daysBefore <= 90) {
+				// major anniversary
+				await knex(postHrTodosAnniversariesDB).insert({
+					user_id: user.user_id,
+					type: 'major',
+					anniversary_date: anniversaryDate,
+					anniversary_year: anniversaryYear,
+				});
 			}
 		}
 
