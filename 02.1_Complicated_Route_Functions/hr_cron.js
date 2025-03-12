@@ -202,6 +202,7 @@ const addHrTodos = async () => {
 							todo['confirmed_enrolment'] = false;
 							todo['emailed_details'] = false;
 							todo['added_benefit_deduction'] = false;
+							todo['updated_intranet_benefits'] = false;
 							break;
 
 						case '1 year':
@@ -211,6 +212,7 @@ const addHrTodos = async () => {
 							todo['emailed_details'] = false;
 							todo['ordered_hsp_card'] = false;
 							todo['updated_benefit_class'] = false;
+							todo['updated_intranet_benefits'] = false;
 							break;
 
 						case '5 year':
@@ -220,6 +222,7 @@ const addHrTodos = async () => {
 							todo['emailed_details'] = false;
 							todo['updated_hsp_amount'] = false;
 							todo['updated_benefit_class'] = false;
+							todo['updated_intranet_benefits'] = false;
 							break;
 
 						case '10 year':
@@ -229,6 +232,7 @@ const addHrTodos = async () => {
 							todo['emailed_details'] = false;
 							todo['updated_hsp_amount'] = false;
 							todo['updated_benefit_class'] = false;
+							todo['updated_intranet_benefits'] = false;
 							break;
 
 						default:

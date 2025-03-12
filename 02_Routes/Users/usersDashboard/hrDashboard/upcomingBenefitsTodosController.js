@@ -51,6 +51,7 @@ const getUpcomingBenefitsTodos = async (req, res) => {
 						emailed_details: todo.emailed_details,
 						confirmed_enrolment: todo.confirmed_enrolment,
 						added_benefit_deduction: todo.added_benefit_deduction,
+						updated_intranet_benefits: todo.updated_intranet_benefits,
 					};
 					break;
 
@@ -59,6 +60,7 @@ const getUpcomingBenefitsTodos = async (req, res) => {
 						emailed_details: todo.emailed_details,
 						updated_benefit_class: todo.updated_benefit_class,
 						ordered_hsp_card: todo.ordered_hsp_card,
+						updated_intranet_benefits: todo.updated_intranet_benefits,
 					};
 					break;
 
@@ -68,6 +70,7 @@ const getUpcomingBenefitsTodos = async (req, res) => {
 						emailed_details: todo.emailed_details,
 						updated_benefit_class: todo.updated_benefit_class,
 						updated_hsp_amount: todo.updated_hsp_amount,
+						updated_intranet_benefits: todo.updated_intranet_benefits,
 					};
 					break;
 			}
@@ -82,6 +85,7 @@ const getUpcomingBenefitsTodos = async (req, res) => {
 			updated_benefit_class: 'Update benefit class on Canada Life',
 			ordered_hsp_card: 'Order HSP card',
 			updated_hsp_amount: 'Update HSP amount',
+			updated_intranet_benefits: 'Update benefits in Intranet',
 		};
 
 		res.status(200).json({
