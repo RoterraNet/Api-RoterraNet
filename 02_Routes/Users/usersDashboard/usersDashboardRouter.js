@@ -4,22 +4,30 @@ const router = express.Router();
 const userDashboardController = require('./newHiresController');
 const offBoardingController = require('./offBoardingController');
 const HrTodoController = require('./HrTodoController');
-const onboardingTodosController = require('./hrDashboard/onboardingTodosController')
-const offboardingTodosController = require('./hrDashboard/offboardingTodosController')
-const upcomingRRSPTodosController = require('./hrDashboard/upcomingRRSPTodosController')
-const upcomingBenefitsTodosController = require('./hrDashboard/upcomingBenefitsTodosController')
-const upcomingAnniversariesController = require('./hrDashboard/upcomingAnniversariesController')
-const testUpcomingTodosController = require('./hrDashboard/testUpcomingTodosController')
-const testOnboardingTodosController = require('./hrDashboard/testOnboardingTodosController')
-const testOffboardingTodosController = require('./hrDashboard/testOffboardingTodosController')
+const onboardingTodosController = require('./hrDashboard/onboardingTodosController');
+const offboardingTodosController = require('./hrDashboard/offboardingTodosController');
+const upcomingRRSPTodosController = require('./hrDashboard/upcomingRRSPTodosController');
+const upcomingBenefitsTodosController = require('./hrDashboard/upcomingBenefitsTodosController');
+const upcomingAnniversariesTodosController = require('./hrDashboard/upcomingAnniversariesTodosController');
+const testUpcomingTodosController = require('./hrDashboard/testUpcomingTodosController');
+const testOnboardingTodosController = require('./hrDashboard/testOnboardingTodosController');
+const testOffboardingTodosController = require('./hrDashboard/testOffboardingTodosController');
 
-router.get('/onboardingTodos', authorize({}), onboardingTodosController.getOnboardingTodos) 
-router.put('/onboardingTodos', authorize({}), onboardingTodosController.updateOnboardingTodos) 
-router.put('/testOnboardingTodos', authorize({}), testOnboardingTodosController.makeOnboardingTodos) 
+router.get('/onboardingTodos', authorize({}), onboardingTodosController.getOnboardingTodos);
+router.put('/onboardingTodos', authorize({}), onboardingTodosController.updateOnboardingTodos);
+router.put(
+	'/testOnboardingTodos',
+	authorize({}),
+	testOnboardingTodosController.makeOnboardingTodos
+);
 
-router.get('/offboardingTodos', authorize({}), offboardingTodosController.getOffboardingTodos) 
-router.put('/offboardingTodos', authorize({}), offboardingTodosController.updateOffboardingTodos) 
-router.put('/testOffboardingTodos', authorize({}), testOffboardingTodosController.makeOffboardingTodos) 
+router.get('/offboardingTodos', authorize({}), offboardingTodosController.getOffboardingTodos);
+router.put('/offboardingTodos', authorize({}), offboardingTodosController.updateOffboardingTodos);
+router.put(
+	'/testOffboardingTodos',
+	authorize({}),
+	testOffboardingTodosController.makeOffboardingTodos
+);
 
 /**
  * @openapi
@@ -317,11 +325,11 @@ router.get('/upcomingRRSPTodos', authorize({}), upcomingRRSPTodosController.getU
  *             $ref: '#/components/schemas/updateRRSPTodos'
  *     responses:
  *       '200':
- *         description: 
+ *         description:
  *         content:
  *           application/json:
  *             schema:
- *               type: 
+ *               type:
  *               items:
  *                 $ref: '#/components/schemas/updateRRSPTodos'
  *     securitySchemes:
@@ -333,7 +341,7 @@ router.get('/upcomingRRSPTodos', authorize({}), upcomingRRSPTodosController.getU
  *           JWT token for authorization.
  *           You can obtain a token by logging in and using the /api/auth/login endpoint.
  */
-router.put('/upcomingRRSPTodos', authorize({}), upcomingRRSPTodosController.updateRRSPTodos)
+router.put('/upcomingRRSPTodos', authorize({}), upcomingRRSPTodosController.updateRRSPTodos);
 
 /**
  * @openapi
@@ -375,7 +383,11 @@ router.put('/upcomingRRSPTodos', authorize({}), upcomingRRSPTodosController.upda
  *           JWT token for authorization.
  *           You can obtain a token by logging in and using the /api/auth/login endpoint.
  */
-router.get('/upcomingBenefitsTodos', authorize({}), upcomingBenefitsTodosController.getUpcomingBenefitsTodos)
+router.get(
+	'/upcomingBenefitsTodos',
+	authorize({}),
+	upcomingBenefitsTodosController.getUpcomingBenefitsTodos
+);
 
 /**
  * @openapi
@@ -401,11 +413,11 @@ router.get('/upcomingBenefitsTodos', authorize({}), upcomingBenefitsTodosControl
  *             $ref: '#/components/schemas/updateBenefitsTodos'
  *     responses:
  *       '200':
- *         description: 
+ *         description:
  *         content:
  *           application/json:
  *             schema:
- *               type: 
+ *               type:
  *               items:
  *                 $ref: '#/components/schemas/updateBenefitsTodos'
  *     securitySchemes:
@@ -417,10 +429,13 @@ router.get('/upcomingBenefitsTodos', authorize({}), upcomingBenefitsTodosControl
  *           JWT token for authorization.
  *           You can obtain a token by logging in and using the /api/auth/login endpoint.
  */
-router.put('/upcomingBenefitsTodos', authorize({}), upcomingBenefitsTodosController.updateBenefitsTodos)
+router.put(
+	'/upcomingBenefitsTodos',
+	authorize({}),
+	upcomingBenefitsTodosController.updateBenefitsTodos
+);
 
-router.put('/testUpcomingTodos', authorize({}), testUpcomingTodosController.makeUpcomingTodos) 
-
+router.put('/testUpcomingTodos', authorize({}), testUpcomingTodosController.makeUpcomingTodos);
 
 /**
  * @openapi
@@ -462,9 +477,16 @@ router.put('/testUpcomingTodos', authorize({}), testUpcomingTodosController.make
  *           JWT token for authorization.
  *           You can obtain a token by logging in and using the /api/auth/login endpoint.
  */
-router.get('/upcomingAnniversaries', authorize({}), upcomingAnniversariesController.getUpcomingAnniversaries)
+router.get(
+	'/upcomingAnniversariesTodos',
+	authorize({}),
+	upcomingAnniversariesTodosController.getUpcomingAnniversariesTodos
+);
 
-
-
+router.put(
+	'/upcomingAnniversariesTodos',
+	authorize({}),
+	upcomingAnniversariesTodosController.updateAnniversariesTodos
+);
 
 module.exports = router;
