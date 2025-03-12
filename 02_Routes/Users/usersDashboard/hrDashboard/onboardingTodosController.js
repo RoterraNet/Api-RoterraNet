@@ -63,6 +63,7 @@ const getOnboardingTodos = async (req, res) => {
 					benefits_waiting_period: checklist.benefits_waiting_period,
 					added_to_birthday_anniversary: checklist.added_to_birthday_anniversary,
 					added_to_orgchart: checklist.added_to_orgchart,
+					added_planner_reminders: checklist.added_planner_reminders,
 					added_to_quickbooks: checklist.added_to_quickbooks,
 					added_to_scotia: checklist.added_to_scotia,
 					wage_negotiation_reminders_made: checklist.wage_negotiation_reminders_made,
@@ -110,6 +111,7 @@ const getOnboardingTodos = async (req, res) => {
 			benefits_waiting_period: 'Benefits waiting period:',
 			added_to_birthday_anniversary: 'Add to Birthday & Anniversary',
 			added_to_orgchart: 'Add to Org chart',
+			added_planner_reminders: 'Add Benefits and RRSP reminder to Planner',
 			added_to_quickbooks: 'Add employee to QuickBooks',
 			added_to_scotia: 'Add employee banking information in Scotia Connect',
 			wage_negotiation_reminders_made: 'Make reminders if any negotiated future wage updates',
@@ -160,8 +162,8 @@ const updateOnboardingTodos = async (req, res) => {
 		// console.log(edited_by, edited_on);
 
 		for (let i = 0; i < new_todos.length; i++) {
-			console.log('new:', new_todos[i]);
-			console.log('old:', old_todos[i]);
+			// console.log('new:', new_todos[i]);
+			// console.log('old:', old_todos[i]);
 			const oldTodo = old_todos[i];
 			const newTodo = new_todos[i];
 
