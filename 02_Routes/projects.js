@@ -41,12 +41,12 @@ router.use('/:id/projects_notes', require('./projects_notes'));
 // /project -> PATCH -> TABLE -> get all projects paginated
 getTableRoute.getTableData(router, getProjectsDB);
 
-router.get(`/table`, authorize({ project_read: true }), async (req, res) => {
+router.get(`/table`, authorize(), async (req, res) => {
 	const { start, size, filters, sorting, globalFilter } = req.query;
 
 	const parsedColumnFilters = JSON.parse(filters);
 	const parsedColumnSorting = JSON.parse(sorting);
-	console.log(getProjectsDB)
+	console.log(getProjectsDB);
 
 	const paginatedTable = await knex(getProjectsDB)
 		.select(

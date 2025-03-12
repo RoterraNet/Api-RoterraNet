@@ -23,11 +23,8 @@ const today_date = datefns.format(new Date(), 'yyyy-MM-dd');
 that has a RETURN_DATE that has NOT been past todays date
 and a DATE (leaving date) that has yet to come */
 router.get('/current', async (req, res) => {
-	const rawData = knex.raw(
-		"date at time zone 'MST' as date, return_date at time zone 'MST' as return_date, id, description, location, start_time, end_time, created_by, category, user_id, created_by_name, event_name, category_name,image, location,location_id"
-	);
 	const getInAndOut = await knex(getInAndOutDB)
-		.select(rawData, 'sub_category_name')
+		.select('*')
 		.where(
 			knex.raw(
 				"return_date >= now() + interval '-1 hours' AND current_date + interval '23 hours' >= date"
@@ -43,11 +40,8 @@ router.get('/current', async (req, res) => {
 that has a DATE (leaving Date) that has yet to come 
 but within 1 week of todays date */
 router.get('/', async (req, res) => {
-	const rawData = knex.raw(
-		"date at time zone 'MST' as date, return_date at time zone 'MST' as return_date, id, description, location, start_time, end_time, created_by, category, user_id, created_by_name, event_name, category_name"
-	);
 	const getInAndOut = await knex(getInAndOutDB)
-		.select(rawData)
+		.select('*')
 		.where(
 			knex.raw(
 				"date > current_date + interval '23 hours' AND date BETWEEN now() AND current_date + interval '1 week'"
@@ -148,6 +142,8 @@ router.get('/all', async (req, res) => {
 				'created_by',
 				'date as start',
 				'return_date as end',
+				'date as go_date',
+				'return_date',
 				'category_name',
 				'category',
 				'location',
