@@ -9,7 +9,7 @@ const { stringify } = require('qs');
 const { format } = require('date-fns');
 
 const getOffboardingTodos = async (req, res) => {
-	/* Gets offboarding todos */
+	/* Gets completed or incompleted, or most recent (if user_id is supplied) offboarding todos */
 	try {
 		const { completed, user_id } = req.query;
 		let offboardingChecklistData;
@@ -36,6 +36,7 @@ const getOffboardingTodos = async (req, res) => {
 		}
 		// console.log(offboardingChecklistData);
 
+		// format todos data
 		todosData = [];
 		for (const checklist of offboardingChecklistData) {
 			todosData.push({
@@ -91,6 +92,7 @@ const getOffboardingTodos = async (req, res) => {
 			});
 		}
 
+		// headers above certain checklist items
 		const headers = {
 			resignation_termination_filed: 'Human Resources',
 			payments_reimbursements_processed: 'Payroll',
@@ -98,6 +100,7 @@ const getOffboardingTodos = async (req, res) => {
 			it_checklist_completed: 'IT (See IT Checklist)',
 		};
 
+		// labels for checklist items
 		const labels = {
 			resignation_termination_filed: 'File resignation/termination letter or email',
 			moved_hr_file_to_former: "Move employee's HR folder to former employees",

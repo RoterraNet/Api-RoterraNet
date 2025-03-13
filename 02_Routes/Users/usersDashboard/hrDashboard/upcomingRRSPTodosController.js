@@ -4,7 +4,7 @@ const { getHrTodosRRSPDB, postHrTodosRRSPDB } = require('../../../../01_Database
 const knex = require('../../../../01_Database/connection');
 
 const getUpcomingRRSPTodos = async (req, res) => {
-	/* Gets all upcoming RRSP eligibility todos */
+	/* Gets completed or incompleted upcoming RRSP eligibility todos */
 	try {
 		const { completed } = req.query;
 		const rrspTodosData =
@@ -72,7 +72,7 @@ const getUpcomingRRSPTodos = async (req, res) => {
 };
 
 const updateRRSPTodos = async (req, res) => {
-	/* Updates all given RRSP milestone todos */
+	/* Updates changed RRSP todos */
 	try {
 		const { new_todos, old_todos, edited_by, edited_on } = req.body.update_details;
 		// console.log(edited_by, edited_on);

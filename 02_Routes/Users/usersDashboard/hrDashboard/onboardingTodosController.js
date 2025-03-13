@@ -7,7 +7,7 @@ const {
 const knex = require('../../../../01_Database/connection');
 
 const getOnboardingTodos = async (req, res) => {
-	/* Gets onboarding todos */
+	/* Gets completed or incompleted, or most recent (if user_id is supplied) onboarding todos */
 	try {
 		const { completed, user_id } = req.query;
 		let onboardingChecklistData;
@@ -33,6 +33,7 @@ const getOnboardingTodos = async (req, res) => {
 							.orderBy('preferred_name', 'asc');
 		}
 
+		// format todos data
 		const todosData = [];
 		for (const checklist of onboardingChecklistData) {
 			todosData.push({
@@ -63,7 +64,8 @@ const getOnboardingTodos = async (req, res) => {
 					benefits_waiting_period: checklist.benefits_waiting_period,
 					added_to_birthday_anniversary: checklist.added_to_birthday_anniversary,
 					added_to_orgchart: checklist.added_to_orgchart,
-					added_to_quickbook: checklist.added_to_quickbook,
+					added_planner_reminders: checklist.added_planner_reminders,
+					added_to_quickbooks: checklist.added_to_quickbooks,
 					added_to_scotia: checklist.added_to_scotia,
 					wage_negotiation_reminders_made: checklist.wage_negotiation_reminders_made,
 					welcome_email_sent: checklist.welcome_email_sent,
@@ -88,11 +90,13 @@ const getOnboardingTodos = async (req, res) => {
 			});
 		}
 
+		// headers above certain checklist items
 		const headers = {
 			resume_filed: 'Human Resources & Payroll',
 			safety_orientation_completed: 'Health & Safety',
 		};
 
+		// labels for checklist items
 		const labels = {
 			resume_filed: 'Resume filed',
 			employment_offer_signed: 'Offer of employment signed & initialed in all corners',
@@ -110,7 +114,8 @@ const getOnboardingTodos = async (req, res) => {
 			benefits_waiting_period: 'Benefits waiting period:',
 			added_to_birthday_anniversary: 'Add to Birthday & Anniversary',
 			added_to_orgchart: 'Add to Org chart',
-			added_to_quickbook: 'Add employee to QuickBooks',
+			added_planner_reminders: 'Add Benefits and RRSP reminder to Planner',
+			added_to_quickbooks: 'Add employee to QuickBooks',
 			added_to_scotia: 'Add employee banking information in Scotia Connect',
 			wage_negotiation_reminders_made: 'Make reminders if any negotiated future wage updates',
 			welcome_email_sent: 'Ensure welcome email is sent',
@@ -160,8 +165,8 @@ const updateOnboardingTodos = async (req, res) => {
 		// console.log(edited_by, edited_on);
 
 		for (let i = 0; i < new_todos.length; i++) {
-			console.log('new:', new_todos[i]);
-			console.log('old:', old_todos[i]);
+			// console.log('new:', new_todos[i]);
+			// console.log('old:', old_todos[i]);
 			const oldTodo = old_todos[i];
 			const newTodo = new_todos[i];
 

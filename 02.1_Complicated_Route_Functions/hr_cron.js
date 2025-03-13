@@ -1,6 +1,7 @@
 const express = require('express');
 const knex = require('../01_Database/connection');
 const {
+	postHrTodosAnniversariesDB,
 	getUsersDB,
 	postNewsDB,
 	getUsersBenefitsDB,
@@ -124,7 +125,8 @@ const addHrTodos = async () => {
 	in advance of actual date, called every morning at 6am
 	 */
 	try {
-		// get all users whose rrsp eligibility is in exactly 1 month
+		/* ADD A RRSP TODO ITEM FOR USERS WHO ARE RRSP ELIGIBLE IN EXACTLY 1 MONTH */
+
 		const getUpcomingRRSP = knex.raw(
 			"DATE(current_date + INTERVAL '1 month') = DATE(rrsp_eligibility)"
 		);
@@ -152,7 +154,8 @@ const addHrTodos = async () => {
 			await knex(postHrTodosRRSPDB).insert(newTodos);
 		}
 
-		// get all users who have a benefit milestone in exactly 1 month
+		/* ADD A BENEFITS TODO ITEM FOR USERS WHO HAVE A BENEFIT MILESONE IN EXACTLY 1 MONTH */
+
 		const getUpcomingBenefits = [
 			['90 days', knex.raw("DATE(current_date + INTERVAL '1 month') = DATE(effective_date)")],
 			[
@@ -199,6 +202,7 @@ const addHrTodos = async () => {
 							todo['confirmed_enrolment'] = false;
 							todo['emailed_details'] = false;
 							todo['added_benefit_deduction'] = false;
+							todo['updated_intranet_benefits'] = false;
 							break;
 
 						case '1 year':
@@ -208,6 +212,7 @@ const addHrTodos = async () => {
 							todo['emailed_details'] = false;
 							todo['ordered_hsp_card'] = false;
 							todo['updated_benefit_class'] = false;
+							todo['updated_intranet_benefits'] = false;
 							break;
 
 						case '5 year':
@@ -217,6 +222,7 @@ const addHrTodos = async () => {
 							todo['emailed_details'] = false;
 							todo['updated_hsp_amount'] = false;
 							todo['updated_benefit_class'] = false;
+							todo['updated_intranet_benefits'] = false;
 							break;
 
 						case '10 year':
@@ -226,6 +232,7 @@ const addHrTodos = async () => {
 							todo['emailed_details'] = false;
 							todo['updated_hsp_amount'] = false;
 							todo['updated_benefit_class'] = false;
+							todo['updated_intranet_benefits'] = false;
 							break;
 
 						default:
@@ -238,6 +245,55 @@ const addHrTodos = async () => {
 				// add to table
 				console.log(`adding new benefits todos (${milestone}):`, newTodos);
 				await knex(postHrTodosBenefitsDB).insert(newTodos);
+			}
+		}
+
+		/* ADD AN ANNIVERSARY TODO ITEM FOR USERS WHO HAVE A REGULAR ANNIVERSARY IN EXACTLY 30 DAYS OR 
+		USERS WHO HAVE A MAJOR ANNIVERSARY IN EXACTLY 90 DAYS */
+
+		activeUsers = await knex(getUsersDB)
+			.select('user_id', 'start_date', 'preferred_name')
+			.where({ deleted: 0 });
+
+		const now = new Date();
+
+		for (const user of activeUsers) {
+			// get what would be user's anniversary this year
+			const anniversaryYear = now.getFullYear() - user.start_date.getFullYear();
+
+			// if upcoming anniversary is not 1st year or greater, skip loop
+			if (anniversaryYear < 1) {
+				continue;
+			}
+
+			// calculate upcoming anniversary date
+			const anniversaryDate = new Date(user.start_date.getTime());
+			anniversaryDate.setFullYear(now.getFullYear());
+
+			// if anniversary is not within 0-90 days, skip loop
+			const daysBefore = Math.round(
+				(anniversaryDate.getTime() - now.getTime()) / (1000 * 3600 * 24)
+			);
+			if (daysBefore < 0 || daysBefore > 90) {
+				continue;
+			}
+
+			if (anniversaryYear % 5 != 0 && daysBefore == 30) {
+				// regular anniversary
+				await knex(postHrTodosAnniversariesDB).insert({
+					user_id: user.user_id,
+					type: 'regular',
+					anniversary_date: anniversaryDate,
+					anniversary_year: anniversaryYear,
+				});
+			} else if (anniversaryYear % 5 == 0 && daysBefore == 90) {
+				// major anniversary
+				await knex(postHrTodosAnniversariesDB).insert({
+					user_id: user.user_id,
+					type: 'major',
+					anniversary_date: anniversaryDate,
+					anniversary_year: anniversaryYear,
+				});
 			}
 		}
 	} catch (error) {
