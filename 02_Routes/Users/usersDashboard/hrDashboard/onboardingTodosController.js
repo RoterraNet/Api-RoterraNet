@@ -7,7 +7,7 @@ const {
 const knex = require('../../../../01_Database/connection');
 
 const getOnboardingTodos = async (req, res) => {
-	/* Gets onboarding todos */
+	/* Gets completed or incompleted, or most recent (if user_id is supplied) onboarding todos */
 	try {
 		const { completed, user_id } = req.query;
 		let onboardingChecklistData;
@@ -33,6 +33,7 @@ const getOnboardingTodos = async (req, res) => {
 							.orderBy('preferred_name', 'asc');
 		}
 
+		// format todos data
 		const todosData = [];
 		for (const checklist of onboardingChecklistData) {
 			todosData.push({
@@ -89,11 +90,13 @@ const getOnboardingTodos = async (req, res) => {
 			});
 		}
 
+		// headers above certain checklist items
 		const headers = {
 			resume_filed: 'Human Resources & Payroll',
 			safety_orientation_completed: 'Health & Safety',
 		};
 
+		// labels for checklist items
 		const labels = {
 			resume_filed: 'Resume filed',
 			employment_offer_signed: 'Offer of employment signed & initialed in all corners',

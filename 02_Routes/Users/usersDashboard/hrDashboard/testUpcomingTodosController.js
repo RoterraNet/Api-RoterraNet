@@ -9,15 +9,17 @@ const {
 } = require('../../../../01_Database/database');
 const knex = require('../../../../01_Database/connection');
 
-// WARNING: WILL DELETE ALL CURRENT DATA FROM TODO TABLES AND
-// ADD ALL UPCOMING TODOS WITHIN A YEAR
+// WARNING: WILL DELETE ALL CURRENT DATA FROM BENEFITS, RRSP, AND ANNIVERSARY TODO TABLES AND
+// ADD ALL UPCOMING TODOS WITHIN A YEAR, SHOULD ONLY BE USED IN NON-LIVE DATABASE
 const makeUpcomingTodos = async (req, res) => {
 	try {
+		/* DELETE CURRENT RRSP TODOS AND ADD RRSP TODO ITEMS FOR USERS WHO ARE RRSP ELIGIBLE IN THE NEXT YEAR */
+
+		await knex(postHrTodosRRSPDB).delete();
+
 		const getUpcomingRRSP = knex.raw(
 			"DATE(rrsp_eligibility) BETWEEN DATE(current_date) AND DATE(current_date + INTERVAL '365 days')"
 		);
-
-		await knex(postHrTodosRRSPDB).delete();
 
 		const upcomingRRSPUsers = await knex(getUsersBenefitsDB)
 			.select('user_id', 'rrsp_eligibility')
@@ -41,6 +43,8 @@ const makeUpcomingTodos = async (req, res) => {
 			console.log('rrsp todos', newTodos);
 			await knex(postHrTodosRRSPDB).insert(newTodos);
 		}
+
+		/* DELETE CURRENT BENEFITS TODOS AND ADD BENEFIT TODO ITEMS FOR USERS WHO HAVE ANY MILESTONE IN THE NEXT YEAR */
 
 		await knex(postHrTodosBenefitsDB).delete();
 
@@ -136,6 +140,8 @@ const makeUpcomingTodos = async (req, res) => {
 				await knex(postHrTodosBenefitsDB).insert(newTodos);
 			}
 		}
+
+		/* DELETE CURRENT ANNIVERSARY TODOS AND ADD ANNIVERSARY TODO ITEMS FOR USERS WHO HAVE ANY ANNIVERSARY IN THE NEXT 90 DAYS */
 
 		await knex(postHrTodosAnniversariesDB).delete();
 

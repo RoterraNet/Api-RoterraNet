@@ -4,7 +4,7 @@ const { getHrTodosBenefitsDB, postHrTodosBenefitsDB } = require('../../../../01_
 const knex = require('../../../../01_Database/connection');
 
 const getUpcomingBenefitsTodos = async (req, res) => {
-	/* Gets all upcoming benefit milestones todos */
+	/* Gets completed or incompleted benefit milestones todos */
 	try {
 		const { completed } = req.query;
 		const benefitsTodosData =
@@ -107,7 +107,7 @@ const getUpcomingBenefitsTodos = async (req, res) => {
 };
 
 const updateBenefitsTodos = async (req, res) => {
-	/* Updates all given benefit milestone todos */
+	/* Updates changed benefit milestone todos */
 	try {
 		const { new_todos, old_todos, edited_by, edited_on } = req.body.update_details;
 		console.log(edited_by, edited_on);
