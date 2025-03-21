@@ -8,7 +8,8 @@ const getHSEFiles = async (req, res) => {
 		const hseFilesData = await knex(getHSEFilesDB)
 			.select('*')
 			.whereNull('deleted_by')
-			.andWhere({ type: type });
+			.andWhere({ type: type })
+			.orderBy('file_name', 'asc');
 
 		const sections = {};
 		for (const file of hseFilesData) {
