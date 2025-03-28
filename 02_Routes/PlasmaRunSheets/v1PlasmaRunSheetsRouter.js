@@ -15,6 +15,7 @@ router.get('/items', authorize({}), plasmaRunSheetItemsController.getSheetItems)
 router.put('/items', authorize({}), plasmaRunSheetItemsController.updateSheetItems);
 
 router.get(`/table`, async (req, res) => {
+	// get plasma run sheet table list
 	const { start, size, filters, sorting, globalFilter } = req.query;
 
 	const parsedColumnFilters = JSON.parse(filters);
@@ -102,6 +103,7 @@ router.get(`/table`, async (req, res) => {
 		ids.push(each.id);
 	});
 
+	// get workorders associated with plasma run sheet
 	const itemList = await knex(getPlasmaRunSheetItemsDB)
 		.select('plasma_run_sheet_id', 'workorder_id', 'workorder_name')
 		.whereIn('plasma_run_sheet_id', ids)
@@ -115,18 +117,16 @@ router.get(`/table`, async (req, res) => {
 			}
 		});
 	});
-
+	// check if workorders has been filtered for, and retrieve sheets that match those workorders
 	const i = parsedColumnFilters.findIndex((filter) => filter.id === 'workorders');
 	if (i != -1 && parsedColumnFilters[i]?.value?.trim() !== '') {
 		const workorderFilter = parsedColumnFilters[i].value.trim();
 		paginatedTable.data = paginatedTable.data.filter((sheet) => {
 			for (const [key, value] of Object.entries(sheet.workorders)) {
 				if (value.includes(workorderFilter)) {
-					console.log('allowed', sheet.workorders);
 					return true;
 				}
 			}
-			console.log('not allowed', sheet.workorders);
 			return false;
 		});
 	}

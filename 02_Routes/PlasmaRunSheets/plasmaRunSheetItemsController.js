@@ -7,6 +7,7 @@ const {
 
 const getSheetItems = async (req, res) => {
 	try {
+		// get plasma run sheet items
 		const { sheet_id } = req.query;
 
 		const itemList = await knex(getPlasmaRunSheetItemsDB)
@@ -15,6 +16,8 @@ const getSheetItems = async (req, res) => {
 			.andWhere({ deleted: false })
 			.orderBy('item_id', 'asc');
 
+		// avoid id as a property when using fieldarray forms,0
+		// since it overwrites it with an id key when edited
 		for (const item of itemList) {
 			delete item.id;
 		}
@@ -32,16 +35,20 @@ const getSheetItems = async (req, res) => {
 
 const updateSheetItems = async (req, res) => {
 	try {
+		// update plasma run sheet items
 		const { fields, dirty_fields, user_id } = req.body.update_details;
 
 		const now = new Date();
 		const updatedItems = [];
+
+		// go through each item type
 		for (const [itemType, dirtyItems] of Object.entries(dirty_fields)) {
+			// go through each item that might be edited (dirty)
 			for (let i = 0; i < dirtyItems.length; i++) {
-				const dirtyItem = dirtyItems[i];
-				const item = fields[itemType][i];
-				if (dirtyItem == null || Object.keys(dirtyItem).length == 0) continue;
-				if (!item.hasOwnProperty('item_id') && item.deleted) continue;
+				const dirtyItem = dirtyItems[i];  // contains booleans of properties that have been changed in item
+				const item = fields[itemType][i];  // contains actual item data 
+				if (dirtyItem == null || Object.keys(dirtyItem).length == 0) continue; // skip if no changes to item
+				if (!item.hasOwnProperty('item_id') && item.deleted) continue; // skip if item was created then deleted in the front end before being added to database
 				else {
 					const updatedItem = {
 						od: item.od ? item.od : null,
@@ -63,16 +70,17 @@ const updateSheetItems = async (req, res) => {
 						verified_on: item.verified_on,
 						deleted: item.deleted,
 						deleted_by: item.deleted ? user_id : item.deleted_by,
-						deleted_on: item.deleted ? now : item.deleted_on,
+						deleted_on: item.deleted ? now : item.deleted_on, 
 					};
 
-					if (item.hasOwnProperty('item_id')) updatedItem.id = item.item_id;
+					if (item.hasOwnProperty('item_id')) updatedItem.id = item.item_id; // used to find already existing items
 
 					updatedItems.push(updatedItem);
 				}
 			}
 		}
 
+		// do an upsert where items with an id are updates and items without an id are inserts
 		await knex(postPlasmaRunSheetItemsDB).insert(updatedItems).onConflict('id').merge();
 		res.status(200).json({ message: 'Sheet items successfully updated', color: 'success' });
 	} catch (e) {

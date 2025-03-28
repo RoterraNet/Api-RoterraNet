@@ -12,7 +12,7 @@ const format = require('date-fns/format');
 
 const getSheetInformationOptions = async (req, res) => {
 	try {
-		// sheet thickness, plasma operators, workorder heats
+		// get options for sheet thickness, plasma operators, workorder heats, priorities
 		const { sheet_id } = req.query;
 
 		const thicknessOptions = await knex(getPlatesDB)
@@ -25,6 +25,7 @@ const getSheetInformationOptions = async (req, res) => {
 			.andWhere({ plasma_table_operator: true })
 			.orderBy('first_name', 'asc');
 
+		// heats from 6 months ago until present
 		const sixMonthsAgo = format(subMonths(new Date(), 12), 'yyyy-MM-dd');
 		const heatOptions = await knex(getWorkordersHeatsDB)
 			.select('heat')
@@ -32,6 +33,7 @@ const getSheetInformationOptions = async (req, res) => {
 			.andWhereBetween('created_on', [sixMonthsAgo, format(new Date(), 'yyyy-MM-dd')])
 			.orderBy('id', 'desc');
 
+		// priorities from 1-10
 		const prioritiesOptions = [];
 		for (let i = 1; i <= 10; i++) {
 			prioritiesOptions.push({ priority: i });
@@ -59,7 +61,7 @@ const getSheetInformationOptions = async (req, res) => {
 
 const getSheetItemsOptions = async (req, res) => {
 	try {
-		// inner diameter (ID) sizes, plasma operators, workorders
+		// get options for inner diameter (ID) sizes, plasma operators, workorders
 
 		const idSizeOptions = await knex(getPlasma_run_sheet_helix_sizesDB)
 			.select('id', 'name')

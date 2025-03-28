@@ -44,7 +44,6 @@ const getSheetInformation = async (req, res) => {
 const updateSheetInformation = async (req, res) => {
 	try {
 		const { set_completed, values } = req.body.update_details;
-		console.log(values, set_completed);
 
 		const updatedSheet = {
 			sheet_name: values.sheet_name,
