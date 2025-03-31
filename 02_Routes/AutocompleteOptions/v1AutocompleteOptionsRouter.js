@@ -4,6 +4,7 @@ const authorize = require('../Authorization/authorization');
 
 const plasmaRunSheetsOptionsController = require('./plasmaRunSheetsOptionsController');
 
+router.get('/sheetAdd', authorize({}), plasmaRunSheetsOptionsController.getSheetAddOptions);
 router.get(
 	'/sheetInformation',
 	authorize({}),

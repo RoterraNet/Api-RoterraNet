@@ -10,6 +10,37 @@ const {
 const subMonths = require('date-fns/subMonths');
 const format = require('date-fns/format');
 
+const getSheetAddOptions = async (req, res) => {
+	try {
+		// get options for sheet thickness, priorities
+		const thicknessOptions = await knex(getPlatesDB)
+			.select('thickness', 'id')
+			.orderBy('sortorder', 'asc');
+
+		// priorities from 1-10
+		const prioritiesOptions = [];
+		for (let i = 1; i <= 10; i++) {
+			prioritiesOptions.push({ priority: i });
+		}
+
+		res.status(200).json({
+			message: 'Sheet add autocomplete options retrieved successfully',
+			color: 'success',
+			data: {
+				thicknessOptions: thicknessOptions,
+				prioritiesOptions: prioritiesOptions,
+			},
+		});
+	} catch (e) {
+		res.status(500).json({
+			message: 'Error retrieving sheet add autocomplete options',
+			color: 'error',
+			error: e,
+		});
+		console.log(e);
+	}
+};
+
 const getSheetInformationOptions = async (req, res) => {
 	try {
 		// get options for sheet thickness, plasma operators, workorder heats, priorities
@@ -101,4 +132,5 @@ const getSheetItemsOptions = async (req, res) => {
 module.exports = {
 	getSheetInformationOptions,
 	getSheetItemsOptions,
+	getSheetAddOptions,
 };
