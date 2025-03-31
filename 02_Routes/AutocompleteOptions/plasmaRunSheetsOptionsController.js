@@ -44,7 +44,7 @@ const getSheetAddOptions = async (req, res) => {
 const getSheetInformationOptions = async (req, res) => {
 	try {
 		// get options for sheet thickness, plasma operators, workorder heats, priorities
-		const { sheet_id } = req.query;
+		const { sheet_thickness } = req.query;
 
 		const thicknessOptions = await knex(getPlatesDB)
 			.select('thickness', 'id')
@@ -58,11 +58,13 @@ const getSheetInformationOptions = async (req, res) => {
 
 		// heats from 6 months ago until present
 		const sixMonthsAgo = format(subMonths(new Date(), 12), 'yyyy-MM-dd');
-		const heatOptions = await knex(getWorkordersHeatsDB)
-			.select('heat')
-			.where({ plate: sheet_id })
-			.andWhereBetween('created_on', [sixMonthsAgo, format(new Date(), 'yyyy-MM-dd')])
-			.orderBy('id', 'desc');
+		const heatOptions = sheet_thickness
+			? await knex(getWorkordersHeatsDB)
+					.select('heat')
+					.where({ plate: sheet_thickness })
+					.andWhereBetween('created_on', [sixMonthsAgo, format(new Date(), 'yyyy-MM-dd')])
+					.orderBy('id', 'desc')
+			: [];
 
 		// priorities from 1-10
 		const prioritiesOptions = [];
