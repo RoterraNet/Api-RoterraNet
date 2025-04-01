@@ -20,6 +20,8 @@ const getUsersPermissionsDB = database.getUsersPermissionsDB;
 
 const getUsersDB = database.getUsersDB;
 
+const getPoEmailListDB = database.getPoEmailListDB;
+
 // Email
 const po_emails = require('../04_Emails/po_emails/po_approval_email/po_approval_fn');
 const po_request_approval_email = po_emails.po_request_approval_email;
@@ -63,9 +65,9 @@ exports.po_add = (router) => {
 			let New_po = values;
 			let user_id = New_po.created_by;
 			//  -> CREATE new entries in po
-			console.log('this is data', New_po);
+
 			const po_id = (await knex(postPoDB).insert(New_po).returning('id'))[0];
-			console.log('return ID', po_id);
+
 			// 		//	-> CREATE new entries in po_detail
 			const New_po_details_AND_po_id = New_po_details.map((po_detail) => {
 				po_detail.id = po_detail.po_detail_id;
@@ -204,12 +206,14 @@ exports.po_edit = (router) => {
 					created_po_details,
 					get_newly_updated_po[0].requisitioned_by_work_email
 				);
-				po_approved_email(
-					get_newly_updated_po[0],
-					created_po_details,
-					'mresler@roterra.com'
-				);
-				po_approved_email(get_newly_updated_po[0], created_po_details, 'gene@roterra.com');
+
+				const emailingList = await knex(getPoEmailListDB)
+					.select()
+					.where({ deleted: false });
+
+				emailingList.forEach(({ work_email }) => {
+					po_approved_email(get_newly_updated_po[0], created_po_details, work_email);
+				});
 			}
 			// Rejected
 			if (Submitted_po.status == 2) {
@@ -418,13 +422,14 @@ const po_approval_process = async (user_id, po_id) => {
 			po_name = response5[0];
 			console.log(2, po_name);
 		}
-		//      => Update Status Of PO => Approved
-		await knex(postPoDB).where({ id: po_id }).update({ status: 4 });
-		// 		=> Sent Email To Admin (Morgan) notifying about PO
-		// 		=> Sent Email To Prez (Gene) notifying about PO
 
-		po_approved_email(Created_po, Created_po_details, 'mresler@roterra.com');
-		po_approved_email(Created_po, Created_po_details, 'gene@roterra.com');
+		await knex(postPoDB).where({ id: po_id }).update({ status: 4 });
+
+		const emailingList = await knex(getPoEmailListDB).select().where({ deleted: false });
+
+		emailingList.forEach(({ work_email }) => {
+			po_approved_email(Created_po, Created_po_details, work_email);
+		});
 
 		po_message = `PO is Approved. PO # is ${po_name}`;
 	}
@@ -440,9 +445,6 @@ const po_approval_process = async (user_id, po_id) => {
 		const manager_info = await recursiveFindManagerWithPOLimit(user_id, po_total_cost);
 		//		=> Send Manager Email to Approve PO
 		po_request_approval_email(Created_po, Created_po_details, manager_info.work_email);
-
-		// 		=> Sent Email To Admin (Morgan) notifying about PO
-		po_request_approval_email(Created_po, Created_po_details, 'mresler@roterra.com');
 
 		po_message = `PO is over your approval limit and requires approval.\n\nYou will be notified by e-mail when your PO is approved.\n\n Your order is being approved by ${manager_info.first_name} ${manager_info.last_name} \n\nThanks`;
 	}

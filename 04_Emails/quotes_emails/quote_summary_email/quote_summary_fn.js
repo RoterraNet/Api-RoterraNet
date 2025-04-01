@@ -22,30 +22,6 @@ const makeEmailObject = (emailBody, contact_email, email_subject) => {
 	return emailObject;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// SENIOR MANAGMENT DAILY EMAIL => ASSIGNED OPEN QUOTES
-// exports.senior_manager_weekly_mail = async () => {
-// 	const all_open_quotes = await knex(getQuotesDB).select('*').where('status', '=', 0);
-
-// 	// Send Email to Garret
-// 	const oneEmailObject = makeEmailObject(all_open_quotes, 'garrett@roterra.com', 'All Open Quotes');
-// 	await sendMail(oneEmailObject);
-// };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// MANAGER DAILY EMAIL => ALL OPEN QUOTES
-// exports.manager_daily_mail = async () => {
-// 	const all_open_quotes = await knex(getQuotesDB).select('*').where('status', '=', 0).andWhere('deleted', '=', 0);
-// 	const quote_managers_emails = await knex(getUsersPermissionsDB).select('work_email').where('quote_manager', '=', true);
-
-// 	// Send Email to All Quote Managers
-// 	for (let i = 0; i < quote_managers_emails.length; i++) {
-// 		arrayOfMailObjects.push(makeEmailObject(all_open_quotes, 'rdick@roterra.com', 'All Open Quotes')); //quote_managers_emails[i].work_email
-// 	}
-// 	// Send All Email
-// };
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ESTIMATOR DAILY EMAIL => ASSIGNED OPEN QUOTES
 exports.estimator_daily_mail = async () => {
 	const estimators_ids_with_open_quotes = await knex(getQuotesDB)

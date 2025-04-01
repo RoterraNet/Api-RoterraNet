@@ -8,6 +8,7 @@ const v1HSERouter = require('./02_Routes/HSE/v1HSERouter');
 const v1QualityRouter = require('./02_Routes/Quality/v1QualityRouter');
 const v1CalendarRouter = require('./02_Routes/calendar/v1CalendarRouter');
 const companyBranding = require('./02_Routes/CompanyBranding/companyBranding');
+const v1PORouter = require('./02_Routes/po/v1PORouter');
 
 router.use('/branding', companyBranding);
 
@@ -16,6 +17,7 @@ router.use('/calendar', v1CalendarRouter);
 router.use('/users', v1UsersRouter);
 
 router.use('/projects', v1ProjectsRouter);
+router.use('/po', v1PORouter);
 
 router.use('/mtr', v1MtrRouter);
 
