@@ -10,6 +10,7 @@ const v1CalendarRouter = require('./02_Routes/calendar/v1CalendarRouter');
 const companyBranding = require('./02_Routes/CompanyBranding/companyBranding');
 const v1PlasmaRunSheetsRouter = require('./02_Routes/PlasmaRunSheets/v1PlasmaRunSheetsRouter');
 const v1AutocompleteOptionsRouter = require('./02_Routes/AutocompleteOptions/v1AutocompleteOptionsRouter');
+const v1PORouter = require('./02_Routes/po/v1PORouter');
 
 router.use('/branding', companyBranding);
 
@@ -18,6 +19,7 @@ router.use('/calendar', v1CalendarRouter);
 router.use('/users', v1UsersRouter);
 
 router.use('/projects', v1ProjectsRouter);
+router.use('/po', v1PORouter);
 
 router.use('/mtr', v1MtrRouter);
 

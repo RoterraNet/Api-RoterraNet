@@ -14,7 +14,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
-	origin: ['*', 'http://localhost:3000', 'http://192.168.2.73:3000', 'http://127.0.0.1:3000'],
+	origin: [
+		'*',
+		'http://localhost:3000',
+		'http://192.168.2.73:3000',
+		'http://127.0.0.1:3000',
+		'http://192.168.1.63:3000',
+	],
 	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 	credentials: true,
 	optionsSuccessStatus: 204,

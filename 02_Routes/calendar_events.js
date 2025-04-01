@@ -130,9 +130,21 @@ router.get('/all', async (req, res) => {
 
 	try {
 		const query = knex.raw(
-			`CASE WHEN category = 1 THEN CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END ELSE event_name END title, 
-			CASE WHEN location = '' THEN description WHEN description = '' THEN location ELSE CONCAT(description, ' - ',location) END detail`
+			`CASE WHEN category = 1 THEN 
+				CASE 
+					WHEN location = '' THEN description 
+					WHEN description = '' THEN location 
+					ELSE CONCAT(description, ' - ', location) 
+				END 
+			 ELSE event_name 
+			 END AS title, 
+			 CASE 
+				WHEN location = '' THEN description 
+				WHEN description = '' THEN location 
+				ELSE CONCAT(description, ' - ', location) 
+			 END AS detail`
 		);
+
 		const getInAndOut = await knex(getInAndOutDB)
 			.select(
 				query,
@@ -154,12 +166,13 @@ router.get('/all', async (req, res) => {
 			)
 			.where('date', '<=', end)
 			.andWhere('return_date', '>=', start)
-			.modify((builder) => {
+			.andWhere((builder) => {
 				if (location !== 'all') {
-					builder.andWhere({ location_id: location });
+					builder.where({ category: 1 }).orWhere((qb) => {
+						qb.where({ location_id: location });
+					});
 				}
 			})
-
 			.orderBy('id', 'desc');
 
 		res.send(getInAndOut);

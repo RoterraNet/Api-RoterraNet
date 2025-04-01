@@ -8,7 +8,8 @@ const getQualityFiles = async (req, res) => {
 		const qualityFilesData = await knex(getQualityFilesDB)
 			.select('*')
 			.whereNull('deleted_by')
-			.andWhere({ type: type });
+			.andWhere({ type: type })
+			.orderBy('file_name', 'asc');
 
 		const sections = {};
 		for (const file of qualityFilesData) {
