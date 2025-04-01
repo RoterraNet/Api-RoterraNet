@@ -10,11 +10,12 @@ const knex = require('../../01_Database/connection');
 router.get('', authorize({}), plasmaRunSheetInformationController.getSheetInformation);
 router.put('', authorize({}), plasmaRunSheetInformationController.updateSheetInformation);
 router.post('', authorize({}), plasmaRunSheetInformationController.createSheet);
+router.post('/clone', authorize({}), plasmaRunSheetInformationController.cloneSheet);
 
 router.get('/items', authorize({}), plasmaRunSheetItemsController.getSheetItems);
 router.put('/items', authorize({}), plasmaRunSheetItemsController.updateSheetItems);
 
-router.get(`/table`, async (req, res) => {
+router.get(`/table`, authorize({}), async (req, res) => {
 	// get plasma run sheet table list
 	const { start, size, filters, sorting, globalFilter } = req.query;
 
@@ -82,14 +83,15 @@ router.get(`/table`, async (req, res) => {
 				parsedColumnSorting.map((sort) => {
 					const { id: columnId, desc: sortValue } = sort;
 					const sorter = sortValue ? 'desc' : 'asc';
-					if (columnId == 'priority') {
+					if (columnId === 'priority') {
 						builder.whereNotNull('priority');
 					}
 					builder.orderBy(columnId, sorter);
 				});
 			}
 		})
-		.orderBy('completed', 'desc')
+		.orderByRaw('completed asc NULLS FIRST')
+		.orderByRaw('completed_date desc NULLS LAST')
 		.orderBy('id', 'desc')
 
 		.paginate({

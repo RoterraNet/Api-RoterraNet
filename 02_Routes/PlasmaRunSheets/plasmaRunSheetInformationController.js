@@ -4,6 +4,7 @@ const {
 	getPlasmaRunSheetsDB,
 	postPlasmaRunSheetsDB,
 	getUsersPermissionsDB,
+	postPlasmaRunSheetItemsDB,
 } = require('../../01_Database/database');
 const { postUserNotification } = require('../userNotifications/userNotifications');
 const { todayDate } = require('../../03_Utils/formatDates');
@@ -20,6 +21,69 @@ const createSheet = async (req, res) => {
 		});
 	} catch (e) {
 		res.status(500).json({ message: 'Error creating sheet', color: 'error', error: e });
+		console.log(e);
+	}
+};
+
+const cloneSheet = async (req, res) => {
+	try {
+		const { copies, starting_number, sheet_id, created_by, created_on } = req.body;
+
+		// get plasma run sheet to copy
+		const sheetToCopy = await knex(postPlasmaRunSheetsDB) // get from postDB, since it already has the fields we need for insertion
+			.select('*')
+			.where({ id: sheet_id })
+			.andWhere({ deleted: false });
+
+		// change copied plasma run sheet created fields
+		const copiedData = {
+			...sheetToCopy[0],
+			created_by: created_by,
+			created_on: created_on,
+		};
+		delete copiedData.id; // remove sheet's ID, since a new ID will be assigned
+
+		// get items associated with copied plasma run sheet
+		const sheetItems = await knex(postPlasmaRunSheetItemsDB) // get from postDB, since it already has the fields we need for insertion
+			.select('*')
+			.where({ plasma_run_sheet_id: sheet_id })
+			.andWhere({ deleted: false })
+			.orderBy('id', 'asc');
+
+		for (let i = 0; i < copies; i++) {
+			// insert new plasma sheet copy and get its ID
+			const newSheet = await knex(postPlasmaRunSheetsDB)
+				.insert({
+					...copiedData,
+					sheet_name: starting_number // if starting_number was supplied, add to sheet_name
+						? `${copiedData.sheet_name} (${parseInt(starting_number) + i})`
+						: copiedData.sheet_name,
+				})
+				.returning('id');
+
+			// create new item copies associated with plasma sheet
+			const copiedItems = sheetItems.map((item) => {
+				// change copied plasma run sheet item created fields and assign new sheet's ID to item
+				const newItem = {
+					...item,
+					created_by: created_by,
+					created_on: created_on,
+					plasma_run_sheet_id: newSheet[0],
+				};
+				delete newItem.id; // remove item's ID, since a new ID will be assigned
+				return newItem;
+			});
+
+			// insert item copies
+			await knex(postPlasmaRunSheetItemsDB).insert(copiedItems);
+		}
+
+		res.status(200).json({
+			message: `Sheet successfully cloned (${copies} copies)`,
+			color: 'success',
+		});
+	} catch (e) {
+		res.status(500).json({ message: 'Error cloning sheet', color: 'error', error: e });
 		console.log(e);
 	}
 };
@@ -43,7 +107,7 @@ const getSheetInformation = async (req, res) => {
 
 const updateSheetInformation = async (req, res) => {
 	try {
-		const { set_completed, values } = req.body.update_details;
+		const { update_type, values } = req.body.update_details;
 
 		const updatedSheet = {
 			sheet_name: values.sheet_name,
@@ -64,13 +128,13 @@ const updateSheetInformation = async (req, res) => {
 			cut_off_width: values.cut_off_width ? values.cut_off_width : null,
 			plate_utilization: values.plate_utilization,
 			completed: values.completed,
+			completed_date: update_type === 'reverted' ? null : values.completed_date,
 			cut_off: values.cut_off,
 			rush: values.rush,
 			priority: values.priority,
 			operator_notes: values.operator_notes,
 			manager_notes: values.manager_notes,
 			deleted: values.deleted,
-			completed_date: values.completed_date,
 		};
 
 		const updatedSheets = await knex(postPlasmaRunSheetsDB)
@@ -78,7 +142,7 @@ const updateSheetInformation = async (req, res) => {
 			.where({ id: values.id })
 			.returning('*');
 
-		if (set_completed == true) {
+		if (update_type === 'completed') {
 			// gets  list of users to send notification to
 			const usersListToNotify = await knex(getUsersPermissionsDB)
 				.select('user_id')
@@ -98,13 +162,26 @@ const updateSheetInformation = async (req, res) => {
 			});
 		}
 
-		res.status(200).json({
-			message:
-				set_completed == true
-					? 'Sheet information successfully updated and completed'
-					: 'Sheet information successfully updated',
-			color: 'success',
-		});
+		switch (update_type) {
+			case 'updated':
+				res.status(200).json({
+					message: 'Sheet information successfully updated',
+					color: 'success',
+				});
+				break;
+			case 'completed':
+				res.status(200).json({
+					message: 'Sheet information successfully updated and completed',
+					color: 'success',
+				});
+				break;
+			case 'reverted':
+				res.status(200).json({
+					message: 'Sheet information successfully updated and reverted',
+					color: 'success',
+				});
+				break;
+		}
 	} catch (e) {
 		res.status(500).json({
 			message: 'Error updating sheet information',
@@ -116,6 +193,7 @@ const updateSheetInformation = async (req, res) => {
 };
 module.exports = {
 	createSheet,
+	cloneSheet,
 	getSheetInformation,
 	updateSheetInformation,
 };
