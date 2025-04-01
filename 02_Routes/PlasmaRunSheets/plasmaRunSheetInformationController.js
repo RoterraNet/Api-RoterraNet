@@ -32,8 +32,7 @@ const cloneSheet = async (req, res) => {
 		// get plasma run sheet to copy
 		const sheetToCopy = await knex(postPlasmaRunSheetsDB) // get from postDB, since it already has the fields we need for insertion
 			.select('*')
-			.where({ id: sheet_id })
-			.andWhere({ deleted: false });
+			.where({ id: sheet_id, deleted: false });
 
 		// change copied plasma run sheet created fields
 		const copiedData = {
@@ -46,8 +45,7 @@ const cloneSheet = async (req, res) => {
 		// get items associated with copied plasma run sheet
 		const sheetItems = await knex(postPlasmaRunSheetItemsDB) // get from postDB, since it already has the fields we need for insertion
 			.select('*')
-			.where({ plasma_run_sheet_id: sheet_id })
-			.andWhere({ deleted: false })
+			.where({ plasma_run_sheet_id: sheet_id, deleted: false })
 			.orderBy('id', 'asc');
 
 		for (let i = 0; i < copies; i++) {
@@ -146,8 +144,7 @@ const updateSheetInformation = async (req, res) => {
 			// gets  list of users to send notification to
 			const usersListToNotify = await knex(getUsersPermissionsDB)
 				.select('user_id')
-				.where({ manufacturing: true })
-				.andWhere({ deleted: 0 });
+				.where({ manufacturing: true, deleted: 0 });
 
 			// send Notification
 			usersListToNotify.forEach(({ user_id }) => {
@@ -162,26 +159,22 @@ const updateSheetInformation = async (req, res) => {
 			});
 		}
 
+		let message = '';
 		switch (update_type) {
 			case 'updated':
-				res.status(200).json({
-					message: 'Sheet information successfully updated',
-					color: 'success',
-				});
+				message = 'Sheet information successfully updated';
 				break;
 			case 'completed':
-				res.status(200).json({
-					message: 'Sheet information successfully updated and completed',
-					color: 'success',
-				});
+				message = 'Sheet information successfully updated and completed';
 				break;
 			case 'reverted':
-				res.status(200).json({
-					message: 'Sheet information successfully updated and reverted',
-					color: 'success',
-				});
+				message = 'Sheet information successfully updated and reverted';
 				break;
 		}
+		res.status(200).json({
+			message: message,
+			color: 'success',
+		});
 	} catch (e) {
 		res.status(500).json({
 			message: 'Error updating sheet information',

@@ -12,8 +12,7 @@ const getSheetItems = async (req, res) => {
 
 		const itemList = await knex(getPlasmaRunSheetItemsDB)
 			.select('*', 'id as item_id')
-			.where({ plasma_run_sheet_id: sheet_id })
-			.andWhere({ deleted: false })
+			.where({ plasma_run_sheet_id: sheet_id, deleted: false })
 			.orderBy('item_id', 'asc');
 
 		// avoid id as a property when using fieldarray forms,0
