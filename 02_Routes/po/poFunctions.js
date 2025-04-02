@@ -48,11 +48,14 @@ exports.po_approval_process = async (user_id, po_id) => {
 		}
 		//      => Update Status Of PO => Approved
 		await knex(postPoDB).where({ id: po_id }).update({ status: 4 });
-		// 		=> Sent Email To Admin (Morgan) notifying about PO
-		// 		=> Sent Email To Prez (Gene) notifying about PO
 
-		po_approved_email(Created_po, Created_po_details, 'mresler@roterra.com');
-		po_approved_email(Created_po, Created_po_details, 'gene@roterra.com');
+		const emailingList = await knex(database.getPoEmailListDB)
+			.select()
+			.where({ deleted: false });
+
+		emailingList.forEach(({ work_email }) => {
+			po_approved_email(Created_po, Created_po_details, work_email);
+		});
 
 		po_message = `PO is Approved. PO # is ${po_name}`;
 	}
@@ -68,9 +71,6 @@ exports.po_approval_process = async (user_id, po_id) => {
 		const manager_info = await recursiveFindManagerWithPOLimit(user_id, po_total_cost);
 		//		=> Send Manager Email to Approve PO
 		po_request_approval_email(Created_po, Created_po_details, manager_info.work_email);
-
-		// 		=> Sent Email To Admin (Morgan) notifying about PO
-		// po_request_approval_email(Created_po, Created_po_details, 'mresler@roterra.com');
 
 		po_message = `PO is over your approval limit and requires approval.\n\nYou will be notified by e-mail when your PO is approved.\n\n Your order is being approved by ${manager_info.first_name} ${manager_info.last_name} \n\nThanks`;
 	}

@@ -157,6 +157,9 @@ exports.postOnboardingChecklistsDB = 'roterranet.onboarding_checklists';
 exports.postOrderControlDB = 'roterranet.ordercontrol';
 exports.getOrderControlDB = 'roterranet.view_ordercontrol';
 
+exports.getPoEmailListDB = 'roterranet.view_po_email_list';
+exports.postPoEmailListDB = 'roterranet.po_email_list';
+
 exports.getPoDB = 'roterranet.view_po';
 exports.postPoDB = 'roterranet.po';
 
@@ -184,6 +187,9 @@ exports.postPoDetailEditedDB = 'roterranet.po_detail_edited';
 
 exports.getPositionsDB = 'roterranet.positions';
 exports.postPositionsDB = 'roterranet.positions';
+
+exports.getProjectsEmailListDB = 'roterranet.view_project_email_list';
+exports.postProjectsEmailListDB = 'roterranet.project_email_list';
 
 exports.getProjectsDB = 'roterranet.view_projects2';
 exports.postProjectsDB = 'roterranet.projects_new2';

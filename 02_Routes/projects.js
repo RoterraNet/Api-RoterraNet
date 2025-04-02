@@ -21,6 +21,9 @@ const today_now = datefns.format(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS');
 
 const { createProjectEmailBody } = require('../04_Emails/Project Emails/newProjectEmail');
 const authorize = require('./Authorization/authorization');
+const {
+	getProjectsEmailList,
+} = require('./Projects/Project_email_list/projectsEmailListController');
 
 const makeEmailObject = (emailBody, contact_email, email_subject) => {
 	const emailObject = {
@@ -150,13 +153,17 @@ router.post('/', async (req, res) => {
 			)
 			.where('id', '=', workOrderIdRes.project_id);
 
-		sendMail(
-			makeEmailObject(
-				createProjectEmailBody(emailInfo[0]),
-				'ar@roterra.com',
-				`New Job Created - ${emailInfo[0].workorder_id}`
-			)
-		);
+		const emailingList = await knex(getProjectsEmailList).select().where({ deleted: false });
+
+		emailingList.forEach(({ work_email }) => {
+			sendMail(
+				makeEmailObject(
+					createProjectEmailBody(emailInfo[0]),
+					work_email,
+					`New Job Created - ${emailInfo[0].workorder_id}`
+				)
+			);
+		});
 	} catch (e) {
 		console.log(e);
 		return res.status(400).send({
