@@ -4,7 +4,7 @@ const { getPlatesDB } = require('../../01_Database/database');
 
 const getThickness = async (req, res) => {
 	try {
-		// get list of sheet thicknesses
+		// get list of plate thicknesses
 		const thicknessList = await knex(getPlatesDB)
 			.select('thickness', 'id')
 			.orderBy('sortorder', 'asc');
