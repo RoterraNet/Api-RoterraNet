@@ -11,6 +11,7 @@ const companyBranding = require('./02_Routes/CompanyBranding/companyBranding');
 const v1PlasmaRunSheetsRouter = require('./02_Routes/PlasmaRunSheets/v1PlasmaRunSheetsRouter');
 const v1PORouter = require('./02_Routes/po/v1PORouter');
 const v1WorkordersRouter = require('./02_Routes/Workorders/v1WorkordersRouter');
+const v1PlatesRouter = require('./02_Routes/Plates/v1PlatesRouter');
 
 router.use('/branding', companyBranding);
 
