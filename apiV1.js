@@ -11,6 +11,7 @@ const companyBranding = require('./02_Routes/CompanyBranding/companyBranding');
 const v1PlasmaRunSheetsRouter = require('./02_Routes/PlasmaRunSheets/v1PlasmaRunSheetsRouter');
 const v1AutocompleteOptionsRouter = require('./02_Routes/AutocompleteOptions/v1AutocompleteOptionsRouter');
 const v1PlatesRouter = require('./02_Routes/Plates/v1PlatesRouter');
+const v1WorkordersRouter = require('./02_Routes/Workorders/v1WorkordersRouter');
 
 router.use('/branding', companyBranding);
 
@@ -31,5 +32,7 @@ router.use('/plasmaRunSheets', v1PlasmaRunSheetsRouter);
 router.use('/autocompleteOptions', v1AutocompleteOptionsRouter);
 
 router.use('/plates', v1PlatesRouter);
+
+router.use('/workorders', v1WorkordersRouter);
 
 module.exports = router;
