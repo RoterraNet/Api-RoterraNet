@@ -7,7 +7,7 @@ const format = require('date-fns/format');
 const getWorkorderHeats = async (req, res) => {
 	try {
 		// get list of workorder heats
-		const { sheet_thickness } = req.body;
+		const { sheet_thickness } = req.query;
 
 		// heats from 1 year ago until present
 		const oneYearAgo = format(subMonths(new Date(), 12), 'yyyy-MM-dd');
