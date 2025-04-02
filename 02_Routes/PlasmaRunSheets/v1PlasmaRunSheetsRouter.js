@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const authorize = require('../Authorization/authorization');
+const knex = require('../../01_Database/connection');
+
+const { getPlasmaRunSheetItemsDB, getPlasmaRunSheetsDB } = require('../../01_Database/database');
 
 const plasmaRunSheetInformationController = require('./plasmaRunSheetInformationController');
 const plasmaRunSheetItemsController = require('./plasmaRunSheetItemsController');
-const { getPlasmaRunSheetItemsDB, getPlasmaRunSheetsDB } = require('../../01_Database/database');
-const knex = require('../../01_Database/connection');
+const plasmaRunSheetHelixSizesController = require('./plasmaRunSheetHelixSizesController');
 
 router.get('', authorize({}), plasmaRunSheetInformationController.getSheetInformation);
 router.put('', authorize({}), plasmaRunSheetInformationController.updateSheetInformation);
@@ -14,6 +16,8 @@ router.post('/clone', authorize({}), plasmaRunSheetInformationController.cloneSh
 
 router.get('/items', authorize({}), plasmaRunSheetItemsController.getSheetItems);
 router.put('/items', authorize({}), plasmaRunSheetItemsController.updateSheetItems);
+
+router.get('/helixSizes', authorize({}), plasmaRunSheetHelixSizesController.getHelixSizes);
 
 router.get(`/table`, authorize({}), async (req, res) => {
 	// get plasma run sheet table list
