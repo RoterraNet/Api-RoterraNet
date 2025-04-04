@@ -157,7 +157,10 @@ const addHrTodos = async () => {
 		/* ADD A BENEFITS TODO ITEM FOR USERS WHO HAVE A BENEFIT MILESONE IN EXACTLY 1 MONTH */
 
 		const getUpcomingBenefits = [
-			['90 days', knex.raw("DATE(current_date + INTERVAL '1 month') = DATE(effective_date)")],
+			[
+				'Benefits effective',
+				knex.raw("DATE(current_date + INTERVAL '1 month') = DATE(effective_date)"),
+			],
 			[
 				'1 year',
 				knex.raw(
@@ -196,7 +199,7 @@ const addHrTodos = async () => {
 
 					// assign default values to benefit todo depending on milestone
 					switch (milestone) {
-						case '90 days':
+						case 'Benefits effective':
 							due_date = new Date(effective_date);
 							todo['due_date'] = due_date;
 							todo['confirmed_enrolment'] = false;
