@@ -167,6 +167,7 @@ router.post('/rrsp/', async (req, res) => {
 		}
 		res.status(202).json({ message: 'RRSP Information was updated', color: 'success' });
 	} catch (error) {
+		console.log(error);
 		res.status(500).json({
 			errorMessage: error,
 			message: 'Something Went Wrong',
