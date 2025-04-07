@@ -5,6 +5,8 @@ const {
 	getUsersPermissionsDB,
 	getUsersPermissionsLogsDB,
 	postUsersPermissionsLogsDB,
+	postPersonalPropertyDB,
+	getPersonalPropertyDB,
 } = require('../../../01_Database/database');
 const {
 	AddUpdateAllUserPermissions,
@@ -247,6 +249,42 @@ const updateGeneralInformation = async (req, res) => {
 	}
 };
 
+const getPersonalProperty = async (req, res) => {
+	try {
+		const { user_id } = req.query;
+
+		const data = await knex(getPersonalPropertyDB).where({ user_id: user_id });
+		res.status(200).json({
+			message: 'Personal property retrieved',
+			color: 'success',
+			data: data,
+		});
+	} catch (e) {
+		res.status(500).json({
+			message: 'Error retrieving personal property',
+			color: 'error',
+			error: e,
+		});
+		console.log(e);
+	}
+};
+
+const updatePersonalProperty = async (req, res) => {
+	try {
+		const { updated_items } = req.body.update_details;
+
+		await knex(postPersonalPropertyDB).insert(updated_items).onConflict('item_id').merge();
+		res.status(200).json({ message: 'Personal property has been updated', color: 'success' });
+	} catch (e) {
+		res.status(500).json({
+			message: 'Error updating personal property',
+			color: 'error',
+			error: e,
+		});
+		console.log(e);
+	}
+};
+
 module.exports = {
 	getIntranetPermissions,
 	updateIntranetPermissions,
@@ -254,4 +292,6 @@ module.exports = {
 	getAccountInformation,
 	updateGeneralInformation,
 	updateAccountInformation,
+	getPersonalProperty,
+	updatePersonalProperty,
 };

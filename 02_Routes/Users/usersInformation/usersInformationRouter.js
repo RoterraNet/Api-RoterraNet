@@ -4,11 +4,33 @@ const router = express.Router();
 
 const usersInformationController = require('./usersInformationController');
 
-router.put('/generalInformation', authorize({}), usersInformationController.updateGeneralInformation);
-router.get('/intranetPermissions', authorize({}), usersInformationController.getIntranetPermissions);
-router.put('/intranetPermissions', authorize({}), usersInformationController.updateIntranetPermissions);
-router.get('/intranetPermissionsLogs', authorize({}), usersInformationController.getIntranetPermissionsLogs);
+router.put(
+	'/generalInformation',
+	authorize({}),
+	usersInformationController.updateGeneralInformation
+);
+router.get(
+	'/intranetPermissions',
+	authorize({}),
+	usersInformationController.getIntranetPermissions
+);
+router.put(
+	'/intranetPermissions',
+	authorize({}),
+	usersInformationController.updateIntranetPermissions
+);
+router.get(
+	'/intranetPermissionsLogs',
+	authorize({}),
+	usersInformationController.getIntranetPermissionsLogs
+);
 router.get('/accountInformation', authorize({}), usersInformationController.getAccountInformation);
-router.put('/accountInformation', authorize({}), usersInformationController.updateAccountInformation);
+router.put(
+	'/accountInformation',
+	authorize({}),
+	usersInformationController.updateAccountInformation
+);
+router.get('/personalProperty', authorize({}), usersInformationController.getPersonalProperty);
+router.put('/personalProperty', authorize({}), usersInformationController.updatePersonalProperty);
 
 module.exports = router;
