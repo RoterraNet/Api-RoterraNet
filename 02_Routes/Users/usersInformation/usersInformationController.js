@@ -253,7 +253,7 @@ const getPersonalProperty = async (req, res) => {
 	try {
 		const { user_id } = req.query;
 
-		const data = await knex(getPersonalPropertyDB).where({ user_id: user_id });
+		const data = await knex(getPersonalPropertyDB).where({ user_id: user_id, deleted: false });
 		res.status(200).json({
 			message: 'Personal property retrieved',
 			color: 'success',
@@ -271,9 +271,21 @@ const getPersonalProperty = async (req, res) => {
 
 const updatePersonalProperty = async (req, res) => {
 	try {
-		const { updated_items } = req.body.update_details;
+		const { edited_by, updated_items } = req.body.update_details;
 
-		await knex(postPersonalPropertyDB).insert(updated_items).onConflict('item_id').merge();
+		const upsertItems = updated_items
+			.filter(
+				(item) =>
+					item.hasOwnProperty('item_id') ||
+					(!item.hasOwnProperty('item_id') && item.deleted == false)
+			)
+			.map((item) => {
+				return item.deleted
+					? { ...item, deleted_by: edited_by, deleted_on: new Date() }
+					: item;
+			});
+
+		await knex(postPersonalPropertyDB).insert(upsertItems).onConflict('item_id').merge();
 		res.status(200).json({ message: 'Personal property has been updated', color: 'success' });
 	} catch (e) {
 		res.status(500).json({
