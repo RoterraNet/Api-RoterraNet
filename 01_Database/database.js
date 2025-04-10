@@ -117,6 +117,9 @@ exports.postNewsDB = 'roterranet.news';
 exports.getNotesDB = 'roterranet.view_notes';
 exports.postNotesDB = 'roterranet.notes';
 
+exports.getPersonalPropertyDB = 'roterranet.view_personal_property';
+exports.postPersonalPropertyDB = 'roterranet.personal_property';
+
 exports.getPipesDB = 'roterranet.pipe'; //change DB name to pipes
 exports.postPipesDB = 'roterranet.pipe'; //change DB name to pipes
 
