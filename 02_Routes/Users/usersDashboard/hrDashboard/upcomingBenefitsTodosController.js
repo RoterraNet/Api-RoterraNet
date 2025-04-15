@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { getHrTodosBenefitsDB, postHrTodosBenefitsDB } = require('../../../../01_Database/database');
+const {
+	getHrTodosBenefitsDB,
+	postHrTodosBenefitsDB,
+	postUsersBenefitsDB,
+} = require('../../../../01_Database/database');
 const knex = require('../../../../01_Database/connection');
 
 const getUpcomingBenefitsTodos = async (req, res) => {
@@ -12,6 +16,9 @@ const getUpcomingBenefitsTodos = async (req, res) => {
 				? await knex(getHrTodosBenefitsDB)
 						.select('*')
 						.where({ completed: completed })
+						.andWhereRaw(
+							"DATE(current_date) BETWEEN DATE(due_date) AND DATE(due_date + INTERVAL '30 days')"
+						)
 						.orderBy('due_date', 'asc')
 						.orderBy('preferred_name', 'asc')
 				: await knex(getHrTodosBenefitsDB)
@@ -34,7 +41,7 @@ const getUpcomingBenefitsTodos = async (req, res) => {
 					due_date: todo.due_date,
 					milestone: todo.milestone,
 					days_before: Math.round(
-						(todo.due_date.getTime() - now.getTime()) / (1000 * 3600 * 24)
+						(new Date(todo.due_date).getTime() - now.getTime()) / (1000 * 3600 * 24)
 					),
 					completed: todo.completed,
 					completed_on: todo.completed_on,
@@ -50,6 +57,7 @@ const getUpcomingBenefitsTodos = async (req, res) => {
 					newTodo.checklist = {
 						emailed_details: todo.emailed_details,
 						confirmed_enrolment: todo.confirmed_enrolment,
+						enrolment_status: todo.enrolment_status,
 						added_benefit_deduction: todo.added_benefit_deduction,
 						updated_intranet_benefits: todo.updated_intranet_benefits,
 					};
@@ -81,6 +89,7 @@ const getUpcomingBenefitsTodos = async (req, res) => {
 		const labels = {
 			emailed_details: 'Email employee about benefits information/bump',
 			confirmed_enrolment: 'Confirm online enrolment completed',
+			enrolment_status: 'Enrolment status:',
 			added_benefit_deduction: 'Add benefit deduction to payroll',
 			updated_benefit_class: 'Update benefit class on Canada Life',
 			ordered_hsp_card: 'Order HSP card',
@@ -116,7 +125,9 @@ const updateBenefitsTodos = async (req, res) => {
 			// console.log('new:', new_todos[i]);
 			// console.log('old:', old_todos[i]);
 			const oldTodo = old_todos[i];
+			const { details: oldDetails, checklist: oldChecklist } = oldTodo;
 			const newTodo = new_todos[i];
+			const { details: newDetails, checklist: newChecklist } = newTodo;
 
 			if (JSON.stringify(newTodo) === JSON.stringify(oldTodo)) {
 				console.log('no changes');
@@ -124,12 +135,16 @@ const updateBenefitsTodos = async (req, res) => {
 			}
 
 			const updatedTodo = {
-				...newTodo.checklist,
+				...newChecklist,
 				updated_by_id: edited_by,
 				updated_on: edited_on,
 			};
 
-			if (newTodo.details.completed == true && oldTodo.details.completed == false) {
+			// exclude fields that are viewed from other tables
+			delete updatedTodo.enrolment_status;
+			delete updatedTodo.due_date;
+
+			if (newDetails.completed == true && oldDetails.completed == false) {
 				updatedTodo.completed = true;
 				updatedTodo.completed_by_id = edited_by;
 				updatedTodo.completed_on = edited_on;
@@ -137,7 +152,37 @@ const updateBenefitsTodos = async (req, res) => {
 
 			// console.log(updatedTodo);
 
-			await knex(postHrTodosBenefitsDB).update(updatedTodo).where({ id: oldTodo.details.id });
+			await knex(postHrTodosBenefitsDB).update(updatedTodo).where({ id: oldDetails.id });
+
+			console.log(newChecklist.enrolment_status);
+			// check if benefits status has been set, if so, update it in user_benefits table
+			if (newChecklist.enrolment_status !== oldChecklist.enrolment_status) {
+				const updatedBenefits = {
+					benefits_updated_by: edited_by,
+					benefits_updated_on: edited_on,
+				};
+
+				switch (newChecklist.enrolment_status) {
+					case 'Waiting':
+						updatedBenefits.benefits_status = 1;
+						break;
+					case 'Enrolled':
+						updatedBenefits.benefits_status = 2;
+						break;
+					case 'Waived':
+						updatedBenefits.benefits_status = 3;
+						break;
+					case 'Ineligible':
+						updatedBenefits.benefits_status = 4;
+						break;
+					default:
+						break;
+				}
+
+				await knex(postUsersBenefitsDB)
+					.update(updatedBenefits)
+					.where({ user_id: newDetails.user_id });
+			}
 		}
 
 		res.status(200).json({ message: 'Benefits to-do changes saved', color: 'success' });
