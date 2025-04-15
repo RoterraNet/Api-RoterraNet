@@ -30,10 +30,8 @@ const makeUpcomingTodos = async (req, res) => {
 		if (upcomingRRSPUsers.length !== 0) {
 			const newTodos = [];
 			for (const user of upcomingRRSPUsers) {
-				const { user_id, rrsp_eligibility } = user;
 				const todo = {
-					user_id: user_id,
-					due_date: rrsp_eligibility,
+					user_id: user.user_id,
 					emailed_details: false,
 					completed: false,
 				};
@@ -85,48 +83,39 @@ const makeUpcomingTodos = async (req, res) => {
 			if (upcomingBenefitsUsers.length !== 0) {
 				const newTodos = [];
 				for (const user of upcomingBenefitsUsers) {
-					const { user_id, effective_date, start_date } = user;
-					let due_date;
 					const todo = {
-						user_id: user_id,
+						user_id: user.user_id,
 						completed: false,
 						milestone: milestone,
 					};
 
 					switch (milestone) {
 						case 'Benefits effective':
-							due_date = new Date(effective_date);
-							todo['due_date'] = due_date;
 							todo['confirmed_enrolment'] = false;
 							todo['emailed_details'] = false;
 							todo['added_benefit_deduction'] = false;
+							todo['updated_intranet_benefits'] = false;
 							break;
 
 						case '1 year':
-							due_date = new Date(start_date);
-							due_date.setFullYear(due_date.getFullYear() + 1);
-							todo['due_date'] = due_date;
 							todo['emailed_details'] = false;
 							todo['ordered_hsp_card'] = false;
 							todo['updated_benefit_class'] = false;
+							todo['updated_intranet_benefits'] = false;
 							break;
 
 						case '5 year':
-							due_date = new Date(start_date);
-							due_date.setFullYear(due_date.getFullYear() + 5);
-							todo['due_date'] = due_date;
 							todo['emailed_details'] = false;
 							todo['updated_hsp_amount'] = false;
 							todo['updated_benefit_class'] = false;
+							todo['updated_intranet_benefits'] = false;
 							break;
 
 						case '10 year':
-							due_date = new Date(start_date);
-							due_date.setFullYear(due_date.getFullYear() + 10);
-							todo['due_date'] = due_date;
 							todo['emailed_details'] = false;
 							todo['updated_hsp_amount'] = false;
 							todo['updated_benefit_class'] = false;
+							todo['updated_intranet_benefits'] = false;
 							break;
 
 						default:
