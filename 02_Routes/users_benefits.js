@@ -15,9 +15,12 @@ router.get('/benefits/:id', async (req, res) => {
 		.select(
 			'id',
 			'user_id',
-			'updated_by',
-			'updated_by_name',
-			'updated_on',
+			'benefits_updated_by',
+			'benefits_updated_by_name',
+			'benefits_updated_on',
+			'rrsp_updated_by',
+			'rrsp_updated_by_name',
+			'rrsp_updated_on',
 			'link_sent',
 			'employee_notified',
 			'effective_date',
@@ -27,22 +30,20 @@ router.get('/benefits/:id', async (req, res) => {
 			'payroll_deduction',
 			'benefits_class',
 			'rrsp_invite',
+			'rrsp_eligibility',
 			'added_to_clife',
-			'rrsp_enrolled',
+			'benefits_status',
+			'rrsp_status',
 
 			'employee_contrub',
 			'company_contrub',
 			'type_of_contrub',
 			'type_of_contrub_2',
-			'rrsp_eligibility',
-			'reminder_date',
-			'benefits_ineligible',
-			'benefits_waived',
-			'rrsp_ineligible',
-			'rrsp_participation'
+			'reminder_date'
 		)
 		.where({ user_id: user_id });
 
+	console.log(getBenefits);
 	res.json(getBenefits);
 });
 
@@ -51,16 +52,13 @@ router.post('/benefits/', async (req, res) => {
 		user_id,
 		updated_by,
 		updated_on,
-		link_sent,
-		employee_notified,
+		benefits_status,
 		effective_date,
 		benefits_id,
 		single_or_family,
-		payroll_deduction,
 		benefits_class,
-		benefits_ineligible,
-		benefits_waived,
 	} = req.body.values;
+
 	try {
 		const select = await knex(postUsersBenefitsDB)
 			.select('id', 'user_id')
@@ -70,33 +68,25 @@ router.post('/benefits/', async (req, res) => {
 			updateInsertRes = await knex(postUsersBenefitsDB)
 				.insert({
 					user_id: user_id,
-					updated_by: updated_by,
-					updated_on: updated_on,
-					link_sent: link_sent,
-					employee_notified: employee_notified,
+					benefits_updated_by: updated_by,
+					benefits_updated_on: updated_on,
+					benefits_status: benefits_status,
 					effective_date: effective_date,
 					benefits_id: benefits_id,
 					single_or_family: single_or_family,
-					payroll_deduction: payroll_deduction,
 					benefits_class: benefits_class,
-					benefits_ineligible: benefits_ineligible,
-					benefits_waived: benefits_waived,
 				})
 				.returning('id');
 		} else {
 			updateInsertRes = await knex(postUsersBenefitsDB)
 				.update({
-					updated_by: updated_by,
-					updated_on: updated_on,
-					link_sent: link_sent,
-					employee_notified: employee_notified,
+					benefits_updated_by: updated_by,
+					benefits_updated_on: updated_on,
+					benefits_status: benefits_status,
 					effective_date: effective_date,
 					benefits_id: benefits_id,
 					single_or_family: single_or_family,
-					payroll_deduction: payroll_deduction,
 					benefits_class: benefits_class,
-					benefits_ineligible: benefits_ineligible,
-					benefits_waived: benefits_waived,
 				})
 				.where({ user_id: user_id })
 				.returning('id');
@@ -108,24 +98,13 @@ router.post('/benefits/', async (req, res) => {
 			message: 'Something Went Wrong',
 			color: 'error',
 		});
+		console.log(error);
 	}
 });
 
 router.post('/rrsp/', async (req, res) => {
-	const {
-		rrsp_invite,
-		added_to_clife,
-		rrsp_enrolled,
-		type_of_contrub,
-		company_contrub,
-		employee_contrub,
-		rrsp_eligibility,
-		user_id,
-		updated_by,
-		updated_on,
-		rrsp_ineligible,
-		rrsp_participation,
-	} = req.body.values;
+	const { rrsp_status, added_to_clife, rrsp_eligibility, user_id, updated_by, updated_on } =
+		req.body.values;
 
 	const select = await knex(postUsersBenefitsDB)
 		.select('id', 'user_id')
@@ -135,33 +114,24 @@ router.post('/rrsp/', async (req, res) => {
 		if (select.length === 0) {
 			await knex(postUsersBenefitsDB)
 				.insert({
-					rrsp_invite: rrsp_invite,
+					rrsp_status: rrsp_status,
 					added_to_clife: added_to_clife,
-					rrsp_enrolled: rrsp_enrolled,
 					user_id: user_id,
-					type_of_contrub: type_of_contrub,
-					company_contrub: company_contrub,
-					employee_contrub: employee_contrub,
 					rrsp_eligibility: rrsp_eligibility,
-					rrsp_ineligible: rrsp_ineligible,
-					rrsp_participation: rrsp_participation,
+					rrsp_updated_by: updated_by,
+					rrsp_updated_on: updated_on,
 				})
 				.returning('id');
 		} else {
 			await knex(postUsersBenefitsDB)
 				.where({ user_id: user_id })
 				.update({
-					rrsp_invite: rrsp_invite,
+					rrsp_status: rrsp_status,
 					added_to_clife: added_to_clife,
-					rrsp_enrolled: rrsp_enrolled,
-					type_of_contrub: type_of_contrub,
-					company_contrub: company_contrub,
-					employee_contrub: employee_contrub,
+					user_id: user_id,
 					rrsp_eligibility: rrsp_eligibility,
-					updated_by: updated_by,
-					updated_on: updated_on,
-					rrsp_ineligible: rrsp_ineligible,
-					rrsp_participation: rrsp_participation,
+					rrsp_updated_by: updated_by,
+					rrsp_updated_on: updated_on,
 				})
 				.returning('id');
 		}
