@@ -281,11 +281,11 @@ router.put('/:id/status', async (req, res) => {
 		);
 
 		// Manu Team
-		workorder_approval_email(
-			workorderUpdating[0],
-			workorderItemsDetail,
-			'Manufacturingworkorders@roterra.com'
-		);
+		// workorder_approval_email(
+		// 	workorderUpdating[0],
+		// 	workorderItemsDetail,
+		// 	'Manufacturingworkorders@roterra.com'
+		// );
 
 		// Inserts Items into Item Detail Based on quantity ONCE ITS APPROVED
 		workorderItemsDetail.forEach(async (itemEntry) => {
@@ -479,11 +479,11 @@ router.put('/workorder/approval', async (req, res) => {
 		workorder_self_approval_email(created_workorder, workorderItemsDetail, managerWorkEmail);
 
 		// // goes to manuf Group
-		workorder_self_approval_email(
-			created_workorder,
-			workorderItemsDetail,
-			'Manufacturingworkorders@roterra.com'
-		);
+		// workorder_self_approval_email(
+		// 	created_workorder,
+		// 	workorderItemsDetail,
+		// 	'Manufacturingworkorders@roterra.com'
+		// );
 
 		// Inserts Items into Item Detail Based on quantity ONCE ITS APPROVED
 		workorderItemsDetail.forEach(async (itemEntry) => {
