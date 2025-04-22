@@ -25,7 +25,7 @@ const makeEmailObject = (emailBody, contact_email, email_subject) => {
 
 // checks start date and add 60 day for probation email
 const get_probation_period_60_days = async () => {
-	const getProbationSQL = knex.raw("start_date + INTERVAL '60 days' = current_date");
+	const getProbationSQL = knex.raw("DATE(start_date + INTERVAL '60 days') = current_date");
 
 	const data = await knex(getUsersDB)
 		.select('start_date', 'manager', 'deleted')
@@ -36,7 +36,7 @@ const get_probation_period_60_days = async () => {
 		const usersManagers = data[i];
 
 		const rawSelect = knex.raw(
-			`first_name, last_name, start_date, manager, manager_name, position_name, deleted, start_date + INTERVAL '60 days' as probation`
+			`first_name, last_name, start_date, manager, manager_name, position_name, deleted, DATE(start_date + INTERVAL '60 days') as probation`
 		);
 		const eachUserAndManager = await knex(getUsersDB)
 			.select(rawSelect)
@@ -60,7 +60,7 @@ const get_probation_period_60_days = async () => {
 };
 // checks start date and add 83 day for probation email
 const get_probation_period_83_days = async () => {
-	const getProbationSQL = knex.raw("start_date + INTERVAL '83 days' = current_date");
+	const getProbationSQL = knex.raw("DATE(start_date + INTERVAL '83 days') = current_date");
 
 	const data = await knex(getUsersDB)
 		.select('start_date', 'manager', 'deleted')
@@ -71,7 +71,7 @@ const get_probation_period_83_days = async () => {
 		const usersManagers = data[i];
 
 		const rawSelect = knex.raw(
-			`first_name, last_name, start_date, manager, manager_name, position_name, deleted, start_date + INTERVAL '83 days' as probation`
+			`first_name, last_name, start_date, manager, manager_name, position_name, deleted, DATE(start_date + INTERVAL '83 days') as probation`
 		);
 		const eachUserAndManager = await knex(getUsersDB)
 			.select(rawSelect)
