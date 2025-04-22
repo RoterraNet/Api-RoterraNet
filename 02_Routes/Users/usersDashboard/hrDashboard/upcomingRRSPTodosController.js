@@ -17,7 +17,7 @@ const getUpcomingRRSPTodos = async (req, res) => {
 						.select('*')
 						.where({ completed: completed })
 						.andWhereRaw(
-							"DATE(current_date) BETWEEN DATE(due_date) AND DATE(due_date + INTERVAL '30 days')"
+							"DATE(current_date) BETWEEN DATE(due_date - INTERVAL '30 days') AND DATE(due_date + INTERVAL '30 days')"
 						)
 						.orderBy('due_date', 'asc')
 						.orderBy('preferred_name', 'asc')
