@@ -210,8 +210,8 @@ const updateOnboardingTodos = async (req, res) => {
 					.update({
 						benefits_status: 1,
 						effective_date: effectiveDate,
-						updated_by: edited_by,
-						updated_on: edited_on,
+						benefits_updated_by: edited_by,
+						benefits_updated_on: edited_on,
 					})
 					.where({ user_id: newDetails.user_id });
 
