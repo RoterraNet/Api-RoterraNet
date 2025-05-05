@@ -85,7 +85,6 @@ const getOffboardingTodos = async (req, res) => {
 					removed_name_from_hs_sheet: checklist.removed_name_from_hs_sheet,
 					drivers_list_updated: checklist.drivers_list_updated,
 					insurance_emailed: checklist.insurance_emailed,
-					safety_equipment_returned: checklist.safety_equipment_returned,
 
 					it_checklist_completed: checklist.it_checklist_completed,
 				},
@@ -130,7 +129,6 @@ const getOffboardingTodos = async (req, res) => {
 			removed_name_from_hs_sheet: 'Remove employee name from H&S Meeting Sign-in Sheet',
 			drivers_list_updated: 'Update drivers list',
 			insurance_emailed: 'Email insurance to have employee removed',
-			safety_equipment_returned: 'Ensure safety equipment is returned',
 
 			it_checklist_completed: 'Ensure IT Termination/Layoff Checklist is completed',
 		};

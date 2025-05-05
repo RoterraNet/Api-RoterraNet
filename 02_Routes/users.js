@@ -16,11 +16,12 @@ const getUsersDB = database.getUsersDB;
 const getQuotesDB = database.getQuotesDB;
 const getUsersPermissionsDB = database.getUsersPermissionsDB;
 const postOnboardingChecklistsDB = database.postOnboardingChecklistsDB;
+const postUsersBenefitsDB = database.postUsersBenefitsDB;
 
 const UsersImages = database.UsersImages;
 
 const XLSX = require('xlsx');
-const userDashboardController = require('./Users/usersDashboard/newHiresController');
+
 const today_now = datefns.format(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS');
 
 ///users -> GET
@@ -218,12 +219,19 @@ router.post('/', async (req, res) => {
 			.merge()
 			.returning('*');
 
-		userDashboardController.createNewHireCheck({
+		const benefitsDate = new Date(newEntryId[0].start_date);
+		benefitsDate.setDate(benefitsDate.getDate() + 90);
+		const rrspDate = new Date(newEntryId[0].start_date);
+		rrspDate.setDate(rrspDate.getDate() + 365);
+
+		await knex(postUsersBenefitsDB).insert({
 			user_id: user_id,
-			position_id: newEntryId[0].position_id,
-			created_by: newEntryId[0].created_by,
-			created_on: newEntryId[0].created_on,
-			start_date: newEntryId[0].start_date,
+			effective_date: benefitsDate,
+			rrsp_eligibility: rrspDate,
+		});
+
+		await knex(postOnboardingChecklistsDB).insert({
+			user_id: user_id,
 		});
 	} catch (e) {
 		console.log(e);

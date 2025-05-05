@@ -3,6 +3,8 @@ const router = express.Router();
 const {
 	getOnboardingChecklistsDB,
 	postOnboardingChecklistsDB,
+	postUsersBenefitsDB,
+	postHrTodosBenefitsDB,
 } = require('../../../../01_Database/database');
 const knex = require('../../../../01_Database/connection');
 
@@ -168,7 +170,9 @@ const updateOnboardingTodos = async (req, res) => {
 			// console.log('new:', new_todos[i]);
 			// console.log('old:', old_todos[i]);
 			const oldTodo = old_todos[i];
+			const { details: oldDetails, checklist: oldChecklist } = oldTodo;
 			const newTodo = new_todos[i];
+			const { details: newDetails, checklist: newChecklist } = newTodo;
 
 			if (JSON.stringify(newTodo) === JSON.stringify(oldTodo)) {
 				console.log('no changes');
@@ -176,12 +180,12 @@ const updateOnboardingTodos = async (req, res) => {
 			}
 
 			const updatedTodo = {
-				...newTodo.checklist,
+				...newChecklist,
 				updated_by_id: edited_by,
 				updated_on: edited_on,
 			};
 
-			if (newTodo.details.completed == true && oldTodo.details.completed == false) {
+			if (newDetails.completed == true && oldDetails.completed == false) {
 				updatedTodo.completed = true;
 				updatedTodo.completed_by_id = edited_by;
 				updatedTodo.completed_on = edited_on;
@@ -189,9 +193,44 @@ const updateOnboardingTodos = async (req, res) => {
 
 			// console.log(updatedTodo);
 
-			await knex(postOnboardingChecklistsDB)
-				.update(updatedTodo)
-				.where({ id: oldTodo.details.id });
+			await knex(postOnboardingChecklistsDB).update(updatedTodo).where({ id: oldDetails.id });
+
+			// automatically update benefits_status and effective_date in users_benefits table when changed
+			// and create a benefits checklist if necessary
+			if (oldChecklist.benefits_waiting_period !== newChecklist.benefits_waiting_period) {
+				let effectiveDate = new Date(newDetails.start_date);
+
+				if (newChecklist.benefits_waiting_period === 'Waiting') {
+					effectiveDate.setDate(effectiveDate.getDate() + 90);
+				}
+
+				console.log(effectiveDate);
+				// set benefits status to 'Waiting' and set calculated effective date
+				await knex(postUsersBenefitsDB)
+					.update({
+						benefits_status: 1,
+						effective_date: effectiveDate,
+						benefits_updated_by: edited_by,
+						benefits_updated_on: edited_on,
+					})
+					.where({ user_id: newDetails.user_id });
+
+				// upsert benefits checklist
+				await knex(postHrTodosBenefitsDB)
+					.insert({
+						user_id: newDetails.user_id,
+						milestone: 'Benefits effective',
+						confirmed_enrolment: false,
+						emailed_details: false,
+						added_benefit_deduction: false,
+						updated_intranet_benefits: false,
+						completed: false,
+						updated_by_id: null,
+						updated_on: null,
+					})
+					.onConflict(['user_id', 'milestone']) // if already exists, update
+					.merge();
+			}
 		}
 
 		res.status(200).json({ message: 'Onboarding to-do changes saved', color: 'success' });
