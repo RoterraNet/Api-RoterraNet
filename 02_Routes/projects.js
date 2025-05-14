@@ -14,6 +14,7 @@ const SearchBuilder = require('./RouteCreaters/RouteHelpers/SearchBuilder');
 const getProjectsDB = database.getProjectsDB;
 const postProjectsDB = database.postProjectsDB;
 const postWorkorder_id = database.postWorkorderIdDB;
+const getProjectsEmailListDB = database.getProjectsEmailListDB;
 
 const { sendMail } = require('../04_Emails/00_mailer');
 
@@ -153,7 +154,7 @@ router.post('/', async (req, res) => {
 			)
 			.where('id', '=', workOrderIdRes.project_id);
 
-		const emailingList = await knex(getProjectsEmailList).select().where({ deleted: false });
+		const emailingList = await knex(getProjectsEmailListDB).select().where({ deleted: false });
 
 		emailingList.forEach(({ work_email }) => {
 			sendMail(
