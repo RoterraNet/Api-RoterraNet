@@ -302,8 +302,6 @@ exports.postUsersPermissionsLogsDB = 'roterranet.users_permissions_logs';
 
 exports.getUserRightsDB = 'roterranet.user_rights'; // Change to users_rights => one day
 
-exports.getUsersHierarchyDB = 'roterranet.view_users_hierarchy';
-
 exports.getWorkordersDB = 'roterranet.view_workorders';
 exports.postWorkordersDB = 'roterranet.workorders_new'; // switch to regular workorders
 exports._addworkorderFN = 'roterranet._addworkorderFN';
