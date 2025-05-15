@@ -10,6 +10,7 @@ const database = require('../01_Database/database');
 
 const getInAndOutDB = database.getInAndOutDB;
 const postInAndOutDB = database.postInAndOutDB;
+const getUsersDB = database.getUsersDB;
 
 const getCalendarCategoriesDB = database.getCalendarCategoriesDB;
 
@@ -129,52 +130,60 @@ router.get('/all', async (req, res) => {
 	const { start, end, location } = req.query;
 
 	try {
-		const query = knex.raw(
-			`CASE WHEN category = 1 THEN 
-				CASE 
-					WHEN location = '' THEN description 
-					WHEN description = '' THEN location 
-					ELSE CONCAT(description, ' - ', location) 
-				END 
-			 ELSE event_name 
-			 END AS title, 
-			 CASE 
-				WHEN location = '' THEN description 
-				WHEN description = '' THEN location 
-				ELSE CONCAT(description, ' - ', location) 
-			 END AS detail`
-		);
-
 		const getInAndOut = await knex(getInAndOutDB)
+			.leftJoin(getUsersDB, `${getInAndOutDB}.user_id`, `${getUsersDB}.user_id`)
 			.select(
-				query,
-				'color',
-				'id',
-				'user_id',
-				'created_by',
-				'date as start',
-				'return_date as end',
-				'date as go_date',
-				'return_date',
-				'category_name',
-				'category',
-				'location',
-				'location_id',
-				'description',
-				'sub_category_name',
-				'sub_category_id'
+				knex.raw(`
+      CASE 
+        WHEN category = 1 THEN 
+          CASE 
+            WHEN location = '' THEN description 
+            WHEN description = '' THEN location 
+            ELSE CONCAT(description, ' - ', location) 
+          END 
+        ELSE event_name 
+      END AS title
+    `),
+				knex.raw(`
+      CASE 
+        WHEN location = '' THEN description 
+        WHEN description = '' THEN location 
+        ELSE CONCAT(description, ' - ', location) 
+      END AS detail
+    `),
+
+				`${getInAndOutDB}.color`,
+				`${getInAndOutDB}.id`,
+				`${getInAndOutDB}.user_id`,
+				`${getInAndOutDB}.created_by`,
+				`${getInAndOutDB}.date as start`,
+				`${getInAndOutDB}.return_date as end`,
+				`${getInAndOutDB}.date as go_date`,
+				`${getInAndOutDB}.return_date`,
+				`${getInAndOutDB}.category_name`,
+				`${getInAndOutDB}.category`,
+				`${getInAndOutDB}.location`,
+				`${getInAndOutDB}.location_id`,
+				`${getInAndOutDB}.description`,
+				`${getInAndOutDB}.sub_category_name`,
+				`${getInAndOutDB}.sub_category_id`
 			)
-			.where('date', '<=', end)
-			.andWhere('return_date', '>=', start)
+			.where(`${getInAndOutDB}.date`, '<=', end)
+			.andWhere(`${getInAndOutDB}.return_date`, '>=', start)
+			.andWhereRaw(
+				`(${getUsersDB}.deleted_on IS NULL OR ${getInAndOutDB}.date < ${getUsersDB}.deleted_on)`
+			)
+
 			.andWhere((builder) => {
 				if (location !== 'all') {
-					builder.where({ category: 1 }).orWhere((qb) => {
-						qb.where({ location_id: location });
-					});
+					builder
+						.where({ [`${getInAndOutDB}.category`]: 1 })
+						.orWhere({ [`${getInAndOutDB}.location_id`]: location });
 				}
 			})
-			.orderBy('id', 'desc');
+			.orderBy(`${getInAndOutDB}.id`, 'desc');
 
+		console.log(getInAndOut);
 		res.send(getInAndOut);
 	} catch (error) {
 		console.log('error', error);

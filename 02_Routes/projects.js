@@ -22,9 +22,6 @@ const today_now = datefns.format(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS');
 
 const { createProjectEmailBody } = require('../04_Emails/Project Emails/newProjectEmail');
 const authorize = require('./Authorization/authorization');
-const {
-	getProjectsEmailList,
-} = require('./Projects/Project_email_list/projectsEmailListController');
 
 const makeEmailObject = (emailBody, contact_email, email_subject) => {
 	const emailObject = {
