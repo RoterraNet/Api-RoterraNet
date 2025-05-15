@@ -55,6 +55,8 @@ const cloneSheet = async (req, res) => {
 			const newSheet = await knex(postPlasmaRunSheetsDB)
 				.insert({
 					...copiedData,
+					completed: false,
+					completed_date: null,
 					sheet_name: starting_number // if starting_number was supplied, add to sheet_name
 						? `${copiedData.sheet_name} (${parseInt(starting_number) + i})`
 						: copiedData.sheet_name,
