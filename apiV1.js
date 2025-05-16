@@ -12,6 +12,7 @@ const v1PlasmaRunSheetsRouter = require('./02_Routes/PlasmaRunSheets/v1PlasmaRun
 const v1PORouter = require('./02_Routes/po/v1PORouter');
 const v1WorkordersRouter = require('./02_Routes/Workorders/v1WorkordersRouter');
 const v1PlatesRouter = require('./02_Routes/Plates/v1PlatesRouter');
+const v1ExamsRouter = require('./02_Routes/Exams/v1ExamsRouter');
 
 router.use('/branding', companyBranding);
 
@@ -33,5 +34,7 @@ router.use('/plasmaRunSheets', v1PlasmaRunSheetsRouter);
 router.use('/plates', v1PlatesRouter);
 
 router.use('/workorders', v1WorkordersRouter);
+
+router.use('/exams', v1ExamsRouter);
 
 module.exports = router;

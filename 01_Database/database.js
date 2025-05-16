@@ -332,3 +332,18 @@ exports.postWorkordersItemsDetailsInspectionsDB = 'roterranet.workorders_items_d
 
 exports.getWorkordersItemsDetailsQuestionsDB = 'roterranet.workorders_items_details_questions';
 exports.postWorkordersItemsDetailsQuestionsDB = 'roterranet.workorders_items_details_questions';
+
+exports.getExamsDB = 'roterranet.exams';
+exports.postExamsDB = 'roterranet.exams';
+
+exports.getExamQuestionsDB = 'roterranet.exam_questions';
+exports.postExamQuestionsDB = 'roterranet.exam_questions';
+
+exports.getAnswerFieldsDB = 'roterranet.answer_fields';
+exports.postAnswerFieldsDB = 'roterranet.answer_fields';
+
+exports.getSelectableAnswerOptionsDB = 'roterranet.selectable_answer_options';
+exports.postSelectableAnswerOptionsDB = 'roterranet.selectable_answer_options';
+
+exports.getAnswerContextsDB = 'roterranet.answer_contexts';
+exports.postAnswerContextsDB = 'roterranet.answer_contexts';
