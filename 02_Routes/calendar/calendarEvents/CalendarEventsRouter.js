@@ -171,4 +171,46 @@ router.get('/getSubCategories', authorize({}), CalendarEventsController.getSubCa
  */
 router.post('/addCalendarEvent', authorize({}), CalendarEventsController.addCalendarEvent);
 
+/**
+ * @openapi
+ * /api/v1/calendar/CalendarEventsRouter/getUsersEvents/:
+ *   get:
+ *     summary: Gets a list of all events in calendar for a user
+ *     tags:
+ *       - Calendar
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: Authorization
+ *         in: header
+ *         description: JWT token for authorization
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/mtrAddNew'
+ *     responses:
+ *       '200':
+ *         description: Gets a list of all events in calendar for a user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/mtrAddNew'
+ *     securitySchemes:
+ *       bearerAuth:
+ *         type: http
+ *         scheme: bearer
+ *         bearerFormat: JWT
+ *         description: |
+ *           JWT token for authorization.
+ *           You can obtain a token by logging in and using the /api/auth/login endpoint.
+ */
+router.get('/getUserEvents', authorize({}), CalendarEventsController.getUserEvents);
+
 module.exports = router;

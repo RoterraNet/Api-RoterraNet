@@ -4,6 +4,7 @@ const {
 	getCalendarCategoriesDB,
 	getCalendarSubCategoriesDB,
 	postInAndOutDB,
+	getInAndOutDB,
 } = require('../../../01_Database/database');
 
 const getLocations = async (req, res) => {
@@ -89,9 +90,58 @@ const addCalendarEvent = async (req, res) => {
 	}
 };
 
+const getUserEvents = async (req, res) => {
+	const { start, size, filters, sorting, user_id } = req.query;
+	const parsedColumnFilters = JSON.parse(filters);
+	const parsedColumnSorting = JSON.parse(sorting);
+
+	try {
+		const calendarEvents = await knex(getInAndOutDB)
+			.select()
+			.where({ user_id: user_id })
+
+			.modify((builder) => {
+				if (!!parsedColumnFilters.length) {
+					parsedColumnFilters.map((filter) => {
+						const { id: columnId, value: filterValue } = filter;
+
+						if (Array.isArray(filterValue) && filterValue.length > 0) {
+							builder.whereIn(columnId, filterValue);
+						} else {
+							builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+						}
+					});
+				}
+				if (!!parsedColumnSorting.length) {
+					parsedColumnSorting.map((sort) => {
+						const { id: columnId, desc: sortValue } = sort;
+
+						const sorter = sortValue ? 'desc' : 'acs';
+						console.log(columnId, sortValue, sorter);
+						builder.orderBy(columnId, sorter);
+					});
+				} else {
+					builder.orderBy('id', 'desc');
+				}
+			})
+			.paginate({
+				perPage: size,
+				currentPage: start,
+				isLengthAware: true,
+			});
+
+		console.log(calendarEvents);
+		res.json(calendarEvents);
+	} catch (error) {
+		console.error('Error getting User events', error);
+		res.status(500).json({ msg: 'Error getting User events:', error: error });
+	}
+};
+
 module.exports = {
 	getLocations,
 	getCategories,
 	getSubCategories,
 	addCalendarEvent,
+	getUserEvents,
 };
