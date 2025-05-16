@@ -55,6 +55,9 @@ const cloneSheet = async (req, res) => {
 			const newSheet = await knex(postPlasmaRunSheetsDB)
 				.insert({
 					...copiedData,
+					rush: false,
+					completed: false,
+					completed_date: null,
 					sheet_name: starting_number // if starting_number was supplied, add to sheet_name
 						? `${copiedData.sheet_name} (${parseInt(starting_number) + i})`
 						: copiedData.sheet_name,
@@ -116,7 +119,6 @@ const updateSheetInformation = async (req, res) => {
 			sheet_width: values.sheet_width ? values.sheet_width : null,
 			created_by: values.created_by,
 			created_on: values.created_on,
-			program_name: values.program_name,
 			program_verified: values.program_verified,
 			thickness_verified: values.thickness_verified,
 			length_verified: values.length_verified,
@@ -126,7 +128,7 @@ const updateSheetInformation = async (req, res) => {
 			heat_number: values.heat_number,
 			cut_off_length: values.cut_off_length ? values.cut_off_length : null,
 			cut_off_width: values.cut_off_width ? values.cut_off_width : null,
-			plate_utilization: values.plate_utilization,
+			plate_utilization: values.plate_utilization ? values.plate_utilization : null,
 			completed: values.completed,
 			completed_date: update_type === 'reverted' ? null : values.completed_date,
 			cut_off: values.cut_off,
