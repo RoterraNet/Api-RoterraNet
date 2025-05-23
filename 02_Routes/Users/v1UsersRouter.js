@@ -13,5 +13,5 @@ router.use('/usersBoarding', usersBoardingRouter);
 router.use('/usersInformation', usersInformationRouter);
 
 router.get('', authorize({}), usersController.getUsers);
-
+router.put('', authorize({}), usersController.updateUser);
 module.exports = router;

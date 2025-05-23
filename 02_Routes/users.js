@@ -248,53 +248,6 @@ getRoute.getById(router, getUsersDB, 'user_id');
 // /user/:id -> PUT -> edit one user
 putRoute.editById(router, getUsersDB, postUsersDB, today_now, 'user_id');
 
-// /user/:id -> DELETE -> delete one user
-router.delete('/:id', async (req, res) => {
-	const { id } = req.params;
-	const { type, senority_debit, start_date, deleted_on, user_id } = req.query;
-	let deletedEntry;
-	if (type === 'activated') {
-		console.log('activate');
-		deletedEntry = await knex(postUsersDB)
-			.update({
-				activated_on: today_now,
-				activated_by: user_id,
-				start_date: start_date,
-				deleted: 0,
-				senority_debit: senority_debit,
-			})
-			.where('user_id', '=', id);
-		addOnboarding = await knex(postOnboardingChecklistsDB).insert({
-			user_id: id,
-			start_date: start_date,
-		});
-		console.log('added onboarding', addOnboarding);
-	} else if (type === 'deleted') {
-		deletedEntry = await knex(postUsersDB)
-			.update({
-				deleted_by: user_id,
-				deleted_on: deleted_on,
-				deleted: 1,
-				senority_debit: senority_debit,
-			})
-			.where('user_id', '=', id);
-
-		//HERE!
-	} else {
-		console.log('reactivate');
-		deletedEntry = await knex(postUsersDB)
-			.update({
-				deleted_by: user_id,
-				deleted_on: deleted_on,
-				deleted: 1,
-				senority_debit: senority_debit,
-			})
-			.where('user_id', '=', id);
-	}
-
-	res.json({ deletedEntry });
-});
-
 router.post('/user_image', async (req, res) => {
 	const { user_id, image } = req.body;
 	try {
