@@ -121,7 +121,7 @@ const getUserEvents = async (req, res) => {
 						builder.orderBy(columnId, sorter);
 					});
 				} else {
-					builder.orderBy('id', 'desc');
+					builder.orderBy('date', 'desc');
 				}
 			})
 			.paginate({
