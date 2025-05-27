@@ -232,6 +232,7 @@ router.post('/', async (req, res) => {
 
 		await knex(postOnboardingChecklistsDB).insert({
 			user_id: user_id,
+			start_date: newEntryId[0].start_date,
 		});
 	} catch (e) {
 		console.log(e);
