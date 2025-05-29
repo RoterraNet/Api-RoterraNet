@@ -45,13 +45,15 @@ const updateExamInfo = async (req, res) => {
 		deleteRows(deleted?.selectable_options, postSelectableAnswerOptionsDB, 'option_id');
 		deleteRows(deleted?.answer_contexts, postAnswerContextsDB, 'answer_context_id');
 
-		console.log('exam id', exam_id);
+		// console.log('exam id', exam_id);
 		const updatedExam = await knex(postExamsDB)
 			.insert({ exam_id: exam_id, title: title, is_draft: is_draft }, ['exam_id'])
 			.onConflict('exam_id')
 			.merge();
 
-		console.log('returned exam id', updatedExam);
+		// console.log('returned exam id', updatedExam);
+
+		// for each item, a 'new: true' field is checked if it is a new item
 		// insert/update exam questions
 		questions?.forEach(async (q, qIndex) => {
 			const updatedQuestion = q.new
