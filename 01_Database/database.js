@@ -5,6 +5,9 @@ exports.getCompanyBrandingDB = 'roterranet.company_branding';
 exports.getActivitiesDB = 'roterranet.activities';
 exports.postActivitiesDB = 'roterranet.activities';
 
+exports.getAssignedExamsDB = 'roterranet.assigned_exams';
+exports.postAssignedExamsDB = 'roterranet.assigned_exams';
+
 exports.getHrTodosAnniversariesDB = 'roterranet.view_anniversary_todos';
 exports.postHrTodosAnniversariesDB = 'roterranet.anniversary_todos';
 
