@@ -30,7 +30,6 @@ router.get('/', async (req, res) => {
 				builder.whereIn('assigned_to_id', userSearch);
 			}
 		})
-		// .where({ customer_id: 27 })
 		.groupBy(
 			'view_quotes_analysis.category',
 			'view_quotes_analysis.assigned_to_id',
@@ -67,7 +66,6 @@ router.get('/', async (req, res) => {
 				builder.whereIn('assigned_to_id', userSearch);
 			}
 		})
-		// .where({ customer_id: 27 })
 		.orderByRaw(`DATE_TRUNC('month',created_on)`);
 
 	const deletedArray = [];

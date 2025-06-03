@@ -98,7 +98,7 @@ const getUserEvents = async (req, res) => {
 	try {
 		const calendarEvents = await knex(getInAndOutDB)
 			.select()
-			.where({ user_id: user_id })
+			.where({ user_id: user_id.user_id })
 
 			.modify((builder) => {
 				if (!!parsedColumnFilters.length) {
