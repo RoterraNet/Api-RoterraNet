@@ -19,6 +19,8 @@ exports.postCalendarSubCategoriesDB = 'roterranet.calendar_sub_categories';
 
 exports.postCalendarLocationsDB = 'roterranet.calendar_locations';
 
+exports.postCompletedExamsHistoryDB = 'roterranet.completed_exams_history';
+
 exports.getContactDB = 'roterranet.view_contact';
 exports.postContactDB = 'roterranet.contact';
 
