@@ -264,7 +264,9 @@ const getTable = async (req, res) => {
 				});
 			}
 		})
-		.orderByRaw('completed asc NULLS FIRST')
+		.orderByRaw(
+			`CASE WHEN completed IS NULL OR completed = false THEN 0 WHEN completed = true THEN 1 END`
+		)
 		.orderByRaw('completed_date desc NULLS LAST')
 		.orderBy('id', 'desc')
 
