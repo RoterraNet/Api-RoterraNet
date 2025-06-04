@@ -4,6 +4,7 @@ const {
 	postAssignedExamsDB,
 	getUsersDB,
 	getExamsDB,
+	postCompletedExamsHistoryDB,
 } = require('../../01_Database/database');
 
 const getExamsAssignedToUser = async (req, res) => {
@@ -236,11 +237,12 @@ const getUsersAssignedToExam = async (req, res) => {
 
 const gradeAssignedExam = async (req, res) => {
 	try {
-		const { assigned_exam_id, questions, answers } = req.body;
+		const { assigned_exam_id, questions, answers, selectable_options, answer_contexts } =
+			req.body;
 
 		let exam_total = 0;
 		let actual_score = 0;
-		questions.forEach((question) => {
+		questions.forEach((question, i) => {
 			const { question_id, type, value } = question;
 
 			exam_total += value;
@@ -249,14 +251,15 @@ const gradeAssignedExam = async (req, res) => {
 				case 1:
 					// multiple choice
 					// if user selected the correct answer add question value to actual_score
-					actual_score += answers.some(
+					let correct = answers.some(
 						(answer) =>
 							answer.question_id === question_id &&
 							answer.mc_correct === true &&
 							answer.inputted_answer == true
-					)
-						? value
-						: 0;
+					);
+
+					questions[i].scored = correct ? value : 0;
+					actual_score += correct ? value : 0;
 					break;
 
 				case 2:
@@ -276,6 +279,7 @@ const gradeAssignedExam = async (req, res) => {
 							}
 						}
 					});
+					questions[i].scored = (correctInputsInQuestion / inputsinQuestion) * value;
 					actual_score += (correctInputsInQuestion / inputsinQuestion) * value;
 					break;
 			}
@@ -302,6 +306,17 @@ const gradeAssignedExam = async (req, res) => {
 				.returning(['exam_id', 'assigned_to', 'assigned_by', 'assigned_on']);
 			await knex(postAssignedExamsDB).insert(examInfo[0]);
 		}
+
+		// insert exam details into completed exam details table as JSON
+		await knex(postCompletedExamsHistoryDB).insert({
+			assigned_exam_id: assigned_exam_id,
+			details_json: {
+				questions: questions,
+				answers: answers,
+				selectable_options: selectable_options,
+				answer_contexts: answer_contexts,
+			},
+		});
 
 		res.status(200).json({
 			message: 'Exam successfully graded',
