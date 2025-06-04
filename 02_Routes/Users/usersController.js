@@ -95,6 +95,8 @@ const updateUser = async (req, res) => {
 						activated_by: edited_by,
 						start_date: start_date,
 						deleted: 0,
+						deleted_on: null,
+						deleted_by: null,
 						senority_debit: senority_debit,
 					})
 					.where('user_id', '=', user_id);
