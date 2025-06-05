@@ -9,6 +9,11 @@ const {
 	postOnboardingChecklistsDB,
 } = require('../../01_Database/database');
 const datefns = require('date-fns');
+const {
+	addToBenefits,
+	addOnboardingChecklist,
+	addEmploymentHistory,
+} = require('./userActivationFunctions');
 
 const getUsers = async (req, res) => {
 	try {
@@ -59,6 +64,19 @@ const getUsers = async (req, res) => {
 					data: plasmaTableOperatorsData,
 				});
 				return;
+
+			case 'managers':
+				const managers = await knex(getUsersPermissionsDB)
+					.select('user_id', 'preferred_name')
+					.where({ deleted: 0 })
+					.andWhere('user_rights', '<=', 4)
+					.orderBy('preferred_name', 'asc');
+				res.status(200).json({
+					message: 'All managers retrieved',
+					color: 'success',
+					data: managers,
+				});
+				return;
 		}
 
 		res.status(400).json({ message: 'Missing or invalid query type', color: 'error' });
@@ -82,6 +100,9 @@ const updateUser = async (req, res) => {
 			deleted_on,
 			edited_by,
 			create_onboarding,
+			position_id,
+			manager_id,
+			reason,
 		} = req.body;
 		const today_now = datefns.format(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS');
 
@@ -98,38 +119,15 @@ const updateUser = async (req, res) => {
 						deleted_on: null,
 						deleted_by: null,
 						senority_debit: senority_debit,
+						position: position_id,
+						manager: manager_id,
 					})
 					.where('user_id', '=', user_id);
 				console.log('activated user');
 
-				if (create_onboarding) {
-					// insert an onboarding checklist for user
-					await knex(postOnboardingChecklistsDB).insert({
-						user_id: user_id,
-						start_date: start_date,
-					});
-					console.log('added onboarding checklist');
-				}
-
-				// check if user is in users_benefits table
-				const benefitsData = await knex(postUsersBenefitsDB)
-					.select('*')
-					.where({ user_id: user_id });
-
-				// if not, add user into table
-				if (benefitsData.length == 0) {
-					const benefitsDate = new Date(start_date);
-					benefitsDate.setDate(benefitsDate.getDate() + 90);
-					const rrspDate = new Date(start_date);
-					rrspDate.setDate(rrspDate.getDate() + 365);
-					console.log(benefitsDate, rrspDate);
-					await knex(postUsersBenefitsDB).insert({
-						user_id: user_id,
-						effective_date: benefitsDate,
-						rrsp_eligibility: rrspDate,
-					});
-					console.log('user was not in benefits table, now addeed');
-				}
+				if (create_onboarding) addOnboardingChecklist(user_id, start_date);
+				addToBenefits(user_id, start_date);
+				addEmploymentHistory(user_id, start_date, position_id, manager_id, reason);
 
 				res.status(200).json({
 					message: 'User successfully activated',
