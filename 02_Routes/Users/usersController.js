@@ -123,11 +123,21 @@ const updateUser = async (req, res) => {
 						manager: manager_id,
 					})
 					.where('user_id', '=', user_id);
-				console.log('activated user');
+				console.log(`Activated user ${user_id}`);
 
-				if (create_onboarding) addOnboardingChecklist(user_id, start_date);
-				addToBenefits(user_id, start_date);
-				addEmploymentHistory(user_id, start_date, position_id, manager_id, reason);
+				// do activation functions (FYI functions return ID of inserted row if successful, -1 if error or row was not added)
+				let checklistId;
+				if (create_onboarding) {
+					checklistId = await addOnboardingChecklist(user_id, start_date);
+				}
+				const benefitsId = await addToBenefits(user_id, start_date);
+				const employmentHistoryId = await addEmploymentHistory(
+					user_id,
+					start_date,
+					position_id,
+					manager_id,
+					reason
+				);
 
 				res.status(200).json({
 					message: 'User successfully activated',
