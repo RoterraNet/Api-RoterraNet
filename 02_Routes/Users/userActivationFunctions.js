@@ -6,7 +6,7 @@ const {
 } = require('../../01_Database/database');
 
 exports.addToBenefits = async (user_id, start_date) => {
-	// check if user is in users_benefits table, add if not exists and return id of inserted item, return -1 if error or user already in table
+	// check if user is in users_benefits table, add if not exists and return id of inserted item, return -1 if error or if user already in table
 	try {
 		const benefitsData = await knex(postUsersBenefitsDB)
 			.select('*')
