@@ -17,6 +17,7 @@ const getQuotesDB = database.getQuotesDB;
 const getUsersPermissionsDB = database.getUsersPermissionsDB;
 const postOnboardingChecklistsDB = database.postOnboardingChecklistsDB;
 const postUsersBenefitsDB = database.postUsersBenefitsDB;
+const postUsersEmploymentRecordDB = database.postUsersEmploymentRecordDB;
 
 const UsersImages = database.UsersImages;
 
@@ -224,15 +225,26 @@ router.post('/', async (req, res) => {
 		const rrspDate = new Date(newEntryId[0].start_date);
 		rrspDate.setDate(rrspDate.getDate() + 365);
 
+		// add to benefits table
 		await knex(postUsersBenefitsDB).insert({
 			user_id: user_id,
 			effective_date: benefitsDate,
 			rrsp_eligibility: rrspDate,
 		});
 
+		// create onboarding checklist
 		await knex(postOnboardingChecklistsDB).insert({
 			user_id: user_id,
 			start_date: newEntryId[0].start_date,
+		});
+
+		// add employment record
+		await knex(postUsersEmploymentRecordDB).insert({
+			user_id: user_id,
+			start_date: newEntryId[0].start_date,
+			position_id: newEntryId[0].position,
+			manager_id: newEntryId[0].manager,
+			reason: 'Initial hire',
 		});
 	} catch (e) {
 		console.log(e);
