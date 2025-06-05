@@ -48,7 +48,7 @@ exports.addOnboardingChecklist = async (user_id, start_date) => {
 			['id']
 		);
 		console.log(`Added onboarding checklist for user ${user_id}`);
-		console.log(onboardingChecklistId);
+
 		return onboardingChecklistId[0].id;
 	} catch (e) {
 		console.log(`Error adding onboarding checklist for user ${user_id}:`, e);
@@ -70,7 +70,7 @@ exports.addEmploymentHistory = async (user_id, start_date, position_id, manager_
 			['id']
 		);
 		console.log(`Added employment history for user ${user_id}`);
-		console.log(employmentHistoryId);
+
 		return employmentHistoryId[0].id;
 	} catch (e) {
 		console.log(`Error adding employment history for ${user_id}:`, e);
