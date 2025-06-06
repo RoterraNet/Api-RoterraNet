@@ -29,12 +29,13 @@ const getExamsAssignedToUser = async (req, res) => {
 					)
 					.innerJoin(getExamsDB, `${getExamsDB}.exam_id`, `${getAssignedExamsDB}.exam_id`)
 					.where({ assigned_to: user_id })
+					.andWhereRaw(`${getAssignedExamsDB}.deleted = false`)
 					.orderBy('title', 'asc')
 					.orderBy('completed', 'asc')
 					.orderBy('completed_on', 'desc');
 				break;
 			case 'passed':
-				// get all exams that are assigned to user and passed
+				// get all exams that have been assigned to user and user has passed
 				exams = await knex(getAssignedExamsDB)
 					.select(
 						`${getAssignedExamsDB}.assigned_exam_id`,
@@ -45,12 +46,13 @@ const getExamsAssignedToUser = async (req, res) => {
 						`${getExamsDB}.title`
 					)
 					.innerJoin(getExamsDB, `${getExamsDB}.exam_id`, `${getAssignedExamsDB}.exam_id`)
-					.where({ assigned_to: user_id, passed: true })
+					.where({ assigned_to: user_id, completed: true, passed: true })
+					.andWhereRaw(`${getAssignedExamsDB}.deleted = false`)
 					.orderBy('title', 'asc')
 					.orderBy('completed_on', 'desc');
 				break;
-			case 'incompleted':
-				// get all exams that are assigned to user and incompleted
+			case 'pending':
+				// get all exams that are assigned to user and waiting to be completed
 				exams = await knex(getAssignedExamsDB)
 					.select(
 						`${getAssignedExamsDB}.assigned_exam_id`,
@@ -58,21 +60,25 @@ const getExamsAssignedToUser = async (req, res) => {
 						`${getExamsDB}.title`
 					)
 					.innerJoin(getExamsDB, `${getExamsDB}.exam_id`, `${getAssignedExamsDB}.exam_id`)
-					.where({ assigned_to: user_id, completed: false })
+					.where({ assigned_to: user_id, deleted: false, completed: false })
+					.andWhereRaw(`${getAssignedExamsDB}.deleted = false`)
 					.orderBy('title', 'asc');
 				break;
 
 			case 'unassigned':
-				// get all exams that have never been assigned to user
+				// get all exams that have never been assigned to user or are not currently waiting for completion by user
+				// i.e. exams that have never been assigned, has been unassigned, or has been already passed by user
 				exams = await knex(getExamsDB)
 					.select('exam_id', 'title')
 					.where({ deleted: false })
 					.whereNotExists(
+						// exclude...
 						knex
 							.select('exam_id')
 							.from(getAssignedExamsDB)
-							.where({ assigned_to: user_id })
-							.andWhereRaw(`${getExamsDB}.exam_id = ${getAssignedExamsDB}.exam_id`)
+							.whereRaw(`${getExamsDB}.exam_id = ${getAssignedExamsDB}.exam_id`) // ...exams that have been assigned to user
+							.whereRaw(`${getAssignedExamsDB}.deleted = false`) // ...exams that are pending completion by user
+							.andWhere({ assigned_to: user_id, completed: false })
 					)
 					.orderBy('title', 'asc');
 
@@ -81,7 +87,7 @@ const getExamsAssignedToUser = async (req, res) => {
 			default:
 				res.status(400).json({
 					message:
-						'Invalid exam_status provided (must be "assigned", "passed", "incompleted", or "unassigned")',
+						'Invalid exam_status provided (must be "assigned", "passed", "pending", or "unassigned")',
 					color: 'error',
 				});
 				return;
@@ -152,61 +158,63 @@ const getUsersAssignedToExam = async (req, res) => {
 				users = await knex(getUsersDB)
 					.select(`${getUsersDB}.user_id`, `${getUsersDB}.preferred_name`)
 					.distinct(`${getUsersDB}.user_id`)
+					.whereRaw(`${getUsersDB}.deleted = 0`)
 					.innerJoin(
 						getAssignedExamsDB,
 						`${getUsersDB}.user_id`,
 						`${getAssignedExamsDB}.assigned_to`
 					)
-					.where(`${getAssignedExamsDB}.exam_id`, exam_id)
-					.andWhere({ deleted: 0 })
+					.where({ exam_id: exam_id })
+					.andWhereRaw(`${getAssignedExamsDB}.deleted = false`)
 					.orderBy('preferred_name', 'asc');
 				break;
 
 			case 'passed':
-				// get all users who have been assigned and passed this exam
+				// get all users who have been assigned, completed, and passed an instance of this exam
 				users = await knex(getUsersDB)
 					.select(`${getUsersDB}.user_id`, `${getUsersDB}.preferred_name`)
 					.distinct(`${getUsersDB}.user_id`)
+					.whereRaw(`${getUsersDB}.deleted = 0`)
 					.innerJoin(
 						getAssignedExamsDB,
 						`${getUsersDB}.user_id`,
 						`${getAssignedExamsDB}.assigned_to`
 					)
-					.where(`${getAssignedExamsDB}.exam_id`, exam_id)
-					.andWhere(`${getAssignedExamsDB}.passed`, true)
-					.andWhere({ deleted: 0 })
+					.where({ exam_id: exam_id, completed: true, passed: true })
+					.andWhereRaw(`${getAssignedExamsDB}.deleted = false`)
 					.orderBy('preferred_name', 'asc');
 				break;
 
-			case 'incompleted':
-				// get all users who have been assigned and not completed this exam
+			case 'pending':
+				// get all users who have an instance of this exam waiting to be completed
 				users = await knex(getUsersDB)
 					.select(`${getUsersDB}.user_id`, `${getUsersDB}.preferred_name`)
 					.distinct(`${getUsersDB}.user_id`)
+					.whereRaw(`${getUsersDB}.deleted = 0`)
 					.innerJoin(
 						getAssignedExamsDB,
 						`${getUsersDB}.user_id`,
 						`${getAssignedExamsDB}.assigned_to`
 					)
-					.where(`${getAssignedExamsDB}.exam_id`, exam_id)
-					.andWhere(`${getAssignedExamsDB}.completed`, false)
-					.andWhere({ deleted: 0 })
+					.where({ exam_id: exam_id, completed: false })
+					.andWhereRaw(`${getAssignedExamsDB}.deleted = false`)
 					.orderBy('preferred_name', 'asc');
 				break;
 
 			case 'unassigned':
-				// get all users who have never been assigned this exam
+				// get all users who have never been assigned this exam or do not have an instance of this exam waiting to be completed
+				// i.e. users that have never been assigned, have been unassigned, or have completed + passed this exam
 				users = await knex(getUsersDB)
 					.select(`${getUsersDB}.user_id`, `${getUsersDB}.preferred_name`)
-					.where({ deleted: 0 })
+					.whereRaw(`${getUsersDB}.deleted = 0`)
 					.whereNotExists(
+						// exclude...
 						knex
 							.select('assigned_to')
 							.from(getAssignedExamsDB)
-							.where({ exam_id: exam_id })
-							.andWhereRaw(
-								`${getAssignedExamsDB}.assigned_to = ${getUsersDB}.user_id`
-							)
+							.whereRaw(`${getAssignedExamsDB}.assigned_to = ${getUsersDB}.user_id`) // ...users who have been assigned this exam
+							.andWhereRaw(`${getAssignedExamsDB}.deleted = false`) // ...users who have an instance of this exam waiting to be completed
+							.andWhere({ exam_id: exam_id, completed: false })
 					)
 					.orderBy('preferred_name', 'asc');
 				break;
@@ -214,7 +222,7 @@ const getUsersAssignedToExam = async (req, res) => {
 			default:
 				res.status(400).json({
 					message:
-						'Invalid exam_status provided (must be "assigned", "passed", "incompleted", or "unassigned")',
+						'Invalid exam_status provided (must be "assigned", "passed", "pending", or "unassigned")',
 					color: 'error',
 				});
 				return;
@@ -235,7 +243,7 @@ const getUsersAssignedToExam = async (req, res) => {
 	}
 };
 
-const gradeAssignedExam = async (req, res) => {
+const gradeExamUserIsTaking = async (req, res) => {
 	try {
 		const { assigned_exam_id, questions, answers, selectable_options, answer_contexts } =
 			req.body;
@@ -362,10 +370,33 @@ const assignExams = async (req, res) => {
 	}
 };
 
+const unassignExam = async (req, res) => {
+	try {
+		const { user_id, exam_id } = req.body;
+
+		await knex(postAssignedExamsDB)
+			.update({ deleted: true })
+			.where({ exam_id: exam_id, assigned_to: user_id, deleted: false, completed: false });
+
+		res.status(200).json({
+			message: 'Exam successfully unassigned',
+			color: 'success',
+		});
+	} catch (e) {
+		res.status(500).json({
+			message: 'Problem unassigning exam',
+			color: 'error',
+			error: e,
+		});
+		console.log(e);
+	}
+};
+
 module.exports = {
 	getExamsAssignedToUser,
 	getExamUserIsTaking,
 	getUsersAssignedToExam,
-	gradeAssignedExam,
+	gradeExamUserIsTaking,
 	assignExams,
+	unassignExam,
 };
