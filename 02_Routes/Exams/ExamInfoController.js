@@ -126,7 +126,9 @@ const updateExamInfo = async (req, res) => {
 					// insert/update answer contexts
 					let before_index = 0;
 					let after_index = 0;
-					answer_contexts?.forEach(async (c) => {
+
+					// need to use for...of loop to ensure order insertion for answer index ordering
+					for (const c of answer_contexts) {
 						if (c.answer_field_id === a.answer_field_id) {
 							c.new
 								? await knex(postAnswerContextsDB).insert({
@@ -158,7 +160,7 @@ const updateExamInfo = async (req, res) => {
 								after_index += 1;
 							}
 						}
-					});
+					}
 				}
 			});
 		});
