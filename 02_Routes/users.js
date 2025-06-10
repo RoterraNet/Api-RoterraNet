@@ -252,7 +252,7 @@ router.post('/', async (req, res) => {
 			message: 'This is an error!',
 		});
 	}
-	res.json('newEntryId');
+	res.json(newEntryId);
 });
 
 // /user/:id -> GET -> get one user
