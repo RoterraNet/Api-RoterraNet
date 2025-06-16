@@ -10,6 +10,7 @@ const {
 	postExamQuestionsDB,
 	postSelectableAnswerOptionsDB,
 	postExamsDB,
+	examPageDetails,
 } = require('../../01_Database/database');
 
 const deleteRows = async (rowsArray, table, rowId) => {
@@ -27,12 +28,12 @@ const deleteRows = async (rowsArray, table, rowId) => {
 
 const updateExamInfo = async (req, res) => {
 	try {
-		console.log(req.body);
-
 		const {
 			exam_id,
 			is_draft,
 			title,
+			page_count,
+			page_details,
 			questions,
 			answers,
 			selectable_options,
@@ -47,9 +48,17 @@ const updateExamInfo = async (req, res) => {
 
 		// console.log('exam id', exam_id);
 		const updatedExam = await knex(postExamsDB)
-			.insert({ exam_id: exam_id, title: title, is_draft: is_draft }, ['exam_id'])
+			.insert(
+				{ exam_id: exam_id, title: title, is_draft: is_draft, page_count: page_count },
+				['exam_id']
+			)
 			.onConflict('exam_id')
 			.merge();
+
+		const newPages = page_details?.map((p, index) => {
+			return { ...p, exam_id: exam_id, page: index + 1 };
+		});
+		await knex(examPageDetails).insert(newPages).onConflict(['exam_id', 'page']).merge();
 
 		// console.log('returned exam id', updatedExam);
 
@@ -64,6 +73,7 @@ const updateExamInfo = async (req, res) => {
 							question_body: q.question_body,
 							value: q.value,
 							number: qIndex + 1,
+							page: q.page,
 						},
 						['question_id']
 				  )
@@ -76,6 +86,7 @@ const updateExamInfo = async (req, res) => {
 								question_body: q.question_body,
 								value: q.value,
 								number: qIndex + 1,
+								page: q.page,
 							},
 							['question_id']
 						)
@@ -181,13 +192,21 @@ const getExamInfo = async (req, res) => {
 		const { exam_id } = req.query;
 
 		const exam = await knex(getExamsDB)
-			.select('exam_id', 'title', 'is_draft')
+			.select('exam_id', 'title', 'is_draft', 'page_count')
 			.where({ exam_id: exam_id });
 
-		const questions = await knex(getExamQuestionsDB)
-			.select('question_id', 'type', 'number', 'question_body', 'value')
+		const pageDetails = await knex(examPageDetails)
+			.select('exam_id', 'page', 'page_header')
 			.where({ exam_id: exam_id })
-			.orderBy('number', 'asc');
+			.orderBy('page', 'asc');
+
+		const questions = await knex(getExamQuestionsDB)
+			.select('question_id', 'type', 'number', 'question_body', 'value', 'page')
+			.where({ exam_id: exam_id })
+			.orderBy([
+				{ column: 'page', order: 'asc' },
+				{ column: 'number', order: 'asc' },
+			]);
 
 		const answers = await knex(getAnswerFieldsDB)
 			.select(
@@ -250,6 +269,8 @@ const getExamInfo = async (req, res) => {
 				exam_id: exam[0]?.exam_id,
 				title: exam[0]?.title,
 				is_draft: exam[0]?.is_draft,
+				page_count: exam[0]?.page_count,
+				page_details: pageDetails,
 				questions: questions,
 				answers: answers,
 				selectable_options: selectableOptions,
