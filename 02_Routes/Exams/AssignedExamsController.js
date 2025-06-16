@@ -60,7 +60,7 @@ const getExamsAssignedToUser = async (req, res) => {
 						`${getExamsDB}.title`
 					)
 					.innerJoin(getExamsDB, `${getExamsDB}.exam_id`, `${getAssignedExamsDB}.exam_id`)
-					.where({ assigned_to: user_id, deleted: false, completed: false })
+					.where({ assigned_to: user_id, completed: false })
 					.andWhereRaw(`${getAssignedExamsDB}.deleted = false`)
 					.orderBy('title', 'asc');
 				break;
