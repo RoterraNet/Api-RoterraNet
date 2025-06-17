@@ -1,11 +1,11 @@
 const knex = require('../../01_Database/connection');
-const { getExamsDB, postExamsDB } = require('../../01_Database/database');
+const { getExamsDB, postExamsDB, examPageDetails } = require('../../01_Database/database');
 
 const createExam = async (req, res) => {
 	try {
-		const { title } = req.body;
+		const { title, page_count } = req.body;
 
-		await knex(postExamsDB).insert({ is_draft: true, title: title });
+		await knex(postExamsDB).insert({ is_draft: true, title: title, page_count: page_count });
 
 		res.status(200).json({ message: 'Exam successfully created', color: 'success' });
 	} catch (e) {

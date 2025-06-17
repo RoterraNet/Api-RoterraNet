@@ -341,6 +341,8 @@ exports.postWorkordersItemsDetailsQuestionsDB = 'roterranet.workorders_items_det
 exports.getExamsDB = 'roterranet.exams';
 exports.postExamsDB = 'roterranet.exams';
 
+exports.examPageDetails = 'roterranet.exam_page_details';
+
 exports.getExamQuestionsDB = 'roterranet.exam_questions';
 exports.postExamQuestionsDB = 'roterranet.exam_questions';
 
