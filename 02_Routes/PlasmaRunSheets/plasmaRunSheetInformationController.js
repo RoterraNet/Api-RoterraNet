@@ -207,7 +207,8 @@ const getTable = async (req, res) => {
 			'created_on',
 			'completed',
 			'completed_date',
-			'rush'
+			'rush',
+			'heat_number'
 		)
 		.where({ deleted: false })
 		.modify((builder) => {
