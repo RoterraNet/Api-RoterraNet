@@ -34,7 +34,7 @@ router.get('/allreviews/:id', async (req, res) => {
 			'discipline_reason',
 			'full_name'
 		)
-		.where({ user_id: user_id })
+		.where({ user_id: user_id, deleted: false })
 		.orderBy('review_on', 'acs');
 
 	res.json({
@@ -98,6 +98,8 @@ router.post('/disciplinereview/', async (req, res) => {
 router.put('/disciplinereview/', async (req, res) => {
 	const { id, type_of_discipline, review_on, discipline_detail, discipline_reason, deleted } =
 		req.body;
+
+	console.log(req.body);
 	const updatedDisciplineReview = await knex(postUsersDisciplineReviewDB)
 		.update({
 			type_of_discipline: type_of_discipline,
