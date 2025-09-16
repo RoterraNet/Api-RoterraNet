@@ -8,7 +8,7 @@ const getBrand = async (req, res) => {
 		const companyBranding = await knex(getCompanyBrandingDB).where({
 			id: company_id,
 		});
-		console.log(companyBranding);
+
 		res.json(companyBranding);
 	} catch (error) {
 		console.error('Error getting Company Brand:', error);

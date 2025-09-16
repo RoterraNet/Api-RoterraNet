@@ -43,7 +43,6 @@ router.get('/benefits/:id', async (req, res) => {
 		)
 		.where({ user_id: user_id });
 
-	console.log(getBenefits);
 	res.json(getBenefits);
 });
 

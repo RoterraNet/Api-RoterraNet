@@ -21,7 +21,7 @@ router.get('/allreviews/:id', async (req, res) => {
 			'review_detail',
 			'full_name'
 		)
-		.where({ user_id: user_id })
+		.where({ user_id: user_id, deleted: false })
 		.orderBy('review_on', 'acs');
 	const getAllDisciplineReviews = await knex(getUsersDisciplineReviewDB)
 		.select(
@@ -34,7 +34,7 @@ router.get('/allreviews/:id', async (req, res) => {
 			'discipline_reason',
 			'full_name'
 		)
-		.where({ user_id: user_id })
+		.where({ user_id: user_id, deleted: false })
 		.orderBy('review_on', 'acs');
 
 	res.json({
@@ -58,6 +58,20 @@ router.post('/performancereview/', async (req, res) => {
 	res.json(postNewPerformanceReview);
 });
 
+router.put('/performancereview/', async (req, res) => {
+	const { id, type_of_review, review_on, review_detail, deleted } = req.body;
+	const updatedPerformanceReview = await knex(postUsersPerformanceReviewDB)
+		.update({
+			type_of_review: type_of_review,
+			review_on: review_on,
+			review_detail: review_detail,
+			deleted: deleted,
+		})
+		.where({ id: id });
+
+	res.json({ message: 'Successfully updated performance review', color: 'success' });
+});
+
 router.post('/disciplinereview/', async (req, res) => {
 	const {
 		user_id,
@@ -79,6 +93,24 @@ router.post('/disciplinereview/', async (req, res) => {
 		.returning('id');
 
 	res.json(postNewPerformanceReview);
+});
+
+router.put('/disciplinereview/', async (req, res) => {
+	const { id, type_of_discipline, review_on, discipline_detail, discipline_reason, deleted } =
+		req.body;
+
+	console.log(req.body);
+	const updatedDisciplineReview = await knex(postUsersDisciplineReviewDB)
+		.update({
+			type_of_discipline: type_of_discipline,
+			review_on: review_on,
+			discipline_detail: discipline_detail,
+			discipline_reason: discipline_reason,
+			deleted: deleted,
+		})
+		.where({ id: id });
+
+	res.json({ message: 'Successfully updated discipline review', color: 'success' });
 });
 
 router.post('/reminder_date/', async (req, res) => {
