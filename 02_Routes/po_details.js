@@ -39,7 +39,8 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/updatePoDetail', async (req, res) => {
-	const { po_id, created_on, created_by, po_details, edit_reason_comment } = req.body;
+	const { po_id, created_on, created_by, po_details, edit_reason_comment, trigger_approval } =
+		req.body;
 	const poInfo = await knex(database.getPoDB)
 		.select(
 			'po_id',
@@ -114,9 +115,12 @@ router.post('/updatePoDetail', async (req, res) => {
 		}
 	});
 
-	const po_message = await po_approval_process(created_by, po_id);
-
-	res.json({ po_id: po_id, po_message: po_message });
+	if (trigger_approval) {
+		const po_message = await po_approval_process(created_by, po_id);
+		res.json({ po_id: po_id, po_message: po_message });
+	} else {
+		res.json({ po_id: po_id });
+	}
 });
 
 // po -> PATCH -> TABLE -> get all quotes paginated

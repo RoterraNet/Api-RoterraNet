@@ -441,12 +441,26 @@ const po_approval_process = async (user_id, po_id) => {
 	else {
 		//  Status => awaiting approval
 		await knex(postPoDB).where({ id: po_id }).update({ status: 3 });
+		const usersCurrentlyOut = await knex(database.getInAndOutDB)
+			.select('user_id')
+			.where(
+				knex.raw(
+					"return_date >= now() + interval '-1 hours' AND current_date + interval '23 hours' >= date"
+				)
+			);
+		const usersOutIds = usersCurrentlyOut.map((item) => item.user_id);
 		//		=> Find Manager with Approval Limit High Enough
-		const manager_info = await recursiveFindManagerWithPOLimit(user_id, po_total_cost);
+		const manager_info = await recursiveFindManagerWithPOLimit(
+			user_id,
+			po_total_cost,
+			usersOutIds
+		);
 		//		=> Send Manager Email to Approve PO
-		po_request_approval_email(Created_po, Created_po_details, manager_info.work_email);
+		po_request_approval_email(Created_po, Created_po_details, manager_info?.work_email);
 
-		po_message = `PO is over your approval limit and requires approval.\n\nYou will be notified by e-mail when your PO is approved.\n\n Your order is being approved by ${manager_info.first_name} ${manager_info.last_name} \n\nThanks`;
+		po_message = manager_info
+			? `PO is over your approval limit and requires approval.\n\nYou will be notified by e-mail when your PO is approved.\n\n Your order is being approved by ${manager_info.first_name} ${manager_info.last_name} \n\nThanks`
+			: `PO is over your approval limit and requires approval.\n\nYou will be notified by e-mail when your PO is approved.`;
 	}
 
 	return po_message;
@@ -456,10 +470,12 @@ const po_approval_process = async (user_id, po_id) => {
 // Find Manager with PO Approval Limit High enough to approve
 // Recursive Function
 
-const recursiveFindManagerWithPOLimit = async (user_id, po_total_cost) => {
+const recursiveFindManagerWithPOLimit = async (user_id, po_total_cost, usersOutIds) => {
 	// Get Manger ID
 	const response1 = await knex(getUsersDB).select('manager').where('user_id', '=', user_id);
 	const manager_id = response1[0].manager;
+
+	if (!manager_id) return null;
 
 	// Find manager approval limit
 	const response2 = await knex(getUsersPermissionsDB)
@@ -469,7 +485,7 @@ const recursiveFindManagerWithPOLimit = async (user_id, po_total_cost) => {
 	// console.log(user_id, manager_po_limit_other, po_total_cost, parseFloat(manager_po_limit_other) > po_total_cost);
 
 	// Manager Limit > PO total cost
-	if (parseFloat(manager_po_limit_other) > po_total_cost) {
+	if (parseFloat(manager_po_limit_other) > po_total_cost && !usersOutIds.includes(manager_id)) {
 		const response3 = await knex(getUsersDB).select('*').where('user_id', '=', manager_id);
 		const manager_info = response3[0];
 		// console.log('made it', manager_info);
@@ -477,6 +493,6 @@ const recursiveFindManagerWithPOLimit = async (user_id, po_total_cost) => {
 	}
 	// Manager Limit Not High Enough => Find that Manager's Manager PO Limit
 	else {
-		return recursiveFindManagerWithPOLimit(manager_id, po_total_cost);
+		return recursiveFindManagerWithPOLimit(manager_id, po_total_cost, usersOutIds);
 	}
 };
