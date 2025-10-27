@@ -110,7 +110,6 @@ getRoute.getById(router, getPoDB, 'po_id');
 // po/:id -> PUT -> edit one po
 router.put('/updatePoDetail/', async (req, res) => {
 	const { id, update } = req.body;
-	console.log(id, update);
 	try {
 		const updatePoDetail = await knex(postPoDB).update(update).where({ id: id });
 
