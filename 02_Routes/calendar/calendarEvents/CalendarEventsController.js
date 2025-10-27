@@ -96,9 +96,10 @@ const getUserEvents = async (req, res) => {
 	const parsedColumnSorting = JSON.parse(sorting);
 
 	try {
+		console.log('user_id:', req.query.user_id);
 		const calendarEvents = await knex(getInAndOutDB)
 			.select()
-			.where({ user_id: user_id.user_id })
+			.where({ user_id: user_id })
 
 			.modify((builder) => {
 				if (!!parsedColumnFilters.length) {
