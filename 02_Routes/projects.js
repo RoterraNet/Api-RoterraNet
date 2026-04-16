@@ -3,14 +3,11 @@ const router = express.Router();
 const datefns = require('date-fns');
 const database = require('../01_Database/database');
 const knex = require('../01_Database/connection');
-
 const deleteRoute = require('./RouteCreaters/delete');
-const postRoute = require('./RouteCreaters/post');
 const getRoute = require('./RouteCreaters/get');
 const getTableRoute = require('./RouteCreaters/getTable');
 const putRoute = require('./RouteCreaters/put');
-const SearchBuilder = require('./RouteCreaters/RouteHelpers/SearchBuilder');
-
+const XLSX = require('xlsx');
 const getProjectsDB = database.getProjectsDB;
 const postProjectsDB = database.postProjectsDB;
 const postWorkorder_id = database.postWorkorderIdDB;
@@ -104,6 +101,79 @@ router.get(`/table`, authorize(), async (req, res) => {
 		});
 
 	res.status(200).json(paginatedTable);
+});
+
+router.get('/table/download', async (req, res) => {
+	try {
+		const { filters, sorting, globalFilter } = req.query;
+
+		const parsedColumnFilters = JSON.parse(filters);
+		const parsedColumnSorting = JSON.parse(sorting);
+		console.log(getProjectsDB);
+
+		const paginatedTable = await knex(getProjectsDB)
+			.select(
+				'workorder_id',
+				'id',
+				'project',
+				'customer_name',
+				'customer_id',
+				'contact_id',
+				'contact_name',
+				'projectmanager_name',
+				'project_status',
+				'project_technology',
+				'contract_total',
+				'invoiced_total',
+				'created_on',
+				'deleted'
+			)
+			.modify((builder) => {
+				if (!!parsedColumnFilters.length) {
+					parsedColumnFilters.map((filter) => {
+						const { id: columnId, value: filterValue } = filter;
+						console.log(columnId);
+						if (columnId === 'contract_total') {
+							builder.whereBetween(
+								columnId,
+								filterValue.map((each) => (each === '' ? 0 : parseFloat(each)))
+							);
+						} else {
+							builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+						}
+					});
+				}
+				if (!!globalFilter) {
+					builder.whereRaw(`${getProjectsDB}.*::text iLIKE ?`, [`%${globalFilter}%`]);
+				}
+				if (!!parsedColumnSorting.length) {
+					parsedColumnSorting.map((sort) => {
+						const { id: columnId, desc: sortValue } = sort;
+
+						const sorter = sortValue ? 'desc' : 'acs';
+						console.log(columnId, sortValue, sorter);
+						builder.orderBy(columnId, sorter);
+					});
+				} else {
+					builder.orderBy('id', 'desc');
+				}
+			});
+
+		const workSheet = XLSX.utils.json_to_sheet(paginatedTable);
+		const workBook = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(workBook, workSheet, 'Data');
+
+		const wbout = XLSX.write(workBook, { bookType: 'xlsx', type: 'buffer' });
+
+		res.setHeader('Content-Disposition', 'attachment; filename="Data.xlsx"');
+		res.setHeader(
+			'Content-Type',
+			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+		);
+		res.send(Buffer.from(wbout));
+	} catch (error) {
+		console.log(error);
+	}
 });
 
 /**

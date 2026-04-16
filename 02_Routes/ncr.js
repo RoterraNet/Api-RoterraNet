@@ -2,11 +2,10 @@ const express = require('express');
 const router = express.Router();
 const database = require('../01_Database/database');
 const knex = require('../01_Database/connection');
-
-const postRoute = require('./RouteCreaters/post');
 const putRoute = require('./RouteCreaters/put');
 const { postUserNotification } = require('./userNotifications/userNotifications');
 const authorize = require('./Authorization/authorization');
+const XLSX = require('xlsx');
 
 const getNcrDB = database.getNcrDB;
 const postNcrDB = database.postNcrDB;
@@ -80,22 +79,73 @@ router.get(`/table`, async (req, res) => {
 });
 
 router.get(`/table/download`, authorize(), async (req, res) => {
-	const sql = knex.raw('LEFT(detail, 50) AS summary ');
-	const paginatedTable = await knex(getNcrDB).select(
-		'id',
-		'created_on',
-		'created_by_name',
-		'classification',
-		'department_label',
-		'classification_name',
-		'internal_department',
-		'defect_code',
-		'status',
-		'total_value',
-		'detail',
-		sql
-	);
-	res.json(paginatedTable);
+	try {
+		const { filters, sorting } = req.query;
+		const parsedColumnFilters = JSON.parse(filters);
+		const parsedColumnSorting = JSON.parse(sorting);
+		const paginatedTable = await knex(getNcrDB)
+			.select(
+				'id',
+				'project_id',
+				'created_on',
+				'created_by_name',
+				'classification',
+				'department_label',
+				'customer_name',
+				'supplier_name',
+				'classification_name',
+				'internal_department',
+				'defect_code',
+				'detail',
+				'quantity',
+				'status',
+				'labor_cost',
+				'other_cost',
+				'material_cost',
+				'total_value',
+				'rca_id',
+				'deleted'
+			)
+			.modify((builder) => {
+				if (!!parsedColumnFilters.length) {
+					parsedColumnFilters.map((filter) => {
+						const { id: columnId, value: filterValue } = filter;
+						if (columnId === 'total_value') {
+							builder.whereBetween(
+								columnId,
+								filterValue.map((each) => (each === '' ? 0 : parseFloat(each)))
+							);
+						} else {
+							builder.whereRaw(`${columnId}::text iLIKE ?`, [`%${filterValue}%`]);
+						}
+					});
+				}
+				if (!!parsedColumnSorting.length) {
+					parsedColumnSorting.map((sort) => {
+						const { id: columnId, desc: sortValue } = sort;
+						const sorter = sortValue ? 'desc' : 'acs';
+						console.log(columnId, sortValue, sorter);
+						builder.orderBy(columnId, sorter);
+					});
+				} else {
+					builder.orderBy('id', 'desc');
+				}
+			});
+		const workSheet = XLSX.utils.json_to_sheet(paginatedTable);
+		const workBook = XLSX.utils.book_new();
+		XLSX.utils.book_append_sheet(workBook, workSheet, 'Data');
+
+		const wbout = XLSX.write(workBook, { bookType: 'xlsx', type: 'buffer' });
+
+		res.setHeader('Content-Disposition', 'attachment; filename="Data.xlsx"');
+		res.setHeader(
+			'Content-Type',
+			'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+		);
+		res.send(Buffer.from(wbout));
+	} catch (error) {
+		console.log(error);
+	}
 });
 
 putRoute.editById(router, getNcrDB, postNcrDB, '', 'id');

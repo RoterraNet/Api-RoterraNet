@@ -332,11 +332,16 @@ exports.postWorkordersItemsDetailsDB = 'roterranet.workorders_items_details';
 exports.getWorkordersItemsDetailsWeldersDB = 'roterranet.view_workorders_items_details_welders';
 exports.postWorkordersItemsDetailsWeldersDB = 'roterranet.workorders_items_details_welders';
 
+exports.getWorkorderQcAnswersDB = 'roterranet.view_workorder_qc_answers';
 exports.getWorkordersItemsDetailsInspectionsDB = 'roterranet.workorders_items_details_inspections'; //change to view eventually
 exports.postWorkordersItemsDetailsInspectionsDB = 'roterranet.workorders_items_details_inspections';
 
 exports.getWorkordersItemsDetailsQuestionsDB = 'roterranet.workorders_items_details_questions';
 exports.postWorkordersItemsDetailsQuestionsDB = 'roterranet.workorders_items_details_questions';
+
+exports.getWorkordersItemsDetailsInspectionsAnswersDB = 'roterranet.view_workorder_qc_answers';
+exports.postWorkordersItemsDetailsInspectionsAnswersDB =
+	'roterranet.workorders_items_details_inspection_answers';
 
 exports.getExamsDB = 'roterranet.exams';
 exports.postExamsDB = 'roterranet.exams';
