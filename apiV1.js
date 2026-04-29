@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
+const v1EquipmentRouter = require('./02_Routes/Equipment/v1EquipmentRouter');
 const v1UsersRouter = require('./02_Routes/Users/v1UsersRouter');
 const v1ProjectsRouter = require('./02_Routes/Projects/v1ProjectsRouter');
 const v1MtrRouter = require('./02_Routes/MTRs/v1MtrRouter');
@@ -15,6 +16,8 @@ const v1PlatesRouter = require('./02_Routes/Plates/v1PlatesRouter');
 const v1ExamsRouter = require('./02_Routes/Exams/v1ExamsRouter');
 
 router.use('/branding', companyBranding);
+
+router.use('/equipment', v1EquipmentRouter);
 
 router.use('/calendar', v1CalendarRouter);
 

@@ -59,6 +59,12 @@ exports.postEquipmentTypesDB = 'roterranet.equipment_types';
 exports.getEquipmentScheduleDB = 'roterranet.view_equipment_schedule';
 exports.postEquipmentSchedulesDB = 'roterranet.equipment_schedule';
 
+exports.getEquipmentInspectionSchemasDB = 'roterranet.equipment_inspection_schemas';
+// exports.postEquipmentSchedulesDB = 'roterranet.equipment_schedule';
+
+exports.getEquipmentInspectionsDB = 'roterranet.view_equipment_inspections';
+exports.postEquipmentInspectionsDB = 'roterranet.equipment_inspections';
+
 exports.getGeneralLedgerDB = 'roterranet.general_ledger2';
 
 exports.getGeneralLedgerDetailsDB = 'roterranet.general_ledger_details2';
