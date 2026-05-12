@@ -9,17 +9,29 @@ const {
 } = require('../02.1_Complicated_Route_Functions/hr_cron');
 
 module.exports = () => {
-	// At 06:00 on every day runs once
+	cron.schedule(
+		'0 7 * * 1-5',
+		async () => {
+			console.log('HR cron running');
 
-	// '0 6 * * *' runs every monday - friday 6 am
+			const jobs = [
+				get_probation_period_60_days(),
+				get_probation_period_83_days(),
+				benefitsEligibilityReminder(),
+				addHrTodos(),
+				performanceReviewReminder(),
+			];
 
-	// '*/10 * * * * *' runs everyt 10 secs
-	cron.schedule('0 6 * * *', async () => {
-		await get_probation_period_60_days();
-		await get_probation_period_83_days();
+			const results = await Promise.allSettled(jobs);
 
-		await benefitsEligibilityReminder();
-		await addHrTodos();
-		await performanceReviewReminder();
-	});
+			results.forEach((r, i) => {
+				if (r.status === 'rejected') {
+					console.error(`Job ${i} failed:`, r.reason);
+				}
+			});
+		},
+		{
+			timezone: 'America/Edmonton',
+		}
+	);
 };

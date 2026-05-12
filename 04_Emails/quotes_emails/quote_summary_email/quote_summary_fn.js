@@ -46,7 +46,7 @@ exports.estimator_daily_mail = async () => {
 			.andWhere('assigned_to_id', '=', estimator_id)
 			.orderBy('due_date', 'asc');
 
-		sendMail(
+		await sendMail(
 			makeEmailObject(
 				createQuoteSummaryEmailEstimators({
 					data: estimators_open_quotes,
@@ -80,7 +80,7 @@ exports.estimator_daily_followUp_email = async () => {
 			.andWhere('follow_up_on', '=', new Date())
 			.andWhere('assigned_to_id', '=', estimator_id);
 
-		const sentMail = sendMail(
+		const sentMail = await sendMail(
 			makeEmailObject(
 				createQuoteSummaryEmailEstimators({
 					data: estimators_follow_ups,
@@ -115,7 +115,7 @@ exports.engineer_daily_mail = async () => {
 			.where({ quote_status_description: 'Awaiting Eng' })
 			.andWhere({ eng_contact_id: engineers_id });
 
-		sendMail(
+		await sendMail(
 			makeEmailObject(
 				createQuoteSummaryEmailEngineers({
 					data: engineers_open_quotes,

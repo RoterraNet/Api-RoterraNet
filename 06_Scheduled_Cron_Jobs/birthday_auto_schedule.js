@@ -11,17 +11,27 @@ module.exports = () => {
 
 	// '0 6 * * *',
 
-	cron.schedule('0 7 * * *', async () => {
-		console.log('cron');
+	cron.schedule(
+		'0 7 * * 1-5',
+		async () => {
+			console.log('cron running');
 
-		await get_birthdays().then((res) => {
-			console.log(res);
-			Object.keys(res).length === 0 ? null : post_birthdays(res);
-		});
+			const birthdays = await get_birthdays();
+			if (Object.keys(birthdays).length) {
+				await post_birthdays(birthdays);
+			}
 
-		await get_start_dates().then((res) => {
-			console.log(res);
-			Object.keys(res).length === 0 ? null : post_anniversaries(res);
-		});
-	});
+			const startDates = await get_start_dates();
+			if (Object.keys(startDates).length) {
+				await post_anniversaries(startDates);
+			}
+			console.log('cron done');
+			console.log('Birthdays', birthdays);
+			console.log('startDates', startDates);
+		},
+
+		{
+			timezone: 'America/Edmonton',
+		}
+	);
 };

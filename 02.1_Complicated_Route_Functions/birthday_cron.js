@@ -1,71 +1,109 @@
 const express = require('express');
 const knex = require('../01_Database/connection');
 const { getUsersDB, postNewsDB } = require('../01_Database/database');
-const formatDistanceToNowStrict = require('date-fns/formatDistanceToNowStrict');
 
-// GETS all birthdays with todays day and todays month
-// retruns users alias if there is ones. if no alias, returns first name
+const { differenceInYears, isSameDay } = require('date-fns');
+
 const get_birthdays = async () => {
-	const getUser = knex.raw(
-		" CASE WHEN alias_first_name = '' THEN first_name ELSE alias_first_name END AS first_name, last_name"
-	);
-	const getBirthday = knex.raw(
-		'EXTRACT(MONTH from birthday)  = EXTRACT(MONTH from now()) and EXTRACT(DAY from birthday)  = EXTRACT(DAY from now()) and deleted = 0'
-	);
-	const data = await knex(getUsersDB).select(getUser).where(getBirthday);
+	const users = await knex(getUsersDB)
+		.select('first_name', 'alias_first_name', 'last_name', 'birthday')
+		.where({ deleted: 0 });
 
-	return data;
-};
+	const today = new Date();
 
-//  Takes in body as an object.
-// Maps the object inserting the info into the NEWS DB table
-const post_birthdays = async (body) => {
-	await body.map(async (i) => {
-		const subject = `Happy Birthday ${i.first_name} ${i.last_name}`;
-		const news_description = `It's ${i.first_name}'s Birthday. Have a great day!`;
-		await knex(postNewsDB).insert({
-			department: 999999,
-			subject: subject,
-			news_description: news_description,
-			deleted: 0,
-			created_by: 2,
-			created_on: new Date(),
+	const birthdays = users
+		.map((u) => ({
+			first_name: u.alias_first_name || u.first_name,
+			last_name: u.last_name,
+			birthday: u.birthday,
+		}))
+		.filter((u) => {
+			const birth = new Date(u.birthday);
+
+			const thisYearBirthday = new Date(birth);
+			thisYearBirthday.setFullYear(today.getFullYear());
+
+			return isSameDay(today, thisYearBirthday);
 		});
-	});
-};
-// GETS all birthdays with todays day and todays month
-// retruns users alias if there is ones. if no alias, returns first name
-// ltart_date, last_name
-const get_start_dates = async () => {
-	const getUser = knex.raw(
-		"start_date, last_name,  CASE WHEN alias_first_name = '' THEN first_name ELSE alias_first_name END AS first_name"
-	);
-	const getBirthday = knex.raw(
-		'EXTRACT(MONTH from start_date)  = EXTRACT(MONTH from now()) and EXTRACT(DAY from start_date)  = EXTRACT(DAY from now()) and deleted = 0'
-	);
-	const data = await knex(getUsersDB).select(getUser).where(getBirthday);
-	return data;
+
+	return birthdays;
 };
 
-//  Takes in body as an object.
-// Maps the object inserting the info into the NEWS DB table
-const post_anniversaries = async (body) => {
+const post_birthdays = async (body) => {
 	try {
-		await body.map(async (i) => {
-			let years = i.start_date;
-			// compares users start_date to current date (functions from datefns)
-			years = formatDistanceToNowStrict(new Date(years));
-			const subject = `Happy ${years} Anniversary ${i.first_name} ${i.last_name}`;
-			const news_description = `Congratulations on another year with the company ${i.first_name}. Here's to many more.`;
+		for (const i of body) {
+			const subject = `Happy Birthday ${i.first_name} ${i.last_name}`;
+			const news_description = `It's ${i.first_name}'s Birthday. Have a great day!`;
+
 			await knex(postNewsDB).insert({
 				department: 999999,
-				subject: subject,
-				news_description: news_description,
+				subject,
+				news_description,
 				deleted: 0,
 				created_by: 2,
 				created_on: new Date(),
 			});
-		});
+		}
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+const get_start_dates = async () => {
+	const users = await knex(getUsersDB)
+		.select(
+			'start_date',
+			'last_name',
+			knex.raw(`
+				CASE 
+					WHEN alias_first_name = '' THEN first_name 
+					ELSE alias_first_name 
+				END AS first_name
+			`)
+		)
+		.where({ deleted: 0 });
+
+	const today = new Date();
+
+	const anniversaries = users.filter((u) => {
+		const start = new Date(u.start_date);
+
+		const anniversaryThisYear = new Date(start);
+		anniversaryThisYear.setFullYear(today.getFullYear());
+
+		return isSameDay(today, anniversaryThisYear);
+	});
+
+	return anniversaries;
+};
+
+const post_anniversaries = async (body) => {
+	try {
+		for (const i of body) {
+			const today = new Date();
+			const startDate = new Date(i.start_date);
+
+			const anniversaryThisYear = new Date(startDate);
+			anniversaryThisYear.setFullYear(today.getFullYear());
+
+			if (!isSameDay(today, anniversaryThisYear)) continue;
+
+			const years = differenceInYears(today, startDate);
+
+			if (years <= 0) continue;
+
+			const subject = `Happy ${years} Year Anniversary ${i.first_name} ${i.last_name}`;
+			const news_description = `Congratulations on another year with the company ${i.first_name}. Here's to many more.`;
+
+			await knex(postNewsDB).insert({
+				department: 999999,
+				subject,
+				news_description,
+				deleted: 0,
+				created_by: 2,
+				created_on: new Date(),
+			});
+		}
 	} catch (error) {
 		console.log(error);
 	}
