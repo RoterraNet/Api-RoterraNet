@@ -597,78 +597,85 @@ const recursiveFindManagerWithWorkorderLimit = async (user_id, workorder_total_c
 router.get('/test/test/:id', async (req, res) => {
 	const { id } = req.params;
 
-	// Updated Values
-	const items = await knex(database.getWorkordersItemsDB)
-		.select(
-			'workorder_item_id',
-			'pipe_od',
-			'pipe_wall',
-			'length',
-			'quantity',
-			'helix_1_thickness',
-			'helix_1_diameter'
-		)
-		.where({ workorder_id: id })
-		.andWhere({ deleted: 0 })
-		.orderBy('workorder_item_line_item', 'asc');
+	try {
+		// Updated Values
+		const items = await knex(database.getWorkordersItemsDB)
+			.select(
+				'workorder_item_id',
+				'pipe_od',
+				'pipe_wall',
+				'length',
+				'quantity',
+				'helix_1_thickness',
+				'helix_1_diameter'
+			)
+			.where({ workorder_id: id })
+			.andWhere({ deleted: 0 })
+			.orderBy('workorder_item_line_item', 'asc');
 
-	const itemsDetail = await knex(database.getWorkordersItemsDetailsDB)
-		.select(
-			'workorder_item_detail_name',
-			'pipe_od',
-			'pipe_wall',
-			'pipe_length',
-			'pipe_pipe_heat',
-			'helix_1_heat',
-			'helix_2_heat',
-			'helix_3_heat',
-			'helix_4_heat',
-			'helix_1_thickness',
-			'helix_1_diameter',
-			'helix_2_diameter',
-			'helix_3_diameter',
-			'helix_4_diameter',
-			'shop_approved_name',
-			'shop_approved_on',
-			'workorder_item_id',
-			'workorder_item_description',
-			'pipe_splice_heat',
-			'welder_ids'
-		)
-		.where({ workorder_id: id })
-		.orderBy('workorder_item_line_item', 'asc')
-		.orderBy('workorder_item_detail_id', 'acs');
+		const itemsDetail = await knex(database.getWorkordersItemsDetailsDB)
+			.select(
+				'workorder_item_detail_name',
+				'pipe_od',
+				'pipe_wall',
+				'pipe_length',
+				'pipe_pipe_heat',
+				'helix_1_heat',
+				'helix_2_heat',
+				'helix_3_heat',
+				'helix_4_heat',
+				'helix_1_thickness',
+				'helix_1_diameter',
+				'helix_2_diameter',
+				'helix_3_diameter',
+				'helix_4_diameter',
+				'shop_approved_name',
+				'shop_approved_on',
+				'workorder_item_id',
+				'workorder_item_description',
+				'pipe_splice_heat',
+				'welder_ids'
+			)
+			.where({ workorder_id: id })
+			.orderBy('workorder_item_line_item', 'asc')
+			.orderBy('workorder_item_detail_id', 'acs');
 
-	const allItems = [];
+		const allItems = [];
 
-	for (let i = 0; i < items.length; i++) {
-		let insertedAmount = 0;
-		let jIndexTracker = 0;
-		while (insertedAmount < items[i].quantity || jIndexTracker <= itemsDetail.length - 1) {
-			String.prototype.replaceBetween = function (start, end, what) {
-				return this.substring(0, start) + what + this.substring(end);
-			};
+		for (let i = 0; i < items.length; i++) {
+			let insertedAmount = 0;
+			let jIndexTracker = 0;
+			while (insertedAmount < items[i].quantity || jIndexTracker <= itemsDetail.length - 1) {
+				String.prototype.replaceBetween = function (start, end, what) {
+					return this.substring(0, start) + what + this.substring(end);
+				};
 
-			if (items[i].workorder_item_id === itemsDetail[jIndexTracker].workorder_item_id) {
-				const locationOfP =
-					itemsDetail[jIndexTracker].workorder_item_detail_name.indexOf('P');
-				const name = itemsDetail[jIndexTracker].workorder_item_detail_name.replaceBetween(
-					locationOfP,
-					itemsDetail[jIndexTracker].workorder_item_detail_name.length,
-					`P${i + 1}-${insertedAmount + 1}`
-				);
-				allItems.push({
-					...itemsDetail[jIndexTracker],
-					lineItemNumber: i + 1,
-					itemIndex: insertedAmount + 1,
-					workorder_item_detail_name: name,
-				});
-				insertedAmount++;
+				if (items[i].workorder_item_id === itemsDetail[jIndexTracker].workorder_item_id) {
+					const locationOfP =
+						itemsDetail[jIndexTracker].workorder_item_detail_name.indexOf('P');
+					const name = itemsDetail[
+						jIndexTracker
+					].workorder_item_detail_name.replaceBetween(
+						locationOfP,
+						itemsDetail[jIndexTracker].workorder_item_detail_name.length,
+						`P${i + 1}-${insertedAmount + 1}`
+					);
+					allItems.push({
+						...itemsDetail[jIndexTracker],
+						lineItemNumber: i + 1,
+						itemIndex: insertedAmount + 1,
+						workorder_item_detail_name: name,
+					});
+					insertedAmount++;
+				}
+				jIndexTracker++;
 			}
-			jIndexTracker++;
+			insertedAmount = 0;
 		}
-		insertedAmount = 0;
-	}
 
-	res.json(itemsDetail);
+		res.json(itemsDetail);
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
 });
