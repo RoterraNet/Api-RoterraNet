@@ -4,7 +4,7 @@ const router = express.Router();
 const { format } = require('date-fns');
 
 const MTRheatRouter = require('./MTRHeats/MTRHeatRouter');
-const { getMaterialTracking } = require('../../01_Database/database');
+const { getMaterialTracking, getMaterialTrackingDetails } = require('../../01_Database/database');
 
 router.use('/heatrouter', MTRheatRouter);
 
@@ -35,6 +35,10 @@ router.get('/table', async (req, res) => {
 			if (!!parsedColumnFilters.length) {
 				parsedColumnFilters.map((filter) => {
 					const { id: columnId, value: filterValue } = filter;
+
+					if (columnId === 'heats') {
+						return;
+					}
 
 					if (columnId === 'dimensions') {
 						for (const [key, value] of Object.entries(filterValue)) {
@@ -89,6 +93,41 @@ router.get('/table', async (req, res) => {
 			currentPage: start,
 			isLengthAware: true,
 		});
+
+	const mtr_ids = [];
+	paginatedTable.data.map((each) => {
+		mtr_ids.push(each.mtr_id);
+	});
+
+	// get all heats that are associated with any of the retrieved MTRs
+	const allHeats = await knex(getMaterialTrackingDetails)
+		.select('heat', 'id', 'mtr_id')
+		.whereIn('mtr_id', mtr_ids)
+		.andWhere({ deleted: 0 });
+
+	// assigned heats to respective MTRs
+	paginatedTable.data.map((mtr) => {
+		mtr.heats = {};
+		allHeats.map((heat) => {
+			if (heat.mtr_id === mtr.mtr_id) {
+				mtr.heats[heat.id] = heat.heat;
+			}
+		});
+	});
+
+	// check if heats has been filtered for (COLUMN FILTER ONLY, does not work in global filter), and retrieve only MTRs that match those heats
+	const i = parsedColumnFilters.findIndex((filter) => filter.id === 'heats');
+	if (i != -1 && parsedColumnFilters[i]?.value?.trim() !== '') {
+		const heatFilter = parsedColumnFilters[i].value.trim();
+		paginatedTable.data = paginatedTable.data.filter((mtr) => {
+			for (const [key, value] of Object.entries(mtr.heats)) {
+				if (value.includes(heatFilter)) {
+					return true;
+				}
+			}
+			return false;
+		});
+	}
 
 	res.status(200).json(paginatedTable);
 });
