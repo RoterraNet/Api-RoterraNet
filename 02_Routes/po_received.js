@@ -29,9 +29,11 @@ router.post('/', async (req, res) => {
 			);
 			let po_detail = response1[0];
 
-			if (po_detail.quantity > po_detail.sum_received_quantity) {
-				let remaining_quantity_to_receive =
-					po_detail.quantity - po_detail.sum_received_quantity;
+			const quantity = parseFloat(po_detail.quantity);
+			const sum_received = parseFloat(po_detail.sum_received_quantity);
+
+			if (quantity > sum_received) {
+				let remaining_quantity_to_receive = quantity - sum_received;
 				newEntryId = await knex(postPoReceivedDB)
 					.insert({ ...values, received_quantity: remaining_quantity_to_receive })
 					.returning('po_receiving_id');
