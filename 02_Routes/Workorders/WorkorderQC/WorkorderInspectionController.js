@@ -4,6 +4,7 @@ const database = require('../../../01_Database/database');
 const knex = require('../../../01_Database/connection');
 const getWorkordersItemsDetailsDB = database.getWorkordersItemsDetailsDB;
 const getProjectsDB = database.getProjectsDB;
+const postWorkordersItemsDetails = database.postWorkordersItemsDetailsDB;
 
 const WorkorderInspectionTable = async (req, res) => {
 	const { start, size, workorder_id, workorder_item_id, globalFilter } = req.query;
@@ -61,7 +62,43 @@ const WorkorderInspectionGetPipeName = async (req, res) => {
 	}
 };
 
+const WorkorderVtInspection = async (req, res) => {
+	try {
+		const { workorder_id, user_id } = req.body;
+
+		console.log('Received data:', { workorder_id, user_id });
+
+		const updatedRows = await knex(postWorkordersItemsDetails)
+			.where({ workorder_id })
+			.whereNotNull('shop_approved_id')
+			.update({
+				vt_user_id: user_id,
+				vt_date: knex.fn.now(),
+			});
+
+		if (updatedRows === 0) {
+			return res.status(404).json({
+				message:
+					'No Items have been shop approved for this workorder, VT inspection cannot be updated',
+				color: 'error',
+			});
+		}
+
+		return res.status(200).json({
+			message: 'VT inspection updated successfully',
+			color: 'success',
+		});
+	} catch (error) {
+		console.error('WorkorderVtInspection error:', error);
+		return res.status(500).json({
+			message: 'Failed to update VT inspection',
+			color: 'error',
+		});
+	}
+};
+
 module.exports = {
 	WorkorderInspectionTable,
 	WorkorderInspectionGetPipeName,
+	WorkorderVtInspection,
 };

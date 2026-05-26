@@ -634,7 +634,9 @@ router.get('/test/test/:id', async (req, res) => {
 				'workorder_item_id',
 				'workorder_item_description',
 				'pipe_splice_heat',
-				'welder_ids'
+				'welder_ids',
+				'vt_user_name',
+				'vt_date'
 			)
 			.where({ workorder_id: id })
 			.orderBy('workorder_item_line_item', 'asc')

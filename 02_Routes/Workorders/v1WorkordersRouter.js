@@ -19,4 +19,6 @@ router.get(
 	WorkorderInspectionController.WorkorderInspectionGetPipeName
 );
 
+router.post('/managerVtApproval', WorkorderInspectionController.WorkorderVtInspection);
+
 module.exports = router;
