@@ -16,27 +16,59 @@ router.get('/table', async (req, res) => {
 
 	const paginatedTable = await knex(getMaterialTracking)
 		.select(
-			'mtr_id',
+			`${getMaterialTracking}.mtr_id`,
 			'supplier_name',
 			'supplier',
 			'plate_yn',
 			'pipe_od',
 			'pipe_wall',
 			'plate_thickness',
-			'wsheet',
-			'hsheet',
-			'created_by_name',
-			'created_by',
-			'created_on',
-			'deleted'
+			`${getMaterialTracking}.wsheet`,
+			`${getMaterialTracking}.hsheet`,
+			`${getMaterialTracking}.created_by_name`,
+			`${getMaterialTracking}.created_by`,
+			`${getMaterialTracking}.created_on`,
+			`${getMaterialTracking}.deleted`,
+			// Aggregate all heats into comma-separated string per MTR
+			knex.raw(
+				`STRING_AGG(${getMaterialTrackingDetails}.heat, ',' ORDER BY ${getMaterialTrackingDetails}.heat) as heats`
+			)
 		)
-		.where({ deleted: 0 })
+		.leftJoin(getMaterialTrackingDetails, (o) => {
+			o.on(
+				`${getMaterialTracking}.mtr_id`,
+				'=',
+				`${getMaterialTrackingDetails}.mtr_id`
+			).andOn(`${getMaterialTrackingDetails}.deleted`, '=', 0);
+		})
+		.where(`${getMaterialTracking}.deleted`, 0)
+		.groupBy(
+			`${getMaterialTracking}.mtr_id`,
+			'supplier_name',
+			'supplier',
+			'plate_yn',
+			'pipe_od',
+			'pipe_wall',
+			'plate_thickness',
+			`${getMaterialTracking}.wsheet`,
+			`${getMaterialTracking}.hsheet`,
+			`${getMaterialTracking}.created_by_name`,
+			`${getMaterialTracking}.created_by`,
+			`${getMaterialTracking}.created_on`,
+			`${getMaterialTracking}.deleted`
+		)
 		.modify((builder) => {
 			if (!!parsedColumnFilters.length) {
 				parsedColumnFilters.map((filter) => {
 					const { id: columnId, value: filterValue } = filter;
 
 					if (columnId === 'heats') {
+						if (filterValue?.trim()) {
+							builder.havingRaw(
+								`STRING_AGG(${getMaterialTrackingDetails}.heat, ',') iLIKE ?`,
+								[`%${filterValue.trim()}%`]
+							);
+						}
 						return;
 					}
 
@@ -82,7 +114,7 @@ router.get('/table', async (req, res) => {
 			if (!!parsedColumnSorting.length) {
 				parsedColumnSorting.map((sort) => {
 					const { id: columnId, desc: sortValue } = sort;
-					const sorter = sortValue ? 'desc' : 'acs';
+					const sorter = sortValue ? 'desc' : 'asc';
 					builder.orderBy(columnId, sorter);
 				});
 			}
@@ -94,40 +126,10 @@ router.get('/table', async (req, res) => {
 			isLengthAware: true,
 		});
 
-	const mtr_ids = [];
-	paginatedTable.data.map((each) => {
-		mtr_ids.push(each.mtr_id);
+	paginatedTable.data = paginatedTable.data.map((mtr) => {
+		mtr.heats = mtr.heats ? mtr.heats.split(',') : [];
+		return mtr;
 	});
-
-	// get all heats that are associated with any of the retrieved MTRs
-	const allHeats = await knex(getMaterialTrackingDetails)
-		.select('heat', 'id', 'mtr_id')
-		.whereIn('mtr_id', mtr_ids)
-		.andWhere({ deleted: 0 });
-
-	// assigned heats to respective MTRs
-	paginatedTable.data.map((mtr) => {
-		mtr.heats = {};
-		allHeats.map((heat) => {
-			if (heat.mtr_id === mtr.mtr_id) {
-				mtr.heats[heat.id] = heat.heat;
-			}
-		});
-	});
-
-	// check if heats has been filtered for (COLUMN FILTER ONLY, does not work in global filter), and retrieve only MTRs that match those heats
-	const i = parsedColumnFilters.findIndex((filter) => filter.id === 'heats');
-	if (i != -1 && parsedColumnFilters[i]?.value?.trim() !== '') {
-		const heatFilter = parsedColumnFilters[i].value.trim();
-		paginatedTable.data = paginatedTable.data.filter((mtr) => {
-			for (const [key, value] of Object.entries(mtr.heats)) {
-				if (value.includes(heatFilter)) {
-					return true;
-				}
-			}
-			return false;
-		});
-	}
 
 	res.status(200).json(paginatedTable);
 });
