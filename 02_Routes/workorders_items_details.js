@@ -64,7 +64,7 @@ router.get(`/table`, async (req, res) => {
 
 	paginatedTable.data.map((i) => {
 		const newWelderId = [];
-		i.welder_ids.map((i) => i !== null && newWelderId.push(i));
+		i.welder_ids?.map((i) => i !== null && newWelderId.push(i));
 		i.welder_ids = newWelderId;
 	});
 
