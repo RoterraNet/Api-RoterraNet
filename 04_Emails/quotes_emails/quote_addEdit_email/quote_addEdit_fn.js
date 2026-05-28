@@ -80,7 +80,8 @@ exports.edit_quote_mail = async (dataOld, dataNew, user_id) => {
 		// Get All Quote Managers
 		const quote_managers_emails = await knex(getUsersPermissionsDB)
 			.select('work_email')
-			.where('quote_manager', '=', true);
+			.where('quote_manager', '=', true)
+			.andWhere({ deleted: 0 });
 
 		// Send Email to All Quote Managers
 		for (let i = 0; i < quote_managers_emails.length; i++) {

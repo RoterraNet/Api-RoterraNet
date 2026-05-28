@@ -47,29 +47,40 @@ router.get('/', async (req, res) => {
 
 // /workorders/:id/workorder_items/:id/workorders_items_details -> PATCH -> TABLE -> get all workorders items paginated
 
-router.get(`/table`, async (req, res) => {
-	const page = req.query.page;
-	const perPage = req.query.perPage;
-	const workorder_id = req.query.workorderid;
-	const workorder_item_id = req.query.workorderitemid;
+router.get('/table', async (req, res) => {
+	try {
+		const {
+			page = 1,
+			perPage = 25,
+			workorderid: workorder_id,
+			workorderitemid: workorder_item_id,
+		} = req.query;
 
-	const paginatedTable = await knex(getWorkordersItemsDetailsDB)
-		.where('workorder_id', '=', workorder_id)
-		.andWhere('workorder_item_id', '=', workorder_item_id)
-		.paginate({
-			perPage: perPage,
-			currentPage: page,
-			isLengthAware: true,
+		const paginatedTable = await knex(getWorkordersItemsDetailsDB)
+			.where({
+				workorder_id,
+				workorder_item_id,
+			})
+			.paginate({
+				perPage: Number(perPage),
+				currentPage: Number(page),
+				isLengthAware: true,
+			});
+
+		paginatedTable.data = paginatedTable.data.map((row) => ({
+			...row,
+			welder_ids: (row.welder_ids || []).filter(Boolean), //THIS REMOVES ALL NULL NAMES
+		}));
+
+		res.json(paginatedTable);
+	} catch (error) {
+		console.error('Error loading workorder items details:', error);
+
+		res.status(500).json({
+			success: false,
+			message: 'Failed to load workorder item details',
 		});
-
-	paginatedTable.data.map((i) => {
-		const newWelderId = [];
-		i.welder_ids?.map((i) => i !== null && newWelderId.push(i));
-		i.welder_ids = newWelderId;
-	});
-
-	console.log(paginatedTable.data.map((i) => console.log('i.welder_ids', i.welder_ids)));
-	res.json(paginatedTable);
+	}
 });
 
 // /workorders/:id/workorder_items/:id/workorders_items_details -> POST -> create new workorder item
