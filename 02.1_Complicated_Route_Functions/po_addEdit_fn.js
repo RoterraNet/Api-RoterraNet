@@ -55,7 +55,6 @@ exports.po_add = (router) => {
 	return router.post('/', async (req, res) => {
 		try {
 			const { values } = req.body;
-
 			//	-> GET NEW po, po_detail
 			let New_po_details = values.po_details;
 			delete values.po_id;
@@ -71,8 +70,8 @@ exports.po_add = (router) => {
 			// 		//	-> CREATE new entries in po_detail
 			const New_po_details_AND_po_id = New_po_details.map((po_detail) => {
 				po_detail.id = po_detail.po_detail_id;
-				const gl_id = po_detail.gl.gl_id;
-				const gl_detail_id = po_detail.gl_detail.gl_detail_id;
+				const gl_id = po_detail.gl_id;
+				const gl_detail_id = po_detail.gl_detail_id;
 				delete po_detail.po_detail_id;
 				delete po_detail.id;
 				delete po_detail.gl;
