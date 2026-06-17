@@ -5,6 +5,7 @@ const knex = require('../../../01_Database/connection');
 const getWorkordersItemsDetailsDB = database.getWorkordersItemsDetailsDB;
 const getProjectsDB = database.getProjectsDB;
 const postWorkordersItemsDetails = database.postWorkordersItemsDetailsDB;
+const getWorkordersDB = database.getWorkordersDB;
 
 const WorkorderInspectionTable = async (req, res) => {
 	const { start, size, workorder_id, workorder_item_id, globalFilter } = req.query;
@@ -23,6 +24,33 @@ const WorkorderInspectionTable = async (req, res) => {
 			currentPage: start,
 			isLengthAware: true,
 		});
+
+	res.status(200).json(paginatedTable);
+};
+
+const WorkorderPipeInspection = async (req, res) => {
+	const { start, size, workorder_id, workorder_item_id, globalFilter } = req.query;
+
+	const paginatedTable = await knex(getWorkordersItemsDetailsDB)
+		.where({
+			workorder_id,
+			workorder_item_id,
+		})
+		.modify((builder) => {
+			if (!!globalFilter) {
+				builder.whereRaw(`${getWorkordersDB}.*::text iLIKE ?`, [`%${globalFilter}%`]);
+			}
+		})
+		.paginate({
+			perPage: size,
+			currentPage: start,
+			isLengthAware: true,
+		});
+
+	paginatedTable.data = paginatedTable.data.map((row) => ({
+		...row,
+		welder_ids: (row.welder_ids || []).filter(Boolean), //THIS REMOVES ALL NULL NAMES
+	}));
 
 	res.status(200).json(paginatedTable);
 };
@@ -99,6 +127,7 @@ const WorkorderVtInspection = async (req, res) => {
 
 module.exports = {
 	WorkorderInspectionTable,
+	WorkorderPipeInspection,
 	WorkorderInspectionGetPipeName,
 	WorkorderVtInspection,
 };
