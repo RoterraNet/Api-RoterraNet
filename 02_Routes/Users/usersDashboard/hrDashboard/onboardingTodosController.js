@@ -31,6 +31,9 @@ const getOnboardingTodos = async (req, res) => {
 					: await knex(getOnboardingChecklistsDB)
 							.select('*')
 							.where({ completed: completed })
+							.andWhereRaw(
+								"DATE(current_date) <= DATE(completed_on + INTERVAL '90 days')"
+							)
 							.orderBy('completed_on', 'desc')
 							.orderBy('preferred_name', 'asc');
 		}
@@ -61,12 +64,12 @@ const getOnboardingTodos = async (req, res) => {
 					reimbursement_form_completed: checklist.reimbursement_form_completed,
 					added_to_timesheet_summary: checklist.added_to_timesheet_summary,
 					employee_record_folder_created: checklist.employee_record_folder_created,
-					added_to_intranet: checklist.added_to_intranet,
+					// added_to_intranet: checklist.added_to_intranet,
 					invited_to_benefits: checklist.invited_to_benefits,
 					benefits_waiting_period: checklist.benefits_waiting_period,
-					added_to_birthday_anniversary: checklist.added_to_birthday_anniversary,
+					// added_to_birthday_anniversary: checklist.added_to_birthday_anniversary,
 					added_to_orgchart: checklist.added_to_orgchart,
-					added_planner_reminders: checklist.added_planner_reminders,
+					// added_planner_reminders: checklist.added_planner_reminders,
 					added_to_quickbooks: checklist.added_to_quickbooks,
 					added_to_scotia: checklist.added_to_scotia,
 					wage_negotiation_reminders_made: checklist.wage_negotiation_reminders_made,
@@ -78,7 +81,7 @@ const getOnboardingTodos = async (req, res) => {
 					electronic_file_documents_scanned: checklist.electronic_file_documents_scanned,
 					safety_orientation_completed: checklist.safety_orientation_completed,
 					safety_form_signed: checklist.safety_form_signed,
-					exams_marked: checklist.exams_marked,
+					// exams_marked: checklist.exams_marked,
 					whmis_certificate_made: checklist.whmis_certificate_made,
 					added_to_hs_folder: checklist.added_to_hs_folder,
 					training_certificates_in_hs: checklist.training_certificates_in_hs,
@@ -111,12 +114,12 @@ const getOnboardingTodos = async (req, res) => {
 			reimbursement_form_completed: 'Complete Reimbursement Form, if required',
 			added_to_timesheet_summary: 'Add to Timesheet Summary (email Morgan)',
 			employee_record_folder_created: 'Create employee record folder in Employee Records',
-			added_to_intranet: 'Add to Intranet',
+			// added_to_intranet: 'Add to Intranet',
 			invited_to_benefits: 'Invite employee to enrol in Canada Life benefit',
 			benefits_waiting_period: 'Benefits waiting period:',
-			added_to_birthday_anniversary: 'Add to Birthday & Anniversary',
+			// added_to_birthday_anniversary: 'Add to Birthday & Anniversary',
 			added_to_orgchart: 'Add to Org chart',
-			added_planner_reminders: 'Add Benefits and RRSP reminder to Planner',
+			// added_planner_reminders: 'Add Benefits and RRSP reminder to Planner',
 			added_to_quickbooks: 'Add employee to QuickBooks',
 			added_to_scotia: 'Add employee banking information in Scotia Connect',
 			wage_negotiation_reminders_made: 'Make reminders if any negotiated future wage updates',
@@ -128,8 +131,8 @@ const getOnboardingTodos = async (req, res) => {
 			electronic_file_documents_scanned: 'Scan all documents for electronic file',
 
 			safety_orientation_completed: 'New Hire Safety Orientation completed',
-			safety_form_signed: 'New Hire Safety Form signed',
-			exams_marked: 'Mark all exams',
+			safety_form_signed: 'SWP and SJP Verification completed',
+			// exams_marked: 'Mark all exams',
 			whmis_certificate_made: 'Make WHMIS certificate',
 			added_to_hs_folder: 'Add employee to H&S folder: Training – Employee Records',
 			training_certificates_in_hs: 'Put copies of all training certificates in H&S folder',

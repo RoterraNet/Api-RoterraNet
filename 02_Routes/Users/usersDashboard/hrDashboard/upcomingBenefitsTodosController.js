@@ -16,14 +16,14 @@ const getUpcomingBenefitsTodos = async (req, res) => {
 				? await knex(getHrTodosBenefitsDB)
 						.select('*')
 						.where({ completed: completed })
-						.andWhereRaw(
-							"DATE(current_date) BETWEEN DATE(due_date - INTERVAL '30 days') AND DATE(due_date + INTERVAL '30 days')"
-						)
 						.orderBy('due_date', 'asc')
 						.orderBy('preferred_name', 'asc')
 				: await knex(getHrTodosBenefitsDB)
 						.select('*')
 						.where({ completed: completed })
+						.andWhereRaw(
+							"DATE(current_date) <= DATE(completed_on + INTERVAL '90 days')"
+						)
 						.orderBy('completed_on', 'desc')
 						.orderBy('preferred_name', 'asc');
 
