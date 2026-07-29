@@ -97,7 +97,7 @@ const get_probation_period_83_days = async () => {
 const benefitsEligibilityReminder = async () => {
 	try {
 		const getProbationSQL = knex.raw(
-			"DATE(current_date - INTERVAL '1 month') = DATE(rrsp_eligibility)"
+			"DATE(current_date - INTERVAL '30 days') = DATE(rrsp_eligibility)"
 		);
 
 		const rrsp_eligibility_users = await knex(getUsersBenefitsDB)
@@ -121,14 +121,14 @@ const benefitsEligibilityReminder = async () => {
 
 const addHrTodos = async () => {
 	/* 
-	Adds RRSP eligibility and benefits milestones to todo tables 1 month 
+	Adds RRSP eligibility and benefits milestones to todo tables 30 days
 	in advance of actual date, called every morning at 6am
 	 */
 	try {
-		/* ADD A RRSP TODO ITEM FOR USERS WHO ARE RRSP ELIGIBLE IN EXACTLY 1 MONTH */
+		/* ADD A RRSP TODO ITEM FOR USERS WHO ARE RRSP ELIGIBLE IN EXACTLY 30 days*/
 
 		const getUpcomingRRSP = knex.raw(
-			"DATE(current_date + INTERVAL '1 month') = DATE(rrsp_eligibility)"
+			"DATE(current_date + INTERVAL '30 days') = DATE(rrsp_eligibility)"
 		);
 		const upcomingRRSPUsers = await knex(getUsersBenefitsDB)
 			.select('user_id', 'rrsp_eligibility')
@@ -152,29 +152,29 @@ const addHrTodos = async () => {
 			await knex(postHrTodosRRSPDB).insert(newTodos);
 		}
 
-		/* ADD A BENEFITS TODO ITEM FOR USERS WHO HAVE A BENEFIT MILESONE IN EXACTLY 1 MONTH */
+		/* ADD A BENEFITS TODO ITEM FOR USERS WHO HAVE A BENEFIT MILESONE IN EXACTLY 30 days*/
 
 		const getUpcomingBenefits = [
 			[
 				'Benefits effective',
-				knex.raw("DATE(current_date + INTERVAL '1 month') = DATE(effective_date)"),
+				knex.raw("DATE(current_date + INTERVAL '30 days') = DATE(effective_date)"),
 			],
 			[
 				'1 year',
 				knex.raw(
-					"DATE(current_date + INTERVAL '1 month') = DATE(start_date + INTERVAL '1 year')"
+					"DATE(current_date + INTERVAL '30 days') = DATE(start_date + INTERVAL '1 year')"
 				),
 			],
 			[
 				'5 year',
 				knex.raw(
-					"DATE(current_date + INTERVAL '1 month') = DATE(start_date + INTERVAL '5 years')"
+					"DATE(current_date + INTERVAL '30 days') = DATE(start_date + INTERVAL '5 years')"
 				),
 			],
 			[
 				'10 year',
 				knex.raw(
-					"DATE(current_date + INTERVAL '1 month') = DATE(start_date + INTERVAL '10 years')"
+					"DATE(current_date + INTERVAL '30 days') = DATE(start_date + INTERVAL '10 years')"
 				),
 			],
 		];
@@ -295,7 +295,7 @@ const addHrTodos = async () => {
 const performanceReviewReminder = async () => {
 	try {
 		const getProbationSQL = knex.raw(
-			"DATE(current_date - INTERVAL '1 month') = DATE(reminder_date)"
+			"DATE(current_date - INTERVAL '30 days') = DATE(reminder_date)"
 		);
 
 		const hr_performance_review_users = await knex(getUsersBenefitsDB)
