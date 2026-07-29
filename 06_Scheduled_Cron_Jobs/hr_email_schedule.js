@@ -10,7 +10,7 @@ const {
 
 module.exports = () => {
 	cron.schedule(
-		'0 7 * * 1-5',
+		'0 7 * * *',
 		async () => {
 			console.log('HR cron running');
 
