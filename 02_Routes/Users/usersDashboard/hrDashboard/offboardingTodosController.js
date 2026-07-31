@@ -31,6 +31,9 @@ const getOffboardingTodos = async (req, res) => {
 					: await knex(getOffboardingChecklistsDB)
 							.select('*')
 							.where({ completed: completed })
+							.andWhereRaw(
+								"DATE(current_date) <= DATE(completed_on + INTERVAL '90 days')"
+							)
 							.orderBy('completed_on', 'desc')
 							.orderBy('preferred_name', 'asc');
 		}
@@ -54,8 +57,8 @@ const getOffboardingTodos = async (req, res) => {
 				checklist: {
 					resignation_termination_filed: checklist.resignation_termination_filed,
 					moved_hr_file_to_former: checklist.moved_hr_file_to_former,
-					employee_tracker_updated: checklist.employee_tracker_updated,
-					deactivated_from_intranet: checklist.deactivated_from_intranet,
+					// employee_tracker_updated: checklist.employee_tracker_updated,
+					// deactivated_from_intranet: checklist.deactivated_from_intranet,
 					benefits_cancelled: checklist.benefits_cancelled,
 					benefits_cancelled_date: checklist.benefits_cancelled_date
 						? format(new Date(checklist.benefits_cancelled_date), 'yyyy-MM-dd')
@@ -66,7 +69,7 @@ const getOffboardingTodos = async (req, res) => {
 						: '',
 					exit_interview_conducted: checklist.exit_interview_conducted,
 					manager_checklist_completed: checklist.manager_checklist_completed,
-					benefits_rrsp_reminders_removed: checklist.benefits_rrsp_reminders_removed,
+					// benefits_rrsp_reminders_removed: checklist.benefits_rrsp_reminders_removed,
 					departure_email_sent: checklist.departure_email_sent,
 					moved_paper_file_to_terminated: checklist.moved_paper_file_to_terminated,
 
@@ -103,16 +106,16 @@ const getOffboardingTodos = async (req, res) => {
 		const labels = {
 			resignation_termination_filed: 'File resignation/termination letter or email',
 			moved_hr_file_to_former: "Move employee's HR folder to former employees",
-			employee_tracker_updated:
-				'Update employee tracker (move employee from active to terminated sheet)',
-			deactivated_from_intranet: 'Deactivate from Intranet',
+			// employee_tracker_updated:
+			// 	'Update employee tracker (move employee from active to terminated sheet)',
+			// deactivated_from_intranet: 'Deactivate from Intranet',
 			benefits_cancelled: 'Cancel Canada Life Benefits',
 			benefits_cancelled_date: 'Effective date:',
 			rrsp_cancelled: 'Cancel RRSP',
 			rrsp_cancelled_date: 'Effective date:',
 			exit_interview_conducted: 'Conduct Exit Interview, if applicable',
 			manager_checklist_completed: "Ensure Manager's Offboarding Checklist is complete",
-			benefits_rrsp_reminders_removed: 'Remove Benefits and RRSP Reminder from Planner',
+			// benefits_rrsp_reminders_removed: 'Remove Benefits and RRSP Reminder from Planner',
 			departure_email_sent: 'Ensure departure email is sent',
 			moved_paper_file_to_terminated: 'Move paper employee file to terminated employees',
 

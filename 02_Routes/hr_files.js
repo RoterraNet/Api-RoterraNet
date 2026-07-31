@@ -19,10 +19,14 @@ router.get('/', async (req, res) => {
 				.orderBy('file_name', 'asc');
 			res.json(getAllFiles);
 		} else {
+			const currentYear = new Date().getFullYear();
+			const startDate = `${currentYear - 2}-01-01`;
+
 			const rawSql = knex.raw(`DATE_PART('year', date) AS year`);
 			const getAllYears = await knex(getHrFilesDB)
 				.select(rawSql)
 				.whereNotNull('date')
+				.where('date', '>=', startDate)
 				.orderByRaw("DATE_PART('year', date) asc")
 				// .orderBy('date', 'asc');
 				.groupByRaw(`DATE_PART('year', date)`);
