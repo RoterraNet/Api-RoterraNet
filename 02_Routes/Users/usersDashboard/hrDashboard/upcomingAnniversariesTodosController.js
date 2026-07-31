@@ -15,12 +15,12 @@ const getUpcomingAnniversariesTodos = async (req, res) => {
 			completed == false
 				? await knex(getHrTodosAnniversariesDB)
 						.select('*')
-						.where({ completed: completed })
+						.where({ completed: completed, type: 'major' })
 						.orderBy('anniversary_date', 'asc')
 						.orderBy('preferred_name', 'asc')
 				: await knex(getHrTodosAnniversariesDB)
 						.select('*')
-						.where({ completed: completed })
+						.where({ completed: completed, type: 'major' })
 						.andWhereRaw(
 							"DATE(current_date) <= DATE(completed_on + INTERVAL '90 days')"
 						)
