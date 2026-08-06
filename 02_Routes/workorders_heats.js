@@ -15,26 +15,32 @@ const sixMonthAgo = format(subMonths(new Date(), 18), 'yyyy-MM-dd');
 // /workorders/:id/heats -> GET ALL Heat for that Workorder
 router.get('/:id/heats', async (req, res) => {
 	const { id } = req.params;
-	const { type, plateId } = req.query;
+	const { type, plateId, search } = req.query;
 
 	const convertStringToNum = [];
 
-	if (plateId)
-		plateId.map((each) => {
+	if (plateId) {
+		plateId.forEach((each) => {
 			convertStringToNum.push(parseInt(each));
 		});
+	}
 
 	const getAllEntry = await knex(getWorkordersHeatsDB)
-		.select('heat')
+		.select('heat', 'displayed_heat')
 		.distinctOn('heat')
 		.modify((builder) => {
-			if (type == 'plate') {
+			if (type === 'plate') {
 				builder.whereIn('plate', convertStringToNum);
 			} else {
 				builder.where({ pipe: id });
 			}
+
+			// Search by heat if provided
+			if (search) {
+				builder.whereRaw('heat ILIKE ?', [`%${search}%`]);
+			}
 		})
-		.andWhereBetween('created_on', [sixMonthAgo, format(new Date(), 'yyyy-MM-dd')]);
+		.orderBy('heat');
 
 	res.json(getAllEntry);
 });
