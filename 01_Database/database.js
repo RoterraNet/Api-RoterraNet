@@ -219,6 +219,8 @@ exports.postProjectSheetItemListDetailsDB = 'roterranet.project_sheet_item_detai
 
 exports.getProjectsGraphApiDB = 'roterranet.projects_graph_api';
 
+exports.PoFilesDB = 'roterranet.po_files';
+
 exports.getQualityFilesDB = 'roterranet.view_quality_files';
 exports.postQualityFilesDB = 'roterranet.quality_files';
 
@@ -230,6 +232,8 @@ exports.postQuotesAnalyticsDB = 'roterranet.quotes_analytics';
 
 exports.getQuotesCustomersDB = 'roterranet.view_quotes_customers';
 exports.postQuotesCustomersDB = 'roterranet.quotes_customers';
+
+exports.QuotesFilesDB = 'roterranet.quotes_files';
 
 exports.getQuotesStatusDB = 'roterranet.quotes_status';
 exports.postQuotesStatusDB = 'roterranet.quotes_status';
