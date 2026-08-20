@@ -122,6 +122,9 @@ exports.getNcrDepartmentsDB = 'roterranet.view_ncr_departments';
 exports.getNcrDB = 'roterranet.view_ncr_new';
 exports.postNcrDB = 'roterranet.ncr_new';
 
+exports.getNcrOptionsDB = 'roterranet.ncr_options';
+exports.postNcrOptionsDB = 'roterranet.ncr_options';
+
 exports.getNewsDB = 'roterranet.view_news';
 exports.postNewsDB = 'roterranet.news';
 

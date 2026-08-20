@@ -14,6 +14,7 @@ const v1PORouter = require('./02_Routes/po/v1PORouter');
 const v1WorkordersRouter = require('./02_Routes/Workorders/v1WorkordersRouter');
 const v1PlatesRouter = require('./02_Routes/Plates/v1PlatesRouter');
 const v1ExamsRouter = require('./02_Routes/Exams/v1ExamsRouter');
+const v1NCRRouter = require('./02_Routes/NCR/v1NCRRouter');
 
 router.use('/branding', companyBranding);
 
@@ -27,6 +28,7 @@ router.use('/projects', v1ProjectsRouter);
 router.use('/po', v1PORouter);
 
 router.use('/mtr', v1MtrRouter);
+router.use('/ncr', v1NCRRouter);
 
 router.use('/hse', v1HSERouter);
 

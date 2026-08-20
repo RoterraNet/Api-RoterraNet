@@ -186,9 +186,11 @@ router.get('/:id', authorize(), async (req, res) => {
 			'containment_review_by',
 			'containment_review_id',
 			'containment_review_on',
-			'rca_id'
+			'rca_id',
+			'resolution_id',
+			'resolution_option'
 		)
-		.where({ deleted: false })
+
 		.andWhere({ id: id });
 
 	res.json(ncrDetail);
