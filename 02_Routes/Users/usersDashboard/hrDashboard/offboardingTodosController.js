@@ -109,7 +109,7 @@ const getOffboardingTodos = async (req, res) => {
 			// employee_tracker_updated:
 			// 	'Update employee tracker (move employee from active to terminated sheet)',
 			// deactivated_from_intranet: 'Deactivate from Intranet',
-			benefits_cancelled: 'Cancel Canada Life Benefits',
+			benefits_cancelled: 'Cancel benefits',
 			benefits_cancelled_date: 'Effective date:',
 			rrsp_cancelled: 'Cancel RRSP',
 			rrsp_cancelled_date: 'Effective date:',

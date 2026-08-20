@@ -115,7 +115,7 @@ const getOnboardingTodos = async (req, res) => {
 			added_to_timesheet_summary: 'Add to Timesheet Summary (email Morgan)',
 			employee_record_folder_created: 'Create employee record folder in Employee Records',
 			// added_to_intranet: 'Add to Intranet',
-			invited_to_benefits: 'Invite employee to enrol in Canada Life benefit',
+			invited_to_benefits: 'Invite employee to enrol in benefits',
 			benefits_waiting_period: 'Benefits waiting period:',
 			// added_to_birthday_anniversary: 'Add to Birthday & Anniversary',
 			added_to_orgchart: 'Add to Org chart',
