@@ -177,6 +177,15 @@ app.use('/MailerSendRoutes', require('./04_Emails/MailerSend/MailerSendRoutes'))
 app.use('/workorderfiles', require('./02_Routes/workorder_files'));
 app.use('/workorders_status', require('./02_Routes/workorders_status'));
 
+app.use((err, req, res, next) => {
+	console.error(err);
+
+	res.status(err.status || 500).json({
+		error: err.message || 'Internal server error',
+		color: 'error'
+	});
+});
+
 const PORT = process.env.PORT;
 const ADDRESS = process.env.ADDRESS;
 

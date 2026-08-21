@@ -16,10 +16,22 @@ const datefns = require('date-fns');
 const today_now = datefns.format(new Date(), 'yyyy-MM-dd hh:mm:ss.SSS');
 
 // /equpiment -> GET ALL
-router.get('/', async (req, res) => {
-	const getEntries = await knex(getEquipmentDB).select(knex.raw("concat(unit_number, ' ' , make_model) as unit_number_name"), knex.raw("concat(unit_number, ' ' , make_model) as unit_number_id")).orderBy('unit_number', 'asc');
 
-	res.json(getEntries);
+router.get('/', async (req, res, next) => {
+	try {
+		const entries = await knex(getEquipmentDB)
+			.select(
+				'unit_number as unit_number_id',
+				knex.raw("CONCAT(unit_number, ' ', make_model) AS unit_number_name")
+			)
+			.orderBy('unit_number', 'asc')
+			.where({ deleted: 0 });
+
+		res.json(entries);
+	} catch (error) {
+		console.log('error LOG', error);
+		next(error);
+	}
 });
 
 // /equipment -> PATCH -> TABLE -> get all equipments paginated
