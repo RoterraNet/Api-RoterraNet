@@ -278,6 +278,8 @@ exports.postUsersOffBoardingCheckList = 'roterranet.users_offboarding_checklist'
 exports.getUsersEmploymentRecordDB = 'roterranet.view_users_employment_records';
 exports.postUsersEmploymentRecordDB = 'roterranet.users_employment_records';
 
+exports.userInvitesDB = 'roterranet.user_invites';
+
 exports.getUsersPerformanceReviewDB = 'roterranet.view_user_performance_review';
 exports.postUsersPerformanceReviewDB = 'roterranet.user_performance_review';
 
