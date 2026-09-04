@@ -6,6 +6,7 @@ const {
 	postUsersEmploymentRecordDB,
 	getNotificationSettingsDB,
 	userInvitesDB,
+	postAssignedExamsDB,
 } = require('../../../01_Database/database');
 const {
 	AddUpdateAllUserPermissions,
@@ -35,9 +36,26 @@ const registerUser = async (req, res, next) => {
 					.update({ user_name_used: true })
 					.where({ user_name: redeemed[0].user_name });
 
+				// create user
 				const newUserData = extractUserData(user_data);
 				const newUser = await knex(postUsersDB).insert(newUserData).returning('*');
-				const { user_id, start_date, position, manager } = newUser[0];
+				const { user_id, start_date, position, manager, created_by, created_on } =
+					newUser[0];
+
+				// assign exams to user
+				const assignedExamsData = user_data.exams;
+				const newAssignedExams = [];
+				assignedExamsData.map((assigned, index) => {
+					if (assigned == true)
+						newAssignedExams.push({
+							exam_id: index,
+							assigned_to: user_id,
+							assigned_by: created_by,
+							assigned_on: created_on,
+							completed: false,
+						});
+				});
+				await knex(postAssignedExamsDB).insert(newAssignedExams);
 
 				// create permissions for user
 				await AddUpdateAllUserPermissions(user_data, user_id);
