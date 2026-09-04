@@ -37,7 +37,7 @@ const registerUser = async (req, res, next) => {
 
 				const newUserData = extractUserData(user_data);
 				const newUser = await knex(postUsersDB).insert(newUserData).returning('*');
-				const { user_id, start_date, position, manager } = newUser;
+				const { user_id, start_date, position, manager } = newUser[0];
 
 				// create permissions for user
 				await AddUpdateAllUserPermissions(user_data, user_id);
