@@ -16,6 +16,7 @@ const v1WorkordersRouter = require('./02_Routes/Workorders/v1WorkordersRouter');
 const v1PlatesRouter = require('./02_Routes/Plates/v1PlatesRouter');
 const v1ExamsRouter = require('./02_Routes/Exams/v1ExamsRouter');
 const v1NCRRouter = require('./02_Routes/NCR/v1NCRRouter');
+const v1SignableFormsRouter = require('./02_Routes/SignableForms/v1SignableFormsRouter');
 
 router.use('/branding', companyBranding);
 
@@ -44,5 +45,7 @@ router.use('/plates', v1PlatesRouter);
 router.use('/workorders', v1WorkordersRouter);
 
 router.use('/exams', v1ExamsRouter);
+
+router.use('/forms', v1SignableFormsRouter);
 
 module.exports = router;
