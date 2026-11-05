@@ -248,6 +248,8 @@ exports.getQuotesGraphApiDB = 'roterranet.quotes_graph_api';
 
 exports.getSalesTypeDB = 'roterranet.sales_type';
 
+exports.signableFormsDB = 'roterranet.signable_forms';
+
 exports.getSuppliersDB = 'roterranet.view_suppliers';
 exports.postSuppliersDB = 'roterranet.supplier'; // change to suppliers (add the "s" at the end)
 
